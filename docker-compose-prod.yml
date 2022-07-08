@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  server:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: prod
+    environment:
+      POSTGRES_HOST: database
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: ecommerce-platform
+      PORT: 80
+    command: npm run start:prod
+    ports:
+      - "80:80"
+    networks:
+      - default
+    links:
+      - database
+  database:
+    image: postgres:14-alpine
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: ecommerce-platform
+
+volumes:
+  postgres:

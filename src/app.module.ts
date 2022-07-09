@@ -12,11 +12,14 @@ import { AuthModule } from './auth/auth.module';
       port: 5432,
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DB,
+      database:
+        process.env.POSTGRES_DB +
+        (process.env.NODE_ENV === 'test' ? '-test' : ''),
       entities: [],
       synchronize: true,
       autoLoadEntities: true,
       keepConnectionAlive: true,
+      dropSchema: process.env.NODE_ENV === 'test',
     }),
     UsersModule,
     AuthModule,

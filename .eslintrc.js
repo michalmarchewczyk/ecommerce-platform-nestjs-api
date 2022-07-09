@@ -25,4 +25,12 @@ module.exports = {
     'no-inline-comments': 1,
     'max-lines': [1, 120],
   },
+  overrides: [
+    {
+      files: ['*.spec.ts', '*.e2e-spec.ts'],
+      rules: {
+        'max-lines': 'off',
+      }
+    }
+  ]
 };

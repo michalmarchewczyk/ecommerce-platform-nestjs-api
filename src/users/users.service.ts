@@ -30,9 +30,9 @@ export class UsersService {
       return savedUser;
     } catch (e) {
       if (e instanceof QueryFailedError) {
-        throw new ConflictException('User already exists');
+        throw new ConflictException(['user already exists']);
       } else {
-        throw new InternalServerErrorException('Could not add user');
+        throw new InternalServerErrorException(['could not add user']);
       }
     }
   }

@@ -2,10 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  PrimaryColumn,
+  Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Role } from './role.enum';
+import { Exclude } from 'class-transformer';
 
 @Entity('users')
 export class User {
@@ -15,16 +16,18 @@ export class User {
   @CreateDateColumn()
   registered: Date;
 
-  @Column()
+  @Column({ nullable: true })
   firstName?: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName?: string;
 
-  @PrimaryColumn()
+  @Index({ unique: true })
+  @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Exclude()
+  @Column({ select: false })
   password: string;
 
   @Column({

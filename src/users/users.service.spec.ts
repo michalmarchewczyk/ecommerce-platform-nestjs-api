@@ -3,7 +3,6 @@ import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { QueryFailedError } from 'typeorm';
-import { ConflictException } from '@nestjs/common';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -70,7 +69,7 @@ describe('UsersService', () => {
     const password = 'test';
     await service.addUser(email, password);
     await expect(service.addUser(email, password)).rejects.toThrowError(
-      ConflictException,
+      QueryFailedError,
     );
   });
 });

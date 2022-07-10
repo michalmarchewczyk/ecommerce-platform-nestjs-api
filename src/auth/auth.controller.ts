@@ -11,6 +11,7 @@ import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/entities/user.entity';
 import { Request } from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard';
+import { SessionAuthGuard } from './session-auth.guard';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -26,5 +27,13 @@ export class AuthController {
   @Post('login')
   async login(@Request() req): Promise<any> {
     return req.user;
+  }
+
+  @UseGuards(SessionAuthGuard)
+  @Post('logout')
+  async logout(@Request() req): Promise<void> {
+    req.logOut(() => {
+      req.session.cookie.maxAge = 0;
+    });
   }
 }

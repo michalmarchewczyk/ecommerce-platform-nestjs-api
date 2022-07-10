@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import {
+  Inject,
+  MiddlewareConsumer,
+  Module,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
@@ -9,7 +14,8 @@ import { APP_PIPE } from '@nestjs/core';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import * as createRedisStore from 'connect-redis';
-import { createClient } from 'redis';
+import { RedisClient } from 'redis';
+import { RedisModule, REDIS_CLIENT } from './redis';
 
 @Module({
   imports: [
@@ -37,6 +43,7 @@ import { createClient } from 'redis';
     }),
     UsersModule,
     AuthModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [
@@ -51,18 +58,17 @@ import { createClient } from 'redis';
   ],
 })
 export class AppModule {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(REDIS_CLIENT) private readonly redisClient: RedisClient,
+  ) {}
 
   configure(consumer: MiddlewareConsumer) {
     const RedisStore = createRedisStore(session);
-    const redisClient = createClient({
-      host: this.configService.get<string>('redis.host'),
-      port: this.configService.get<number>('redis.port'),
-    });
     consumer
       .apply(
         session({
-          store: new RedisStore({ client: redisClient }),
+          store: new RedisStore({ client: this.redisClient }),
           secret: this.configService.get('session.secret'),
           resave: false,
           saveUninitialized: false,

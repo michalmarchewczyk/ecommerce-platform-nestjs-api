@@ -6,7 +6,7 @@ import { AppModule } from '../src/app.module';
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -15,29 +15,33 @@ describe('AuthController (e2e)', () => {
     await app.init();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   describe('/auth/register (POST)', () => {
     it('should return user', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/register')
         .send({
-          email: 'test@test.local',
+          email: 'test1@test.local',
           password: 'test1234',
         });
       expect(response.status).toBe(201);
-      expect(response.body.email).toBe('test@test.local');
+      expect(response.body.email).toBe('test1@test.local');
     });
 
     it('should return user with optional fields', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/register')
         .send({
-          email: 'test@test.local',
+          email: 'test2@test.local',
           password: 'test1234',
           firstName: 'Test',
           lastName: 'User',
         });
       expect(response.status).toBe(201);
-      expect(response.body.email).toBe('test@test.local');
+      expect(response.body.email).toBe('test2@test.local');
       expect(response.body.firstName).toBe('Test');
       expect(response.body.lastName).toBe('User');
     });
@@ -46,7 +50,7 @@ describe('AuthController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/auth/register')
         .send({
-          email: 'test',
+          email: 'test3',
           password: 'test1234',
         });
       expect(response.status).toBe(400);
@@ -61,7 +65,7 @@ describe('AuthController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/auth/register')
         .send({
-          email: 'test@test.local',
+          email: 'test4@test.local',
           password: 'test',
         });
       expect(response.status).toBe(400);
@@ -74,13 +78,13 @@ describe('AuthController (e2e)', () => {
 
     it('should return error when duplicate email', async () => {
       await request(app.getHttpServer()).post('/auth/register').send({
-        email: 'test@test.local',
+        email: 'test5@test.local',
         password: 'test1234',
       });
       const response2 = await request(app.getHttpServer())
         .post('/auth/register')
         .send({
-          email: 'test@test.local',
+          email: 'test5@test.local',
           password: 'test1234',
         });
       expect(response2.status).toBe(409);
@@ -90,9 +94,5 @@ describe('AuthController (e2e)', () => {
         error: 'Conflict',
       });
     });
-  });
-
-  afterAll(async () => {
-    await app.close();
   });
 });

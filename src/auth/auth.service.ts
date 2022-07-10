@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   async validateUser(loginDto: LoginDto): Promise<User | null> {
-    const user = await this.usersService.findUserByEmail(loginDto.email);
+    const user = await this.usersService.findUserToLogin(loginDto.email);
     if (!user) {
       return null;
     }

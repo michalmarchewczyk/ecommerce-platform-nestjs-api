@@ -25,10 +25,17 @@ export class UsersService {
     return savedUser;
   }
 
-  async findUserByEmail(email: string): Promise<User | null> {
+  async findUserToLogin(email: string): Promise<User | null> {
     return await this.usersRepository.findOne({
       where: { email },
       select: { password: true, email: true, id: true },
+    });
+  }
+
+  async findUserById(id: number): Promise<User | null> {
+    return await this.usersRepository.findOne({
+      where: { id },
+      select: { email: true, id: true },
     });
   }
 }

@@ -22,6 +22,7 @@ services:
       - default
     links:
       - database
+      - redis
   database:
     image: postgres:14-alpine
     volumes:
@@ -32,6 +33,10 @@ services:
       POSTGRES_DB: ecommerce-platform
     ports:
       - "5432:5432"
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
   pgadmin:
     image: dpage/pgadmin4
     environment:

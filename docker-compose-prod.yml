@@ -20,6 +20,7 @@ services:
       - default
     links:
       - database
+      - redis
   database:
     image: postgres:14-alpine
     volumes:
@@ -28,6 +29,8 @@ services:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_DB: ecommerce-platform
+  redis:
+    image: redis:7-alpine
 
 volumes:
   postgres:

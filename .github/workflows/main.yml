@@ -60,7 +60,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: ecommerce-platform
-          REDIS_HOST: redis
+          REDIS_HOST: localhost
           NODE_ENV: test
 
   lint:

@@ -12,7 +12,7 @@ export class SessionAuthGuard implements CanActivate {
     if (request.isAuthenticated()) {
       return true;
     } else {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(['unauthorized']);
     }
   }
 }

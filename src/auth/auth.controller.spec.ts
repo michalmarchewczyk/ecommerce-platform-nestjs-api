@@ -35,26 +35,46 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return registered user', async () => {
-    const email = 'test@test.local';
-    const password = 'test';
-    const user = await controller.register({ email, password });
-    expect(user).toBeDefined();
-    expect(user).toEqual({ email });
+  describe('register', () => {
+    it('should return registered user', async () => {
+      const email = 'test@test.local';
+      const password = 'test';
+      const user = await controller.register({ email, password });
+      expect(user).toBeDefined();
+      expect(user).toEqual({ email });
+    });
+
+    it('should return registered user with optional fields', async () => {
+      const email = 'test@test.local';
+      const password = 'test';
+      const firstName = 'Test';
+      const lastName = 'User';
+      const user = await controller.register({
+        email,
+        password,
+        firstName,
+        lastName,
+      });
+      expect(user).toBeDefined();
+      expect(user).toEqual({ email, firstName, lastName });
+    });
   });
 
-  it('should return registered user with optional fields', async () => {
+  describe('login', () => {
     const email = 'test@test.local';
     const password = 'test';
-    const firstName = 'Test';
-    const lastName = 'User';
-    const user = await controller.register({
-      email,
-      password,
-      firstName,
-      lastName,
+    it('should return req.user', async () => {
+      const user = await controller.login({ user: { email, password } });
+      expect(user).toBeDefined();
+      expect(user).toEqual({ email, password });
     });
-    expect(user).toBeDefined();
-    expect(user).toEqual({ email, firstName, lastName });
+  });
+
+  describe('logout', () => {
+    it('should call logout method', async () => {
+      const logout = jest.fn();
+      await controller.logout({ logOut: logout });
+      expect(logout).toHaveBeenCalled();
+    });
   });
 });

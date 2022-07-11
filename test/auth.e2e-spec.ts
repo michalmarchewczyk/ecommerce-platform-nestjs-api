@@ -95,4 +95,75 @@ describe('AuthController (e2e)', () => {
       });
     });
   });
+
+  describe('/auth/login (POST)', () => {
+    beforeAll(async () => {
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'test6@test.local',
+        password: 'test1234',
+        firstName: 'Test',
+        lastName: 'User',
+      });
+    });
+
+    it('should return logged in user', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'test6@test.local',
+          password: 'test1234',
+        });
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        email: 'test6@test.local',
+        id: expect.any(Number),
+      });
+      expect(response.headers['set-cookie']).toBeDefined();
+    });
+
+    it('should return error when invalid email', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'test123@test.local',
+          password: 'test1234',
+        });
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({
+        statusCode: 401,
+        message: ['unauthorized'],
+        error: 'Unauthorized',
+      });
+    });
+
+    it('should return error when invalid password', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'test6@test.local',
+          password: 'test',
+        });
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({
+        statusCode: 401,
+        message: ['unauthorized'],
+        error: 'Unauthorized',
+      });
+    });
+  });
+
+  describe('/auth/logout (POST)', () => {
+    beforeAll(async () => {
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'test7@test.local',
+        password: 'test1234',
+        firstName: 'Test',
+        lastName: 'User',
+      });
+      await request(app.getHttpServer()).post('/auth/login').send({
+        email: 'test7@test.local',
+        password: 'test1234',
+      });
+    });
+  });
 });

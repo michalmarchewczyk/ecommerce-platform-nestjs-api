@@ -160,9 +160,29 @@ describe('AuthController (e2e)', () => {
         firstName: 'Test',
         lastName: 'User',
       });
-      await request(app.getHttpServer()).post('/auth/login').send({
-        email: 'test7@test.local',
-        password: 'test1234',
+    });
+
+    it('should logout user', async () => {
+      const { headers } = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'test7@test.local',
+          password: 'test1234',
+        });
+      const response = await request(app.getHttpServer())
+        .post('/auth/logout')
+        .set('Cookie', headers['set-cookie'])
+        .send();
+      expect(response.status).toBe(201);
+    });
+
+    it('should return error when not logged in', async () => {
+      const response = await request(app.getHttpServer()).post('/auth/logout');
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({
+        statusCode: 401,
+        message: ['unauthorized'],
+        error: 'Unauthorized',
       });
     });
   });

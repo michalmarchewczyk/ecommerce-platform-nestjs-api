@@ -17,6 +17,7 @@ import * as createRedisStore from 'connect-redis';
 import { RedisClient } from 'redis';
 import { RedisModule, REDIS_CLIENT } from './redis';
 import { RolesGuard } from './auth/roles.guard';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { RolesGuard } from './auth/roles.guard';
     UsersModule,
     AuthModule,
     RedisModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import { Role } from '../src/users/entities/role.enum';
 import { TestUsersService } from './utils/test-users.service';
 import { TestUsersModule } from './utils/test-users.module';
+import { parseEndpoint } from './utils/parse-endpoint';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -247,115 +248,48 @@ describe('UsersController (e2e)', () => {
   });
 
   describe('RBAC for /users', () => {
-    describe('/users/me (GET)', () => {
-      it.each([
-        [Role.Customer, true],
-        [Role.Sales, true],
-        [Role.Manager, true],
-        [Role.Admin, true],
-      ])('/users/me role %s can call endpoint: %p', async (role, status) => {
-        const { headers } = await request(app.getHttpServer())
-          .post('/auth/login')
-          .send({
-            ...testUsers.getCredentials(role),
-          });
+    const cookieHeaders = {};
+    const availableRoles = Object.values(Role);
+
+    beforeAll(async () => {
+      for (const role of availableRoles) {
         const response = await request(app.getHttpServer())
-          .get('/users/me')
-          .set('Cookie', headers['set-cookie']);
-        if (status) {
-          expect(response.status).not.toBe(403);
-        } else {
-          expect(response.status).toBe(403);
-        }
-      });
+          .post('/auth/login')
+          .send({ ...testUsers.getCredentials(role) });
+        cookieHeaders[role] = response.headers['set-cookie'];
+      }
     });
-    describe('/users (GET)', () => {
-      it.each([
-        [Role.Customer, false],
-        [Role.Sales, false],
-        [Role.Manager, false],
-        [Role.Admin, true],
-      ])('/users/me role %s can call endpoint: %p', async (role, status) => {
-        const { headers } = await request(app.getHttpServer())
-          .post('/auth/login')
-          .send({
-            ...testUsers.getCredentials(role),
-          });
-        const response = await request(app.getHttpServer())
-          .get('/users')
-          .set('Cookie', headers['set-cookie']);
-        if (status) {
-          expect(response.status).not.toBe(403);
-        } else {
-          expect(response.status).toBe(403);
-        }
-      });
-    });
-    describe('/users/:id (GET)', () => {
-      it.each([
-        [Role.Customer, false],
-        [Role.Sales, false],
-        [Role.Manager, false],
-        [Role.Admin, true],
-      ])('/users/me role %s can call endpoint: %p', async (role, status) => {
-        const { headers } = await request(app.getHttpServer())
-          .post('/auth/login')
-          .send({
-            ...testUsers.getCredentials(role),
-          });
-        const response = await request(app.getHttpServer())
-          .get('/users/12345')
-          .set('Cookie', headers['set-cookie']);
-        if (status) {
-          expect(response.status).not.toBe(403);
-        } else {
-          expect(response.status).toBe(403);
-        }
-      });
-    });
-    describe('/users/:id (PATCH)', () => {
-      it.each([
-        [Role.Customer, false],
-        [Role.Sales, false],
-        [Role.Manager, false],
-        [Role.Admin, true],
-      ])('/users/me role %s can call endpoint: %p', async (role, status) => {
-        const { headers } = await request(app.getHttpServer())
-          .post('/auth/login')
-          .send({
-            ...testUsers.getCredentials(role),
-          });
-        const response = await request(app.getHttpServer())
-          .patch('/users/12345')
-          .set('Cookie', headers['set-cookie']);
-        if (status) {
-          expect(response.status).not.toBe(403);
-        } else {
-          expect(response.status).toBe(403);
-        }
-      });
-    });
-    describe('/users/:id (DELETE)', () => {
-      it.each([
-        [Role.Customer, false],
-        [Role.Sales, false],
-        [Role.Manager, false],
-        [Role.Admin, true],
-      ])('/users/me role %s can call endpoint: %p', async (role, status) => {
-        const { headers } = await request(app.getHttpServer())
-          .post('/auth/login')
-          .send({
-            ...testUsers.getCredentials(role),
-          });
-        const response = await request(app.getHttpServer())
-          .delete('/users/12345')
-          .set('Cookie', headers['set-cookie']);
-        if (status) {
-          expect(response.status).not.toBe(403);
-        } else {
-          expect(response.status).toBe(403);
-        }
-      });
+
+    describe.each([
+      [
+        '/users/me (GET)',
+        [Role.Customer, Role.Manager, Role.Sales, Role.Admin, Role.Disabled],
+      ],
+      ['/users (GET)', [Role.Admin]],
+      ['/users/:id (GET)', [Role.Admin]],
+      ['/users/:id (PATCH)', [Role.Admin]],
+      ['/users/:id (DELETE)', [Role.Admin]],
+    ])('%s', (endpoint, roles) => {
+      const [url, method] = parseEndpoint(endpoint);
+
+      const testRoles: [Role, boolean][] = availableRoles.map((role) => [
+        role,
+        roles.includes(role),
+      ]);
+
+      it.each(testRoles)(
+        `${endpoint} can be accessed by %s: %p`,
+        async (role, result) => {
+          const response = await request(app.getHttpServer())
+            [method](url)
+            .set('Cookie', cookieHeaders[role]);
+          if (result) {
+            expect(response.status).not.toBe(403);
+          } else {
+            expect(response.status).toBe(403);
+          }
+        },
+      );
     });
   });
 });

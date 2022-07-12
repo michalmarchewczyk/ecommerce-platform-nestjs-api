@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Attribute } from './attribute.entity';
+import { ProductPhoto } from './product-photo.entity';
 
 @Entity('products')
 export class Product {
@@ -36,6 +37,13 @@ export class Product {
 
   @OneToMany(() => Attribute, (attribute) => attribute.product, {
     eager: true,
+    onDelete: 'CASCADE',
   })
   attributes: Attribute[];
+
+  @OneToMany(() => ProductPhoto, (photo) => photo.product, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  photos: ProductPhoto[];
 }

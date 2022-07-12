@@ -23,6 +23,8 @@ export class AttributeType {
   })
   valueType: AttributeValueType;
 
-  @OneToMany(() => Attribute, (attribute) => attribute.type)
+  @OneToMany(() => Attribute, (attribute) => attribute.type, {
+    onDelete: 'CASCADE',
+  })
   attributes: Attribute[];
 }

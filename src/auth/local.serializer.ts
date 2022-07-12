@@ -14,7 +14,7 @@ export class LocalSerializer extends PassportSerializer {
   }
 
   async deserializeUser(id: string, done: CallableFunction) {
-    const user = await this.usersService.findUserById(parseInt(id, 10));
+    const user = await this.usersService.findUserToSession(parseInt(id, 10));
     done(null, user);
   }
 }

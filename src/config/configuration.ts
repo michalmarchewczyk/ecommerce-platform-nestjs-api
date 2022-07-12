@@ -9,7 +9,6 @@ export default () => ({
       process.env.POSTGRES_DB +
         (process.env.NODE_ENV === 'test' ? '-test' : '') ||
       'ecommerce-platform',
-    dropSchema: process.env.NODE_ENV === 'test',
   },
   session: {
     secret: process.env.SESSION_SECRET || 'secret',

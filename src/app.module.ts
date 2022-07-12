@@ -38,7 +38,7 @@ import { RolesGuard } from './auth/roles.guard';
         synchronize: true,
         autoLoadEntities: true,
         keepConnectionAlive: true,
-        dropSchema: configService.get<boolean>('postgres.dropSchema'),
+        dropSchema: false,
       }),
       inject: [ConfigService],
     }),

@@ -3,17 +3,25 @@ import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { QueryFailedError } from 'typeorm';
+import { Role } from './entities/role.enum';
 
 describe('UsersService', () => {
   let service: UsersService;
   const mockUsersRepository = {
     users: [],
     save(user: User): User {
-      if (this.users.find((u) => u.email === user.email)) {
+      const foundUser = this.users.find((u) => u.email === user.email);
+      if (foundUser && foundUser.id !== user.id) {
         throw new QueryFailedError('', [], '');
       }
-      this.users.push({ ...user, id: Date.now() });
+      this.users.push({ ...user, id: Date.now(), role: Role.Customer });
       return { ...user, id: Date.now() } as User;
+    },
+    find(): User[] {
+      return this.users;
+    },
+    delete(where: { id: number }): void {
+      this.users = this.users.filter((u) => u.id !== where.id);
     },
     findOne(options: {
       where: { id?: number; email?: string };
@@ -31,7 +39,7 @@ describe('UsersService', () => {
       if (!user) {
         return null;
       }
-      if (options.select.password) {
+      if (options.select?.password) {
         return { ...user };
       } else {
         return { ...user, password: undefined };
@@ -118,20 +126,103 @@ describe('UsersService', () => {
     });
   });
 
-  describe('findUserById', () => {
+  describe('findUserToSession', () => {
     it('should return user with given id', async () => {
       const email = 'test6@test.local';
       const password = 'test';
       const { id } = await service.addUser(email, password);
-      const user = await service.findUserById(id);
+      const user = await service.findUserToSession(id);
       expect(user).toBeDefined();
       expect(user.email).toEqual(email);
       expect(user.password).toBeUndefined();
     });
 
     it('should return null when user with given id does not exist', async () => {
-      const user = await service.findUserById(12345);
+      const user = await service.findUserToSession(12345);
       expect(user).toBeNull();
+    });
+  });
+
+  describe('getUsers', () => {
+    it('should return all users', async () => {
+      const users = await service.getUsers();
+      expect(users).toBeDefined();
+      expect(users).toEqual(mockUsersRepository.users);
+    });
+  });
+
+  describe('getUser', () => {
+    it('should return user with given id', async () => {
+      const email = 'test7@test.local';
+      const password = 'test';
+      const { id } = await service.addUser(email, password);
+      const user = await service.getUser(id);
+      expect(user).toBeDefined();
+      expect(user).toEqual({
+        email,
+        id: expect.any(Number),
+        role: Role.Customer,
+        firstName: undefined,
+        lastName: undefined,
+        password: undefined,
+      });
+    });
+
+    it('should return null when user with given id does not exist', async () => {
+      const user = await service.getUser(12345);
+      expect(user).toBeNull();
+    });
+  });
+
+  describe('updateUser', () => {
+    it('should return updated user', async () => {
+      const email = 'test8@test.local';
+      const password = 'test';
+      const { id } = await service.addUser(email, password);
+      const updatedUser = await service.updateUser(id, {
+        email: 'test8888@test.local',
+        role: Role.Admin,
+        firstName: 'Test',
+        lastName: 'User',
+      });
+      expect(updatedUser).toBeDefined();
+      expect(updatedUser).toEqual({
+        email: 'test8888@test.local',
+        id: expect.any(Number),
+        role: Role.Admin,
+        firstName: 'Test',
+        lastName: 'User',
+      });
+    });
+
+    it('should return null when user with given id does not exist', async () => {
+      const updatedUser = await service.updateUser(12345, {
+        email: 'test8888@test.local',
+        role: Role.Admin,
+        firstName: 'Test',
+        lastName: 'User',
+      });
+      expect(updatedUser).toBeNull();
+    });
+  });
+
+  describe('deleteUser', () => {
+    it('should delete user', async () => {
+      const email = 'test9@test.local';
+      const password = 'test';
+      const { id } = await service.addUser(email, password);
+      const deleted = await service.deleteUser(id);
+      const user = await service.getUser(id);
+      expect(deleted).toBeTruthy();
+      expect(user).toBeNull();
+      expect(
+        mockUsersRepository.users.find((u) => u.id === id),
+      ).toBeUndefined();
+    });
+
+    it('should return false when user with given id does not exist', async () => {
+      const deleted = await service.deleteUser(12345);
+      expect(deleted).toBeFalsy();
     });
   });
 });

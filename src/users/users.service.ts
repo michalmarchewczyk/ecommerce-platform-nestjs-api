@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { UserUpdateDto } from './dto/user-update.dto';
 
 @Injectable()
 export class UsersService {
@@ -32,10 +33,43 @@ export class UsersService {
     });
   }
 
-  async findUserById(id: number): Promise<User | null> {
+  async findUserToSession(id: number): Promise<User | null> {
     return await this.usersRepository.findOne({
       where: { id },
       select: { email: true, id: true, role: true },
     });
+  }
+
+  async getUsers(): Promise<User[]> {
+    return await this.usersRepository.find();
+  }
+
+  async getUser(id: number): Promise<User | null> {
+    return await this.usersRepository.findOne({
+      where: { id },
+    });
+  }
+
+  async updateUser(id: number, update: UserUpdateDto): Promise<User | null> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      return null;
+    }
+    Object.assign(user, update);
+    await this.usersRepository.save(user);
+    return user;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+    });
+    if (!user) {
+      return false;
+    }
+    await this.usersRepository.delete({ id });
+    return true;
   }
 }

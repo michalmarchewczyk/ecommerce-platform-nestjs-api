@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -9,6 +10,7 @@ import {
 export class ProductUpdateDto {
   @IsString()
   @IsOptional()
+  @IsNotEmpty()
   name?: string;
 
   @IsNumber()

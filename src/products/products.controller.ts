@@ -29,8 +29,12 @@ export class ProductsController {
 
   @Get('/:id')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
-  getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
-    return this.productsService.getProduct(id);
+  async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
+    const product = await this.productsService.getProduct(id);
+    if (!product) {
+      throw new NotFoundException(['product not found']);
+    }
+    return product;
   }
 
   @Post()

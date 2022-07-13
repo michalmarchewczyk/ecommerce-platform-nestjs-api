@@ -35,7 +35,11 @@ export class TestUsersService {
     user.password = await argon2.hash('test1234');
     user.role = role;
     TestUsersService.users.push({ ...user, password: 'test1234' });
-    await this.usersRepository.upsert(user, ['email']);
+    try {
+      await this.usersRepository.upsert(user, ['email']);
+    } catch (e) {
+      return;
+    }
   }
 
   getCredentials(role: Role): { email: string; password: string } {

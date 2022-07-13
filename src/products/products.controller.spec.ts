@@ -78,7 +78,9 @@ describe('ProductsController', () => {
     });
 
     it('should return null if product not found', async () => {
-      expect(await controller.getProduct(12345)).toBeNull();
+      await expect(controller.getProduct(12345)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

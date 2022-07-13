@@ -7,7 +7,10 @@ export class Attribute {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Product, (product) => product.attributes)
+  @ManyToOne(() => Product, (product) => product.attributes, {
+    onDelete: 'CASCADE',
+    orphanedRowAction: 'delete',
+  })
   product: Product;
 
   @Column()
@@ -15,6 +18,8 @@ export class Attribute {
 
   @ManyToOne(() => AttributeType, (attributeType) => attributeType.attributes, {
     eager: true,
+    onDelete: 'CASCADE',
+    orphanedRowAction: 'delete',
   })
   type: AttributeType;
 }

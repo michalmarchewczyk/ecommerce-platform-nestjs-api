@@ -38,6 +38,7 @@ export class Product {
   @OneToMany(() => Attribute, (attribute) => attribute.product, {
     eager: true,
     onDelete: 'CASCADE',
+    cascade: true,
   })
   attributes: Attribute[];
 

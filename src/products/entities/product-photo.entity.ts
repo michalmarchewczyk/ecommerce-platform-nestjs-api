@@ -11,4 +11,7 @@ export class ProductPhoto {
 
   @Column()
   path: string;
+
+  @Column()
+  mimeType: string;
 }

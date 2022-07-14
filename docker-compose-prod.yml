@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
       context: .
       target: prod
+    volumes:
+      - uploads:/usr/src/app/uploads
     environment:
       POSTGRES_HOST: database
       POSTGRES_USER: "${POSTGRES_USER}"
@@ -34,3 +36,4 @@ services:
 
 volumes:
   postgres:
+  uploads:

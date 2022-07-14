@@ -18,5 +18,6 @@ export default () => ({
     host: process.env.REDIS_HOST || 'redis',
     port: parseInt(process.env.REDIS_PORT) || 6379,
   },
+  uploadPath: process.env.UPLOAD_PATH || './uploads',
   nodeEnv: process.env.NODE_ENV || 'development',
 });

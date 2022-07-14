@@ -2,12 +2,17 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   NotFoundException,
   Param,
+  ParseFilePipe,
   ParseIntPipe,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from './entities/product.entity';
@@ -16,19 +21,18 @@ import { Roles } from '../auth/roles.decorator';
 import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/product-update.dto';
 import { AttributeDto } from './dto/attribute.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
-  @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   getProducts(): Promise<Product[]> {
     return this.productsService.getProducts();
   }
 
   @Get('/:id')
-  @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
     const product = await this.productsService.getProduct(id);
     if (!product) {
@@ -78,6 +82,44 @@ export class ProductsController {
     const updatedProduct = await this.productsService.updateProductAttributes(
       id,
       attributes,
+    );
+    if (!updatedProduct) {
+      throw new NotFoundException(['product not found']);
+    }
+    return updatedProduct;
+  }
+
+  @Post('/:id/photos')
+  @Roles(Role.Admin, Role.Manager)
+  @UseInterceptors(FileInterceptor('file'))
+  async addProductPhoto(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
+          new FileTypeValidator({ fileType: /^image\/(png|jpe?g|gif|webp)/ }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ): Promise<void> {
+    const updatedProduct = await this.productsService.addProductPhoto(id, file);
+    if (!updatedProduct) {
+      throw new NotFoundException(['product not found']);
+    }
+    return;
+  }
+
+  @Delete('/:id/photos/:photoId')
+  @Roles(Role.Admin, Role.Manager)
+  async deleteProductPhoto(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('photoId', ParseIntPipe) photoId: number,
+  ): Promise<Product> {
+    const updatedProduct = await this.productsService.deleteProductPhoto(
+      id,
+      photoId,
     );
     if (!updatedProduct) {
       throw new NotFoundException(['product not found']);

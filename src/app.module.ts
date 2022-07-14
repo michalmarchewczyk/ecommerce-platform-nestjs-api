@@ -18,6 +18,7 @@ import { RedisClient } from 'redis';
 import { RedisModule, REDIS_CLIENT } from './redis';
 import { RolesGuard } from './auth/roles.guard';
 import { ProductsModule } from './products/products.module';
+import { LocalFilesModule } from './local-files/local-files.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ProductsModule } from './products/products.module';
     AuthModule,
     RedisModule,
     ProductsModule,
+    LocalFilesModule,
   ],
   controllers: [AppController],
   providers: [

@@ -8,6 +8,7 @@ services:
       target: dev
     volumes:
       - ./src:/usr/src/app/src
+      - uploads:/usr/src/app/uploads
     environment:
       POSTGRES_HOST: database
       POSTGRES_USER: postgres
@@ -54,3 +55,4 @@ services:
 volumes:
   postgres:
   pgadmin:
+  uploads:

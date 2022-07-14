@@ -343,16 +343,18 @@ describe('ProductsController (e2e)', () => {
     describe.each([
       [
         '/products (GET)',
-        [Role.Admin, Role.Manager, Role.Sales, Role.Customer],
+        [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
       ],
       [
         '/products/:id (GET)',
-        [Role.Admin, Role.Manager, Role.Sales, Role.Customer],
+        [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
       ],
       ['/products (POST)', [Role.Admin, Role.Manager]],
       ['/products/:id (PATCH)', [Role.Admin, Role.Manager]],
       ['/products/:id (DELETE)', [Role.Admin, Role.Manager]],
       ['/products/:id/attributes (PATCH)', [Role.Admin, Role.Manager]],
+      ['/products/:id/photos (POST)', [Role.Admin, Role.Manager]],
+      ['/products/:id/photos/:photoId (DELETE)', [Role.Admin, Role.Manager]],
     ])('%s', (endpoint, roles) => {
       const [url, method] = parseEndpoint(endpoint);
 

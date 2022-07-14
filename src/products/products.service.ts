@@ -16,8 +16,6 @@ import { ProductPhoto } from './entities/product-photo.entity';
 export class ProductsService {
   constructor(
     @InjectRepository(Product) private productsRepository: Repository<Product>,
-    @InjectRepository(ProductPhoto)
-    private productPhotosRepository: Repository<ProductPhoto>,
     @InjectRepository(Attribute)
     private attributesRepository: Repository<Attribute>,
   ) {}
@@ -98,17 +96,11 @@ export class ProductsService {
     id: number,
     photoId: number,
   ): Promise<Product | null> {
-    const photo = await this.productPhotosRepository.findOne({
-      where: { id: photoId },
-    });
-    if (!photo) {
-      return null;
-    }
-    await this.productPhotosRepository.delete({ id: photoId });
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
       return null;
     }
-    return product;
+    product.photos = product.photos.filter((p) => p.id !== photoId);
+    return this.productsRepository.save(product);
   }
 }

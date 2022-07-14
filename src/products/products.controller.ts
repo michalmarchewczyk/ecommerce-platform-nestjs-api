@@ -103,12 +103,12 @@ export class ProductsController {
       }),
     )
     file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<Product> {
     const updatedProduct = await this.productsService.addProductPhoto(id, file);
     if (!updatedProduct) {
       throw new NotFoundException(['product not found']);
     }
-    return;
+    return updatedProduct;
   }
 
   @Delete('/:id/photos/:photoId')

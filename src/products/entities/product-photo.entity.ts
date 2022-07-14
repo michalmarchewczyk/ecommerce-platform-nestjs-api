@@ -6,7 +6,9 @@ export class ProductPhoto {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Product, (product) => product.photos)
+  @ManyToOne(() => Product, (product) => product.photos, {
+    orphanedRowAction: 'delete',
+  })
   product: Product;
 
   @Column()

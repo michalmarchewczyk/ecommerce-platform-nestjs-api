@@ -9,6 +9,7 @@ import { ProductPhoto } from './entities/product-photo.entity';
 import { AttributesModule } from './attributes/attributes.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
       inject: [ConfigService],
     }),
+    CategoriesModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

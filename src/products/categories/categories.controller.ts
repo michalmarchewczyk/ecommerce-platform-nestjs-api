@@ -22,13 +22,11 @@ export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
 
   @Get()
-  @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled)
   async getCategories(): Promise<Category[]> {
     return this.categoriesService.getCategories();
   }
 
   @Get('/:id')
-  @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled)
   async getCategory(@Param('id', ParseIntPipe) id: number): Promise<Category> {
     const category = await this.categoriesService.getCategory(id);
     if (!category) {
@@ -76,7 +74,6 @@ export class CategoriesController {
   }
 
   @Get('/:id/products')
-  @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled)
   async getCategoryProducts(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Product[]> {

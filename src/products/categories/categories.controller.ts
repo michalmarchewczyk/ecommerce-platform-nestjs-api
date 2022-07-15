@@ -80,7 +80,11 @@ export class CategoriesController {
   async getCategoryProducts(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Product[]> {
-    return this.categoriesService.getCategoryProducts(id);
+    const products = await this.categoriesService.getCategoryProducts(id);
+    if (!products) {
+      throw new NotFoundException(['category not found']);
+    }
+    return products;
   }
 
   @Post('/:id/products')

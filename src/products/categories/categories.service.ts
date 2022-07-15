@@ -74,11 +74,14 @@ export class CategoriesService {
     return true;
   }
 
-  async getCategoryProducts(id: number): Promise<Product[]> {
+  async getCategoryProducts(id: number): Promise<Product[] | null> {
     const category = await this.categoriesRepository.findOne({
       where: { id },
       relations: ['products'],
     });
+    if (!category) {
+      return null;
+    }
     return category.products;
   }
 

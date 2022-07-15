@@ -20,8 +20,8 @@ export class Category {
   @Column()
   description: string;
 
-  @Column()
-  slug: string;
+  @Column({ nullable: true })
+  slug?: string;
 
   @ManyToOne(() => Category, (category) => category.childCategories, {
     onDelete: 'SET NULL',
@@ -34,7 +34,9 @@ export class Category {
   })
   childCategories: Category[];
 
-  @ManyToMany(() => Product)
+  @ManyToMany(() => Product, {
+    onDelete: 'CASCADE',
+  })
   @JoinTable()
   products: Product[];
 }

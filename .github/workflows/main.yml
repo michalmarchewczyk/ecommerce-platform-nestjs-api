@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Run e2e tests
-        run: npm run test:e2e
+        run: npm run test:e2e:cov
         env:
           POSTGRES_HOST: localhost
           POSTGRES_USER: postgres
@@ -62,6 +62,11 @@ jobs:
           POSTGRES_DB: ecommerce-platform
           REDIS_HOST: localhost
           NODE_ENV: test
+      - name: Archive e2e tests coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-tests-coverage
+          path: test/coverage
 
   lint:
     runs-on: ubuntu-latest

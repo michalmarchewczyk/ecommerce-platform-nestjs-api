@@ -1,10 +1,9 @@
 {
   "name": "ecommerce-platform-nestjs-api",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "version": "0.8.0",
+  "description": "REST API for the E-commerce Platform project.",
+  "author": "Michał Marchewczyk",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",

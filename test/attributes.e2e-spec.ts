@@ -5,10 +5,10 @@ import { AppModule } from '../src/app.module';
 import { Role } from '../src/users/entities/role.enum';
 import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
-import { parseEndpoint } from './utils/parse-endpoint';
 import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
 import { AttributeType } from '../src/products/entities/attribute-type.entity';
 import { AttributeTypeDto } from '../src/products/dto/attribute-type.dto';
+import { setupRbacTests } from './utils/setup-rbac-tests';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;
@@ -184,45 +184,17 @@ describe('ProductsController (e2e)', () => {
     });
   });
 
-  describe('RBAC for /attributes', () => {
-    const cookieHeaders = {};
-    const availableRoles = Object.values(Role);
-
-    beforeAll(async () => {
-      for (const role of availableRoles) {
-        const response = await request(app.getHttpServer())
-          .post('/auth/login')
-          .send({ ...testUsers.getCredentials(role) });
-        cookieHeaders[role] = response.headers['set-cookie'];
-      }
-    });
-
-    describe.each([
-      ['/attributes (GET)', [Role.Admin, Role.Manager]],
-      ['/attributes (POST)', [Role.Admin, Role.Manager]],
-      ['/attributes/:id (PUT)', [Role.Admin, Role.Manager]],
-      ['/attributes/:id (DELETE)', [Role.Admin, Role.Manager]],
-    ])('%s', (endpoint, roles) => {
-      const [url, method] = parseEndpoint(endpoint);
-
-      const testRoles: [Role, boolean][] = availableRoles.map((role) => [
-        role,
-        roles.includes(role),
-      ]);
-
-      it.each(testRoles)(
-        `${endpoint} can be accessed by %s: %p`,
-        async (role, result) => {
-          const response = await request(app.getHttpServer())
-            [method](url)
-            .set('Cookie', cookieHeaders[role]);
-          if (result) {
-            expect(response.status).not.toBe(403);
-          } else {
-            expect(response.status).toBe(403);
-          }
-        },
-      );
-    });
-  });
+  describe(
+    'RBAC for /attributes',
+    setupRbacTests(
+      () => app,
+      () => testUsers,
+      [
+        ['/attributes (GET)', [Role.Admin, Role.Manager]],
+        ['/attributes (POST)', [Role.Admin, Role.Manager]],
+        ['/attributes/:id (PUT)', [Role.Admin, Role.Manager]],
+        ['/attributes/:id (DELETE)', [Role.Admin, Role.Manager]],
+      ],
+    ),
+  );
 });

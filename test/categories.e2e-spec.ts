@@ -5,13 +5,13 @@ import { AppModule } from '../src/app.module';
 import { Role } from '../src/users/entities/role.enum';
 import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
-import { parseEndpoint } from './utils/parse-endpoint';
 import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
 import { Category } from '../src/products/entities/category.entity';
 import { Product } from '../src/products/entities/product.entity';
 import { CategoryCreateDto } from '../src/products/dto/category-create.dto';
 import { ProductCreateDto } from '../src/products/dto/product-create.dto';
 import { CategoryUpdateDto } from '../src/products/dto/category-update.dto';
+import { setupRbacTests } from './utils/setup-rbac-tests';
 
 describe('CategoriesController (e2e)', () => {
   let app: INestApplication;
@@ -318,61 +318,33 @@ describe('CategoriesController (e2e)', () => {
     });
   });
 
-  describe('RBAC for /categories', () => {
-    const cookieHeaders = {};
-    const availableRoles = Object.values(Role);
-
-    beforeAll(async () => {
-      for (const role of availableRoles) {
-        const response = await request(app.getHttpServer())
-          .post('/auth/login')
-          .send({ ...testUsers.getCredentials(role) });
-        cookieHeaders[role] = response.headers['set-cookie'];
-      }
-    });
-
-    describe.each([
+  describe(
+    'RBAC for /categories',
+    setupRbacTests(
+      () => app,
+      () => testUsers,
       [
-        '/categories (GET)',
-        [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        [
+          '/categories (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        ],
+        ['/categories (POST)', [Role.Admin, Role.Manager]],
+        [
+          '/categories/:id (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        ],
+        ['/categories/:id (PATCH)', [Role.Admin, Role.Manager]],
+        ['/categories/:id (DELETE)', [Role.Admin, Role.Manager]],
+        [
+          '/categories/:id/products (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        ],
+        ['/categories/:id/products (POST)', [Role.Admin, Role.Manager]],
+        [
+          '/categories/:id/products/:productId (DELETE)',
+          [Role.Admin, Role.Manager],
+        ],
       ],
-      ['/categories (POST)', [Role.Admin, Role.Manager]],
-      [
-        '/categories/:id (GET)',
-        [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
-      ],
-      ['/categories/:id (PATCH)', [Role.Admin, Role.Manager]],
-      ['/categories/:id (DELETE)', [Role.Admin, Role.Manager]],
-      [
-        '/categories/:id/products (GET)',
-        [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
-      ],
-      ['/categories/:id/products (POST)', [Role.Admin, Role.Manager]],
-      [
-        '/categories/:id/products/:productId (DELETE)',
-        [Role.Admin, Role.Manager],
-      ],
-    ])('%s', (endpoint, roles) => {
-      const [url, method] = parseEndpoint(endpoint);
-
-      const testRoles: [Role, boolean][] = availableRoles.map((role) => [
-        role,
-        roles.includes(role),
-      ]);
-
-      it.each(testRoles)(
-        `${endpoint} can be accessed by %s: %p`,
-        async (role, result) => {
-          const response = await request(app.getHttpServer())
-            [method](url)
-            .set('Cookie', cookieHeaders[role]);
-          if (result) {
-            expect(response.status).not.toBe(403);
-          } else {
-            expect(response.status).toBe(403);
-          }
-        },
-      );
-    });
-  });
+    ),
+  );
 });

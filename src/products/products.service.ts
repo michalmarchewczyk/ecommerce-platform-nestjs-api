@@ -65,7 +65,13 @@ export class ProductsService {
     }
     try {
       // TODO: type-check attribute values
-      product.attributes = await this.attributesRepository.save(attributes);
+      const attributesToSave = attributes.map((a) => ({
+        value: a.value,
+        type: { id: a.typeId },
+      }));
+      product.attributes = await this.attributesRepository.save(
+        attributesToSave,
+      );
     } catch (e) {
       if (e instanceof QueryFailedError) {
         throw new BadRequestException(['wrong attribute type']);

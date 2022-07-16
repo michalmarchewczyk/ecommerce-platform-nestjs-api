@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { Role } from './entities/role.enum';
 import { NotFoundException } from '@nestjs/common';
+import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -39,8 +40,9 @@ describe('UsersController', () => {
       return true;
     },
   };
+  let generate: DtoGeneratorService['generate'];
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
@@ -48,10 +50,14 @@ describe('UsersController', () => {
           provide: UsersService,
           useValue: mockUsersService,
         },
+        DtoGeneratorService,
       ],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
+    generate = module
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
   });
 
   it('should be defined', () => {
@@ -84,19 +90,12 @@ describe('UsersController', () => {
 
   describe('updateUser', () => {
     it('should update a user', async () => {
-      const updatedUser = await controller.updateUser(1, {
-        email: 'test2@test.local',
-        role: Role.Admin,
-        firstName: 'Test',
-        lastName: 'User',
-      });
-      expect(updatedUser).toBeDefined();
-      expect(updatedUser).toEqual({
-        id: 1,
-        email: 'test2@test.local',
-        role: Role.Admin,
-        firstName: 'Test',
-        lastName: 'User',
+      const updateData = generate(UserUpdateDto, true);
+      const updated = await controller.updateUser(1, updateData);
+      expect(updated).toBeDefined();
+      expect(updated).toEqual({
+        id: expect.any(Number),
+        ...updateData,
       });
     });
 

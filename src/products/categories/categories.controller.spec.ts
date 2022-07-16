@@ -5,9 +5,14 @@ import { Category } from '../entities/category.entity';
 import { CategoriesService } from './categories.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
+import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
+import { CategoryCreateDto } from '../dto/category-create.dto';
+import { CategoryUpdateDto } from '../dto/category-update.dto';
+import { ProductCreateDto } from '../dto/product-create.dto';
 
 describe('CategoriesController', () => {
   let controller: CategoriesController;
+  let generate: DtoGeneratorService['generate'];
   const mockProductsRepository = {
     products: [],
     save(product): Product {
@@ -80,10 +85,14 @@ describe('CategoriesController', () => {
           provide: getRepositoryToken(Category),
           useValue: mockCategoriesRepository,
         },
+        DtoGeneratorService,
       ],
     }).compile();
 
     controller = module.get<CategoriesController>(CategoriesController);
+    generate = module
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
   });
 
   it('should be defined', () => {
@@ -99,17 +108,14 @@ describe('CategoriesController', () => {
 
   describe('getCategory', () => {
     it('should return a category', async () => {
-      const { id } = mockCategoriesRepository.save({
-        name: 'Category 1',
-        description: 'Description 1',
-      });
+      const createData = generate(CategoryCreateDto);
+      const { id } = mockCategoriesRepository.save(createData);
       const category = await controller.getCategory(id);
       expect(category).toEqual({
+        id,
+        ...createData,
         childCategories: [],
         products: [],
-        name: 'Category 1',
-        description: 'Description 1',
-        id,
       });
     });
 
@@ -122,23 +128,19 @@ describe('CategoriesController', () => {
 
   describe('createCategory', () => {
     it('should create a category', async () => {
-      const category = await controller.createCategory({
-        name: 'Category 2',
-        description: 'Description 2',
-      });
-      expect(category).toEqual({
-        name: 'Category 2',
-        description: 'Description 2',
+      const createData = generate(CategoryCreateDto);
+      const created = await controller.createCategory(createData);
+      expect(created).toEqual({
         id: expect.any(Number),
+        ...createData,
         childCategories: [],
         products: [],
       });
       expect(
-        mockCategoriesRepository.categories.find((c) => c.id === category.id),
+        mockCategoriesRepository.categories.find((c) => c.id === created.id),
       ).toEqual({
-        name: 'Category 2',
-        description: 'Description 2',
         id: expect.any(Number),
+        ...createData,
         childCategories: [],
         products: [],
       });
@@ -147,48 +149,37 @@ describe('CategoriesController', () => {
 
   describe('updateCategory', () => {
     it('should update a category', async () => {
-      const { id } = mockCategoriesRepository.save({
-        name: 'Category 3',
-        description: 'Description 3',
-      });
-      const category = await controller.updateCategory(id, {
-        name: 'Category 3 updated',
-        description: 'Description 3 updated',
-      });
-      expect(category).toEqual({
-        name: 'Category 3 updated',
-        description: 'Description 3 updated',
+      const createData = generate(CategoryCreateDto);
+      const { id } = mockCategoriesRepository.save(createData);
+      const updateData = generate(CategoryUpdateDto, true);
+      const updated = await controller.updateCategory(id, updateData);
+      expect(updated).toEqual({
         id,
+        ...updateData,
         childCategories: [],
         products: [],
       });
       expect(
-        mockCategoriesRepository.categories.find((c) => c.id === category.id),
+        mockCategoriesRepository.categories.find((c) => c.id === updated.id),
       ).toEqual({
-        name: 'Category 3 updated',
-        description: 'Description 3 updated',
         id,
+        ...updateData,
         childCategories: [],
         products: [],
       });
     });
 
     it('should throw error if category not found', async () => {
-      await expect(
-        controller.updateCategory(12345, {
-          name: 'Category 3 updated',
-          description: 'Description 3 updated',
-        }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(controller.updateCategory(12345, {})).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('deleteCategory', () => {
     it('should delete a category', async () => {
-      const { id } = mockCategoriesRepository.save({
-        name: 'Category 4',
-        description: 'Description 4',
-      });
+      const createData = generate(CategoryCreateDto);
+      const { id } = mockCategoriesRepository.save(createData);
       await controller.deleteCategory(id);
       expect(
         mockCategoriesRepository.categories.find((c) => c.id === id),
@@ -204,10 +195,8 @@ describe('CategoriesController', () => {
 
   describe('getCategoryProducts', () => {
     it('should return all products of a category', async () => {
-      const { id } = mockCategoriesRepository.save({
-        name: 'Category 5',
-        description: 'Description 5',
-      });
+      const createData = generate(CategoryCreateDto);
+      const { id } = mockCategoriesRepository.save(createData);
       const products = await controller.getCategoryProducts(id);
       expect(products).toEqual(
         mockCategoriesRepository.categories.find((c) => c.id === id).products,
@@ -223,26 +212,16 @@ describe('CategoriesController', () => {
 
   describe('addCategoryProduct', () => {
     it('should add a product to a category', async () => {
-      const { id } = mockCategoriesRepository.save({
-        name: 'Category 6',
-        description: 'Description 6',
-      });
-      const { id: productId } = mockProductsRepository.save({
-        name: 'Product 6',
-        description: 'Description 6',
-        price: 6,
-        stock: 6,
-      });
+      const createData = generate(CategoryCreateDto);
+      const { id } = mockCategoriesRepository.save(createData);
+      const productData = generate(ProductCreateDto, true);
+      const { id: productId } = mockProductsRepository.save(productData);
       const product = await controller.addCategoryProduct(id, productId);
       expect(product).toEqual({
-        name: 'Product 6',
-        description: 'Description 6',
         id: expect.any(Number),
-        price: 6,
-        stock: 6,
+        ...productData,
         attributes: [],
         photos: [],
-        visible: true,
       });
       expect(
         mockCategoriesRepository.categories.find((c) => c.id === id).products,
@@ -258,16 +237,10 @@ describe('CategoriesController', () => {
 
   describe('deleteCategoryProduct', () => {
     it('should delete a product from a category', async () => {
-      const { id } = mockCategoriesRepository.save({
-        name: 'Category 7',
-        description: 'Description 7',
-      });
-      const { id: productId } = mockProductsRepository.save({
-        name: 'Product 7',
-        description: 'Description 7',
-        price: 7,
-        stock: 7,
-      });
+      const createData = generate(CategoryCreateDto);
+      const { id } = mockCategoriesRepository.save(createData);
+      const productData = generate(ProductCreateDto, true);
+      const { id: productId } = mockProductsRepository.save(productData);
       await controller.addCategoryProduct(id, productId);
       await controller.deleteCategoryProduct(id, productId);
       expect(

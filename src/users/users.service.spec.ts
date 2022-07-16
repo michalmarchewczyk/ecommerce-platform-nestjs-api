@@ -4,9 +4,14 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { QueryFailedError } from 'typeorm';
 import { Role } from './entities/role.enum';
+import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
+import { RegisterDto } from '../auth/dto/register.dto';
+import { UserUpdateDto } from './dto/user-update.dto';
 
 describe('UsersService', () => {
   let service: UsersService;
+  let generate: DtoGeneratorService['generate'];
+
   const mockUsersRepository = {
     users: [],
     save(user: User): User {
@@ -47,7 +52,7 @@ describe('UsersService', () => {
     },
   };
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
@@ -55,11 +60,15 @@ describe('UsersService', () => {
           provide: getRepositoryToken(User),
           useValue: mockUsersRepository,
         },
+        DtoGeneratorService,
       ],
     }).compile();
 
     mockUsersRepository.users = [];
     service = module.get<UsersService>(UsersService);
+    generate = module
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
   });
 
   it('should be defined', () => {
@@ -68,18 +77,17 @@ describe('UsersService', () => {
 
   describe('addUser', () => {
     it('should return created user', async () => {
-      const email = 'test@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       const user = await service.addUser(email, password);
       expect(user).toBeDefined();
       expect(user).toEqual({ email, id: expect.any(Number) });
     });
 
     it('should return created user with optional fields', async () => {
-      const email = 'test2@test.local';
-      const password = 'test';
-      const firstName = 'Test';
-      const lastName = 'User';
+      const { email, password, firstName, lastName } = generate(
+        RegisterDto,
+        true,
+      );
       const user = await service.addUser(email, password, firstName, lastName);
       expect(user).toBeDefined();
       expect(user).toEqual({
@@ -91,16 +99,14 @@ describe('UsersService', () => {
     });
 
     it('should hide password when creating user', async () => {
-      const email = 'test3@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       const user = await service.addUser(email, password);
       expect(user).toBeDefined();
       expect(user.password).toBeUndefined();
     });
 
     it('should throw error when attempting to create user with used email', async () => {
-      const email = 'test4@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       await service.addUser(email, password);
       await expect(service.addUser(email, password)).rejects.toThrowError(
         QueryFailedError,
@@ -110,8 +116,7 @@ describe('UsersService', () => {
 
   describe('findUserToLogin', () => {
     it('should return user with given email', async () => {
-      const email = 'test5@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       await service.addUser(email, password);
       const user = await service.findUserToLogin(email);
       expect(user).toBeDefined();
@@ -120,7 +125,7 @@ describe('UsersService', () => {
     });
 
     it('should return null when user with given email does not exist', async () => {
-      const email = 'test123@test.local';
+      const { email } = generate(RegisterDto);
       const user = await service.findUserToLogin(email);
       expect(user).toBeNull();
     });
@@ -128,8 +133,7 @@ describe('UsersService', () => {
 
   describe('findUserToSession', () => {
     it('should return user with given id', async () => {
-      const email = 'test6@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       const { id } = await service.addUser(email, password);
       const user = await service.findUserToSession(id);
       expect(user).toBeDefined();
@@ -153,8 +157,7 @@ describe('UsersService', () => {
 
   describe('getUser', () => {
     it('should return user with given id', async () => {
-      const email = 'test7@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       const { id } = await service.addUser(email, password);
       const user = await service.getUser(id);
       expect(user).toBeDefined();
@@ -176,40 +179,27 @@ describe('UsersService', () => {
 
   describe('updateUser', () => {
     it('should return updated user', async () => {
-      const email = 'test8@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       const { id } = await service.addUser(email, password);
-      const updatedUser = await service.updateUser(id, {
-        email: 'test8888@test.local',
-        role: Role.Admin,
-        firstName: 'Test',
-        lastName: 'User',
-      });
-      expect(updatedUser).toBeDefined();
-      expect(updatedUser).toEqual({
-        email: 'test8888@test.local',
+      const updateData = generate(UserUpdateDto, true);
+      const updated = await service.updateUser(id, updateData);
+      expect(updated).toBeDefined();
+      expect(updated).toEqual({
         id: expect.any(Number),
-        role: Role.Admin,
-        firstName: 'Test',
-        lastName: 'User',
+        password: undefined,
+        ...updateData,
       });
     });
 
     it('should return null when user with given id does not exist', async () => {
-      const updatedUser = await service.updateUser(12345, {
-        email: 'test8888@test.local',
-        role: Role.Admin,
-        firstName: 'Test',
-        lastName: 'User',
-      });
+      const updatedUser = await service.updateUser(12345, {});
       expect(updatedUser).toBeNull();
     });
   });
 
   describe('deleteUser', () => {
     it('should delete user', async () => {
-      const email = 'test9@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       const { id } = await service.addUser(email, password);
       const deleted = await service.deleteUser(id);
       const user = await service.getUser(id);

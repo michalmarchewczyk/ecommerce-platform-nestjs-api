@@ -1,9 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
+import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
+import { RegisterDto } from './dto/register.dto';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let generate: DtoGeneratorService['generate'];
   const mockUsersService = {
     users: [],
     addUser: jest.fn(
@@ -29,18 +32,22 @@ describe('AuthService', () => {
     ),
   };
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
-    })
-      .useMocker((token) => {
-        if (token === UsersService) {
-          return mockUsersService;
-        }
-      })
-      .compile();
+      providers: [
+        AuthService,
+        DtoGeneratorService,
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
+        },
+      ],
+    }).compile();
 
     service = module.get<AuthService>(AuthService);
+    generate = module
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
   });
 
   it('should be defined', () => {
@@ -49,18 +56,17 @@ describe('AuthService', () => {
 
   describe('register', () => {
     it('should return registered user', async () => {
-      const email = 'test@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       const user = await service.register({ email, password });
       expect(user).toBeDefined();
       expect(user).toEqual({ email, id: expect.any(Number) });
     });
 
     it('should return registered user with optional fields', async () => {
-      const email = 'test2@test.local';
-      const password = 'test';
-      const firstName = 'Test';
-      const lastName = 'User';
+      const { email, password, firstName, lastName } = generate(
+        RegisterDto,
+        true,
+      );
       const user = await service.register({
         email,
         password,
@@ -77,8 +83,7 @@ describe('AuthService', () => {
     });
 
     it('should hash password when registering', async () => {
-      const email = 'test3@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       await service.register({ email, password });
       expect(mockUsersService.addUser).not.toHaveBeenLastCalledWith(
         email,
@@ -91,8 +96,7 @@ describe('AuthService', () => {
 
   describe('validateUser', () => {
     it('should return user if user exists and password matches', async () => {
-      const email = 'test4@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       await service.register({ email, password });
       const user = await service.validateUser({ email, password });
       expect(user).toBeDefined();
@@ -100,16 +104,14 @@ describe('AuthService', () => {
     });
 
     it("should return null if user exists and password doesn't match", async () => {
-      const email = 'test5@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       await service.register({ email, password });
       const user = await service.validateUser({ email, password: '123' });
       expect(user).toBeNull();
     });
 
     it('should return null if user does not exist', async () => {
-      const email = 'test123@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       const user = await service.validateUser({ email, password });
       expect(user).toBeNull();
     });

@@ -5,10 +5,15 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Attribute } from './entities/attribute.entity';
 import { NotFoundException } from '@nestjs/common';
-import { Readable } from 'stream';
+import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
+import { ProductCreateDto } from './dto/product-create.dto';
+import { ProductUpdateDto } from './dto/product-update.dto';
+import { AttributeDto } from './dto/attribute.dto';
+import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
+  let generate: DtoGeneratorService['generate'];
   const mockProductsRepository = {
     products: [],
     save(product): Product {
@@ -45,7 +50,7 @@ describe('ProductsController', () => {
     },
   };
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProductsController],
       providers: [
@@ -58,10 +63,14 @@ describe('ProductsController', () => {
           provide: getRepositoryToken(Attribute),
           useValue: mockAttributesRepository,
         },
+        DtoGeneratorService,
       ],
     }).compile();
 
     controller = module.get<ProductsController>(ProductsController);
+    generate = module
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
   });
 
   it('should be defined', () => {
@@ -79,11 +88,8 @@ describe('ProductsController', () => {
   describe('getProduct', () => {
     it('should return a product with given id', async () => {
       const product = {
+        ...generate(ProductCreateDto, true),
         id: 1,
-        name: 'Product 1',
-        description: 'Description 1',
-        price: 1,
-        visible: true,
         attributes: [],
       };
       mockProductsRepository.products.push(product);
@@ -99,16 +105,11 @@ describe('ProductsController', () => {
 
   describe('createProduct', () => {
     it('should create a product', async () => {
-      const product = {
-        name: 'Product 2',
-        description: 'Description 2',
-        price: 2,
-        stock: 2,
-      };
-      expect(await controller.createProduct(product)).toEqual({
-        ...product,
+      const createData = generate(ProductCreateDto, true);
+      const created = await controller.createProduct(createData);
+      expect(created).toEqual({
+        ...createData,
         id: expect.any(Number),
-        visible: true,
         attributes: [],
         photos: [],
       });
@@ -117,43 +118,29 @@ describe('ProductsController', () => {
 
   describe('updateProduct', () => {
     it('should update a product', async () => {
-      const product = {
-        name: 'Product 3',
-        description: 'Description 3',
-        price: 1,
-        stock: 1,
-      };
-      const { id } = await controller.createProduct(product);
-      const updatedProduct = {
-        name: 'Product 3 updated',
-        visible: false,
-      };
-      expect(await controller.updateProduct(id, updatedProduct)).toEqual({
-        ...product,
+      const createData = generate(ProductCreateDto, true);
+      const { id } = await controller.createProduct(createData);
+      const updateData = generate(ProductUpdateDto, true);
+      const updated = await controller.updateProduct(id, updateData);
+      expect(updated).toEqual({
+        ...updateData,
         id: expect.any(Number),
-        name: 'Product 3 updated',
-        visible: false,
         attributes: [],
         photos: [],
       });
     });
 
     it('should throw error when product not found', async () => {
-      await expect(
-        controller.updateProduct(12345, { name: 'Product 2 updated' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(controller.updateProduct(12345, {})).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('deleteProduct', () => {
     it('should delete a product', async () => {
-      const product = {
-        name: 'Product 4',
-        description: 'Description 4',
-        price: 4,
-        stock: 4,
-      };
-      const { id } = await controller.createProduct(product);
+      const createData = generate(ProductCreateDto);
+      const { id } = await controller.createProduct(createData);
       await controller.deleteProduct(id);
       expect(
         mockProductsRepository.products.find((p) => p.id === id),
@@ -169,23 +156,22 @@ describe('ProductsController', () => {
 
   describe('updateProductAttributes', () => {
     it('should update a product attributes', async () => {
-      const product = {
-        name: 'Product 5',
-        description: 'Description 5',
-        price: 5,
-        stock: 5,
-      };
-      const { id } = await controller.createProduct(product);
-      const attributes = [
-        { value: 'Attribute 1', type: { id: 1 } },
-        { value: 'Attribute 2', type: { id: 1 } },
-      ];
-      expect(await controller.updateProductAttributes(id, attributes)).toEqual({
-        ...product,
+      const createData = generate(ProductCreateDto, true);
+      const { id } = await controller.createProduct(createData);
+      const attributesData = generate(AttributeDto, false, 4);
+      const updated = await controller.updateProductAttributes(
+        id,
+        attributesData,
+      );
+      const expectedAttributes = attributesData.map((a) => ({
+        value: a.value,
+        type: { id: a.typeId },
+      }));
+      expect(updated).toEqual({
+        ...createData,
         id: expect.any(Number),
-        visible: true,
         photos: [],
-        attributes,
+        attributes: expectedAttributes,
       });
     });
 
@@ -198,31 +184,16 @@ describe('ProductsController', () => {
 
   describe('addProductPhoto', () => {
     it('should add product photo', async () => {
-      const product = {
-        name: 'Product 6',
-        description: 'Description 6',
-        price: 6,
-        stock: 6,
-      };
-      const { id } = mockProductsRepository.save(product);
-      const updatedProduct = await controller.addProductPhoto(id, {
-        fieldname: 'file',
-        originalname: 'file.jpg',
-        encoding: '8bit',
-        mimetype: 'image/jpeg',
-        size: 1234,
-        destination: './uploads',
-        filename: 'filejpg',
-        path: './uploads/filejpg',
-        buffer: Buffer.from('file'),
-        stream: new Readable(),
-      });
-      expect(updatedProduct.photos).toHaveLength(1);
+      const createData = generate(ProductCreateDto);
+      const { id } = mockProductsRepository.save(createData);
+      const fileMetadata = generateFileMetadata();
+      const updated = await controller.addProductPhoto(id, fileMetadata);
+      expect(updated.photos).toHaveLength(1);
       expect(
         mockProductsRepository.products.find((p) => p.id === id)?.photos,
       ).toEqual([
         {
-          path: './uploads/filejpg',
+          path: fileMetadata.path,
           mimeType: 'image/jpeg',
         },
       ]);
@@ -237,30 +208,14 @@ describe('ProductsController', () => {
 
   describe('deleteProductPhoto', () => {
     it('should delete product photo', async () => {
-      const product = {
-        name: 'Product 7',
-        description: 'Description 7',
-        price: 7,
-        stock: 7,
-      };
-      const { id } = mockProductsRepository.save(product);
+      const createData = generate(ProductCreateDto);
+      const { id } = mockProductsRepository.save(createData);
       const photoId = (
-        await controller.addProductPhoto(id, {
-          fieldname: 'file',
-          originalname: 'file.jpg',
-          encoding: '8bit',
-          mimetype: 'image/jpeg',
-          size: 1234,
-          destination: './uploads',
-          filename: 'filejpg',
-          path: './uploads/filejpg',
-          buffer: Buffer.from('file'),
-          stream: new Readable(),
-        })
+        await controller.addProductPhoto(id, generateFileMetadata())
       ).photos[0].id;
-      const updatedProduct = await controller.deleteProductPhoto(id, photoId);
-      expect(updatedProduct).toBeDefined();
-      expect(updatedProduct.photos).toHaveLength(0);
+      const updated = await controller.deleteProductPhoto(id, photoId);
+      expect(updated).toBeDefined();
+      expect(updated.photos).toHaveLength(0);
       expect(
         mockProductsRepository.products.find((p) => p.id === id)?.photos,
       ).toEqual([]);

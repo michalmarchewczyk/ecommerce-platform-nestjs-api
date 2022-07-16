@@ -2,14 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AttributesController } from './attributes.controller';
 import { AttributesService } from './attributes.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  AttributeType,
-  AttributeValueType,
-} from '../entities/attribute-type.entity';
+import { AttributeType } from '../entities/attribute-type.entity';
 import { NotFoundException } from '@nestjs/common';
+import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
+import { AttributeTypeDto } from '../dto/attribute-type.dto';
 
 describe('AttributesController', () => {
   let controller: AttributesController;
+  let generate: DtoGeneratorService['generate'];
   const mockAttributeTypesRepository = {
     attributeTypes: [],
     save(attributeType): AttributeType {
@@ -43,10 +43,14 @@ describe('AttributesController', () => {
           provide: getRepositoryToken(AttributeType),
           useValue: mockAttributeTypesRepository,
         },
+        DtoGeneratorService,
       ],
     }).compile();
 
     controller = module.get<AttributesController>(AttributesController);
+    generate = module
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
   });
 
   it('should be defined', () => {
@@ -63,54 +67,42 @@ describe('AttributesController', () => {
 
   describe('createAttributeType', () => {
     it('should create an attribute type', async () => {
-      const attributeType = await controller.createAttributeType({
-        name: 'test',
-        valueType: AttributeValueType.String,
-      });
-      expect(attributeType).toEqual({
-        name: 'test',
-        valueType: 'string',
+      const createData = generate(AttributeTypeDto);
+      const created = await controller.createAttributeType(createData);
+      expect(created).toEqual({
         id: expect.any(Number),
+        ...createData,
       });
     });
   });
 
   describe('updateAttributeType', () => {
     it('should update an attribute type', async () => {
-      const { id } = await controller.createAttributeType({
-        name: 'test',
-        valueType: AttributeValueType.String,
-      });
-      const attributeType = await controller.updateAttributeType(id, {
-        name: 'test2',
-        valueType: AttributeValueType.Number,
-      });
-      expect(attributeType).toBeDefined();
+      const createData = generate(AttributeTypeDto);
+      const { id } = await controller.createAttributeType(createData);
+      const updateData = generate(AttributeTypeDto);
+      const updated = await controller.updateAttributeType(id, updateData);
+      expect(updated).toBeDefined();
       expect(
         mockAttributeTypesRepository.attributeTypes.find((a) => a.id === id),
       ).toEqual({
         id: expect.any(Number),
-        name: 'test2',
-        valueType: AttributeValueType.Number,
+        ...updateData,
       });
     });
 
     it('should throw error if attribute type does not exist', async () => {
+      const updateData = generate(AttributeTypeDto);
       await expect(
-        controller.updateAttributeType(12345, {
-          name: 'test2',
-          valueType: AttributeValueType.Number,
-        }),
+        controller.updateAttributeType(12345, updateData),
       ).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('deleteAttributeType', () => {
     it('should delete an attribute type', async () => {
-      const { id } = await controller.createAttributeType({
-        name: 'test',
-        valueType: AttributeValueType.String,
-      });
+      const createData = generate(AttributeTypeDto);
+      const { id } = await controller.createAttributeType(createData);
       await controller.deleteAttributeType(id);
       expect(
         mockAttributeTypesRepository.attributeTypes.find((a) => a.id === id),

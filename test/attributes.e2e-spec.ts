@@ -3,8 +3,8 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { Role } from '../src/users/entities/role.enum';
-import { TestUsersService } from './utils/test-users.service';
-import { TestUsersModule } from './utils/test-users.module';
+import { TestUsersService } from './utils/test-users/test-users.service';
+import { TestUsersModule } from './utils/test-users/test-users.module';
 import { parseEndpoint } from './utils/parse-endpoint';
 
 describe('ProductsController (e2e)', () => {

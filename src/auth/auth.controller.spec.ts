@@ -2,9 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
+import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
+import { RegisterDto } from './dto/register.dto';
 
 describe('AuthController', () => {
   let controller: AuthController;
+  let generate: DtoGeneratorService['generate'];
   const mockUsersService = {
     addUser: jest.fn(
       (
@@ -16,19 +19,23 @@ describe('AuthController', () => {
     ),
   };
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService],
-    })
-      .useMocker((token) => {
-        if (token === UsersService) {
-          return mockUsersService;
-        }
-      })
-      .compile();
+      providers: [
+        AuthService,
+        DtoGeneratorService,
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
+        },
+      ],
+    }).compile();
 
     controller = module.get<AuthController>(AuthController);
+    generate = module
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
   });
 
   it('should be defined', () => {
@@ -37,18 +44,17 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('should return registered user', async () => {
-      const email = 'test@test.local';
-      const password = 'test';
+      const { email, password } = generate(RegisterDto);
       const user = await controller.register({ email, password });
       expect(user).toBeDefined();
       expect(user).toEqual({ email });
     });
 
     it('should return registered user with optional fields', async () => {
-      const email = 'test@test.local';
-      const password = 'test';
-      const firstName = 'Test';
-      const lastName = 'User';
+      const { email, password, firstName, lastName } = generate(
+        RegisterDto,
+        true,
+      );
       const user = await controller.register({
         email,
         password,
@@ -61,9 +67,8 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    const email = 'test@test.local';
-    const password = 'test';
     it('should return req.user', async () => {
+      const { email, password } = generate(RegisterDto);
       const user = await controller.login({ user: { email, password } });
       expect(user).toBeDefined();
       expect(user).toEqual({ email, password });

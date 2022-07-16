@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CategoryCreateDto {
   @IsString()
@@ -12,6 +12,7 @@ export class CategoryCreateDto {
   @IsOptional()
   slug?: string;
 
+  @IsNumber()
   @IsOptional()
   parentCategoryId?: number;
 }

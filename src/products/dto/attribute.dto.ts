@@ -5,7 +5,5 @@ export class AttributeDto {
   value: string;
 
   @IsNumber()
-  type: {
-    id: number;
-  };
+  typeId: number;
 }

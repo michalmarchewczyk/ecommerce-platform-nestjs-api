@@ -1,8 +1,8 @@
-import { TestUsersModule } from './test-users.module';
+import { TestUsersModule } from './test-users/test-users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TestUsersService } from './test-users.service';
+import { TestUsersService } from './test-users/test-users.service';
 import configuration from '../../src/config/configuration';
 
 const setup = async () => {

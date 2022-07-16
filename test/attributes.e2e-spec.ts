@@ -6,22 +6,33 @@ import { Role } from '../src/users/entities/role.enum';
 import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
 import { parseEndpoint } from './utils/parse-endpoint';
+import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
+import { AttributeType } from '../src/products/entities/attribute-type.entity';
+import { AttributeTypeDto } from '../src/products/dto/attribute-type.dto';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
   let cookieHeader: string;
-  let testAttributeTypeId: number;
+  let testAttributeType: AttributeType;
+  let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, TestUsersModule],
+      providers: [DtoGeneratorService],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     testUsers = moduleFixture.get<TestUsersService>(TestUsersService);
     await app.init();
     await testUsers.init();
+
+    generate = moduleFixture
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(
+        moduleFixture.get<DtoGeneratorService>(DtoGeneratorService),
+      );
 
     const response = await request(app.getHttpServer())
       .post('/auth/login')
@@ -30,7 +41,7 @@ describe('ProductsController (e2e)', () => {
       });
     cookieHeader = response.headers['set-cookie'];
 
-    testAttributeTypeId = (
+    testAttributeType = (
       await request(app.getHttpServer())
         .post('/attributes')
         .set('Cookie', cookieHeader)
@@ -38,7 +49,7 @@ describe('ProductsController (e2e)', () => {
           name: 'Test attribute',
           valueType: 'string',
         })
-    ).body.id;
+    ).body;
   });
 
   afterAll(async () => {
@@ -51,28 +62,21 @@ describe('ProductsController (e2e)', () => {
         .get('/attributes')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      expect(response.body).toContainEqual({
-        id: testAttributeTypeId,
-        name: 'Test attribute',
-        valueType: 'string',
-      });
+      expect(response.body).toContainEqual(testAttributeType);
     });
   });
 
   describe('/attributes (POST)', () => {
     it('should create new attribute type', async () => {
+      const createData = generate(AttributeTypeDto);
       const response = await request(app.getHttpServer())
         .post('/attributes')
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test attribute 2',
-          valueType: 'number',
-        });
+        .send(createData);
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
         id: expect.any(Number),
-        name: 'Test attribute 2',
-        valueType: 'number',
+        ...createData,
       });
     });
 
@@ -98,33 +102,28 @@ describe('ProductsController (e2e)', () => {
 
   describe('/attributes/:id (PUT)', () => {
     it('should update attribute type', async () => {
+      const createData = generate(AttributeTypeDto);
       const id = (
         await request(app.getHttpServer())
           .post('/attributes')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test attribute 4',
-            valueType: 'string',
-          })
+          .send(createData)
       ).body.id;
+      const updateData = generate(AttributeTypeDto);
       const response = await request(app.getHttpServer())
         .put(`/attributes/${id}`)
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test attribute 4 updated',
-          valueType: 'boolean',
-        });
+        .send(updateData);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
-        id: id,
-        name: 'Test attribute 4 updated',
-        valueType: 'boolean',
+        id,
+        ...updateData,
       });
     });
 
     it('should return error when data is invalid', async () => {
       const response = await request(app.getHttpServer())
-        .put('/attributes/' + testAttributeTypeId)
+        .put('/attributes/' + testAttributeType.id)
         .set('Cookie', cookieHeader)
         .send({
           name: '',
@@ -142,13 +141,11 @@ describe('ProductsController (e2e)', () => {
     });
 
     it('should return error when attribute type does not exist', async () => {
+      const updateData = generate(AttributeTypeDto);
       const response = await request(app.getHttpServer())
         .put('/attributes/12345')
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test attribute 5 updated',
-          valueType: 'boolean',
-        });
+        .send(updateData);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
@@ -160,14 +157,12 @@ describe('ProductsController (e2e)', () => {
 
   describe('/attributes/:id (DELETE)', () => {
     it('should delete attribute type', async () => {
+      const createData = generate(AttributeTypeDto);
       const id = (
         await request(app.getHttpServer())
           .post('/attributes')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test attribute 6',
-            valueType: 'string',
-          })
+          .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
         .delete(`/attributes/${id}`)

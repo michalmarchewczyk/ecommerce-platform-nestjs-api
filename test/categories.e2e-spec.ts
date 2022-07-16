@@ -6,23 +6,37 @@ import { Role } from '../src/users/entities/role.enum';
 import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
 import { parseEndpoint } from './utils/parse-endpoint';
+import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
+import { Category } from '../src/products/entities/category.entity';
+import { Product } from '../src/products/entities/product.entity';
+import { CategoryCreateDto } from '../src/products/dto/category-create.dto';
+import { ProductCreateDto } from '../src/products/dto/product-create.dto';
+import { CategoryUpdateDto } from '../src/products/dto/category-update.dto';
 
 describe('CategoriesController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
   let cookieHeader: string;
-  let testCategoryId: number;
-  let testProductId: number;
+  let testCategory: Category;
+  let testProduct: Product;
+  let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, TestUsersModule],
+      providers: [DtoGeneratorService],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     testUsers = moduleFixture.get<TestUsersService>(TestUsersService);
     await app.init();
     await testUsers.init();
+
+    generate = moduleFixture
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(
+        moduleFixture.get<DtoGeneratorService>(DtoGeneratorService),
+      );
 
     const response = await request(app.getHttpServer())
       .post('/auth/login')
@@ -31,32 +45,26 @@ describe('CategoriesController (e2e)', () => {
       });
     cookieHeader = response.headers['set-cookie'];
 
-    testCategoryId = (
+    const createData = generate(CategoryCreateDto);
+    testCategory = (
       await request(app.getHttpServer())
         .post('/categories')
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test category',
-          description: 'Test category description',
-        })
-    ).body.id;
+        .send(createData)
+    ).body;
 
-    testProductId = (
+    const productData = generate(ProductCreateDto);
+    testProduct = (
       await request(app.getHttpServer())
         .post('/products')
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test product',
-          price: 100,
-          description: 'Test description',
-          stock: 100,
-        })
-    ).body.id;
+        .send(productData)
+    ).body;
 
     await request(app.getHttpServer())
-      .post('/categories/' + testCategoryId + '/products/')
+      .post('/categories/' + testCategory.id + '/products/')
       .set('Cookie', cookieHeader)
-      .send({ productId: testProductId });
+      .send({ productId: testProduct.id });
   });
 
   afterAll(async () => {
@@ -69,28 +77,17 @@ describe('CategoriesController (e2e)', () => {
         .get('/categories')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      expect(response.body).toContainEqual({
-        id: testCategoryId,
-        name: 'Test category',
-        description: 'Test category description',
-        slug: null,
-      });
+      expect(response.body).toContainEqual(testCategory);
     });
   });
 
   describe('/categories/:id (GET)', () => {
     it('should return category with given id', async () => {
       const response = await request(app.getHttpServer())
-        .get(`/categories/${testCategoryId}`)
+        .get(`/categories/${testCategory.id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({
-        id: testCategoryId,
-        name: 'Test category',
-        description: 'Test category description',
-        slug: null,
-        childCategories: [],
-      });
+      expect(response.body).toEqual({ ...testCategory, childCategories: [] });
     });
 
     it('should return error if category with given id does not exist', async () => {
@@ -108,29 +105,27 @@ describe('CategoriesController (e2e)', () => {
 
   describe('/categories (POST)', () => {
     it('should create new category', async () => {
+      const createData = generate(CategoryCreateDto);
       const response = await request(app.getHttpServer())
         .post('/categories')
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test category 2',
-          description: 'Test category description 2',
-        });
+        .send(createData);
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
         id: expect.any(Number),
-        name: 'Test category 2',
-        description: 'Test category description 2',
+        ...createData,
         slug: null,
       });
     });
 
     it('should return error if data is invalid', async () => {
+      const createData = generate(CategoryCreateDto);
       const response = await request(app.getHttpServer())
         .post('/categories')
         .set('Cookie', cookieHeader)
         .send({
+          ...createData,
           name: '',
-          description: 'Test category description 2',
         });
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
@@ -143,40 +138,31 @@ describe('CategoriesController (e2e)', () => {
 
   describe('/categories/:id (PATCH)', () => {
     it('should update category with given id', async () => {
+      const createData = generate(CategoryCreateDto);
       const id = (
         await request(app.getHttpServer())
           .post('/categories')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test category 3',
-            description: 'Test category description 3',
-          })
+          .send(createData)
       ).body.id;
+      const updateData = generate(CategoryUpdateDto, true);
       const response = await request(app.getHttpServer())
         .patch('/categories/' + id)
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test category 3 updated',
-          description: 'Test category description 3 updated',
-          slug: 'test-category-3-updated',
-        });
+        .send(updateData);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
-        id: id,
-        name: 'Test category 3 updated',
-        description: 'Test category description 3 updated',
-        slug: 'test-category-3-updated',
+        id,
+        ...updateData,
       });
     });
 
     it('should return error if category with given id does not exist', async () => {
+      const updateData = generate(CategoryUpdateDto, true);
       const response = await request(app.getHttpServer())
         .patch('/categories/12345')
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test category 3 updated',
-          description: 'Test category description 3 updated',
-        });
+        .send(updateData);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         message: ['category not found'],
@@ -186,12 +172,13 @@ describe('CategoriesController (e2e)', () => {
     });
 
     it('should return error if data is invalid', async () => {
+      const updateData = generate(CategoryUpdateDto, true);
       const response = await request(app.getHttpServer())
-        .patch(`/categories/${testCategoryId}`)
+        .patch(`/categories/${testCategory.id}`)
         .set('Cookie', cookieHeader)
         .send({
+          ...updateData,
           name: '',
-          description: 'Test category description 3 updated',
         });
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
@@ -204,14 +191,12 @@ describe('CategoriesController (e2e)', () => {
 
   describe('/categories/:id (DELETE)', () => {
     it('should delete category with given id', async () => {
+      const createData = generate(CategoryCreateDto);
       const id = (
         await request(app.getHttpServer())
           .post('/categories')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test category 4',
-            description: 'Test category description 4',
-          })
+          .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
         .delete('/categories/' + id)
@@ -236,20 +221,13 @@ describe('CategoriesController (e2e)', () => {
   describe('/categories/:id/products (GET)', () => {
     it('should return products of category with given id', async () => {
       const response = await request(app.getHttpServer())
-        .get(`/categories/${testCategoryId}/products`)
+        .get(`/categories/${testCategory.id}/products`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
       expect(response.body).toContainEqual({
-        id: testProductId,
-        name: 'Test product',
-        description: 'Test description',
-        price: 100,
-        stock: 100,
-        visible: true,
+        ...testProduct,
         attributes: [],
         photos: [],
-        created: expect.any(String),
-        updated: expect.any(String),
       });
     });
 
@@ -268,33 +246,24 @@ describe('CategoriesController (e2e)', () => {
 
   describe('/categories/:id/products (POST)', () => {
     it('should add product to category with given id', async () => {
+      const createData = generate(ProductCreateDto);
       const categoryId = (
         await request(app.getHttpServer())
           .post('/categories')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test category 5',
-            description: 'Test category description 5',
-          })
+          .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
         .post(`/categories/${categoryId}/products`)
         .set('Cookie', cookieHeader)
         .send({
-          productId: testProductId,
+          productId: testProduct.id,
         });
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
-        id: testProductId,
-        name: 'Test product',
-        description: 'Test description',
-        price: 100,
-        stock: 100,
-        visible: true,
+        ...testProduct,
         attributes: [],
         photos: [],
-        created: expect.any(String),
-        updated: expect.any(String),
       });
     });
 
@@ -303,7 +272,7 @@ describe('CategoriesController (e2e)', () => {
         .post('/categories/12345/products')
         .set('Cookie', cookieHeader)
         .send({
-          productId: testProductId,
+          productId: testProduct.id,
         });
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
@@ -316,29 +285,27 @@ describe('CategoriesController (e2e)', () => {
 
   describe('/categories/:id/products/:productId (DELETE)', () => {
     it('should delete product from category with given id', async () => {
+      const createData = generate(ProductCreateDto);
       const categoryId = (
         await request(app.getHttpServer())
           .post('/categories')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test category 5',
-            description: 'Test category description 5',
-          })
+          .send(createData)
       ).body.id;
       await request(app.getHttpServer())
         .post(`/categories/${categoryId}/products`)
         .set('Cookie', cookieHeader)
         .send({
-          productId: testProductId,
+          productId: testProduct.id,
         });
       const response = await request(app.getHttpServer())
-        .delete(`/categories/${categoryId}/products/${testProductId}`)
+        .delete(`/categories/${categoryId}/products/${testProduct.id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({});
     });
 
-    it('should return error if category with given id does not exist', async () => {
+    it('should return error if category or product with given id does not exist', async () => {
       const response = await request(app.getHttpServer())
         .delete('/categories/12345/products/12345')
         .set('Cookie', cookieHeader);

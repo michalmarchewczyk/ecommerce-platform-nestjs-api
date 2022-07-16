@@ -6,22 +6,36 @@ import { Role } from '../src/users/entities/role.enum';
 import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
 import { parseEndpoint } from './utils/parse-endpoint';
+import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
+import { ProductCreateDto } from '../src/products/dto/product-create.dto';
+import { Product } from '../src/products/entities/product.entity';
+import { ProductUpdateDto } from '../src/products/dto/product-update.dto';
+import { AttributeDto } from '../src/products/dto/attribute.dto';
+import { AttributeTypeDto } from '../src/products/dto/attribute-type.dto';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
   let cookieHeader: string;
-  let testProductId: number;
+  let testProduct: Product;
+  let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, TestUsersModule],
+      providers: [DtoGeneratorService],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     testUsers = moduleFixture.get<TestUsersService>(TestUsersService);
     await app.init();
     await testUsers.init();
+
+    generate = moduleFixture
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(
+        moduleFixture.get<DtoGeneratorService>(DtoGeneratorService),
+      );
 
     const response = await request(app.getHttpServer())
       .post('/auth/login')
@@ -30,17 +44,13 @@ describe('ProductsController (e2e)', () => {
       });
     cookieHeader = response.headers['set-cookie'];
 
-    testProductId = (
+    const createData = generate(ProductCreateDto);
+    testProduct = (
       await request(app.getHttpServer())
         .post('/products')
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test product',
-          price: 100,
-          description: 'Test description',
-          stock: 100,
-        })
-    ).body.id;
+        .send(createData)
+    ).body;
   });
 
   afterAll(async () => {
@@ -54,14 +64,7 @@ describe('ProductsController (e2e)', () => {
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
       expect(response.body).toContainEqual({
-        id: testProductId,
-        name: 'Test product',
-        price: 100,
-        description: 'Test description',
-        stock: 100,
-        visible: true,
-        created: expect.any(String),
-        updated: expect.any(String),
+        ...testProduct,
         attributes: [],
         photos: [],
       });
@@ -71,18 +74,11 @@ describe('ProductsController (e2e)', () => {
   describe('/products/:id (GET)', () => {
     it('should return product by id', async () => {
       const response = await request(app.getHttpServer())
-        .get('/products/' + testProductId)
+        .get('/products/' + testProduct.id)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
-        id: testProductId,
-        name: 'Test product',
-        price: 100,
-        description: 'Test description',
-        stock: 100,
-        visible: true,
-        created: expect.any(String),
-        updated: expect.any(String),
+        ...testProduct,
         attributes: [],
         photos: [],
       });
@@ -103,22 +99,15 @@ describe('ProductsController (e2e)', () => {
 
   describe('/products (POST)', () => {
     it('should create product', async () => {
+      const createData = generate(ProductCreateDto);
       const response = await request(app.getHttpServer())
         .post('/products')
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test product 2',
-          price: 200,
-          description: 'Test description 2',
-          stock: 200,
-        });
+        .send(createData);
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
         id: expect.any(Number),
-        name: 'Test product 2',
-        price: 200,
-        description: 'Test description 2',
-        stock: 200,
+        ...createData,
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
@@ -126,13 +115,14 @@ describe('ProductsController (e2e)', () => {
     });
 
     it('should return error when data is invalid', async () => {
+      const createData = generate(ProductCreateDto);
       const response = await request(app.getHttpServer())
         .post('/products')
         .set('Cookie', cookieHeader)
         .send({
+          ...createData,
           name: '',
           price: '200',
-          description: 'Test description 2',
           stock: '200',
         });
       expect(response.status).toBe(400);
@@ -152,34 +142,22 @@ describe('ProductsController (e2e)', () => {
 
   describe('/products/:id (PATCH)', () => {
     it('should update product', async () => {
+      const createData = generate(ProductCreateDto);
       const id = (
         await request(app.getHttpServer())
           .post('/products')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test product 3',
-            price: 300,
-            description: 'Test description 3',
-            stock: 300,
-          })
+          .send(createData)
       ).body.id;
+      const updateData = generate(ProductUpdateDto, true);
       const response = await request(app.getHttpServer())
         .patch('/products/' + id)
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test product 3 updated',
-          price: 3300,
-          stock: 330,
-          visible: false,
-        });
+        .send(updateData);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
         id: expect.any(Number),
-        name: 'Test product 3 updated',
-        price: 3300,
-        description: 'Test description 3',
-        stock: 330,
-        visible: false,
+        ...updateData,
         created: expect.any(String),
         updated: expect.any(String),
         attributes: [],
@@ -189,15 +167,11 @@ describe('ProductsController (e2e)', () => {
     });
 
     it('should return error if product not found', async () => {
+      const updateData = generate(ProductUpdateDto, true);
       const response = await request(app.getHttpServer())
         .patch('/products/12345')
         .set('Cookie', cookieHeader)
-        .send({
-          name: 'Test product 3 updated',
-          price: 3300,
-          stock: 330,
-          visible: false,
-        });
+        .send(updateData);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
@@ -207,21 +181,19 @@ describe('ProductsController (e2e)', () => {
     });
 
     it('should return error when data is invalid', async () => {
+      const createData = generate(ProductCreateDto);
       const id = (
         await request(app.getHttpServer())
           .post('/products')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test product 4',
-            price: 400,
-            description: 'Test description 4',
-            stock: 400,
-          })
+          .send(createData)
       ).body.id;
+      const updateData = generate(ProductUpdateDto, true);
       const response = await request(app.getHttpServer())
         .patch('/products/' + id)
         .set('Cookie', cookieHeader)
         .send({
+          ...updateData,
           name: '',
           price: '200',
           stock: '200',
@@ -243,16 +215,12 @@ describe('ProductsController (e2e)', () => {
 
   describe('/products/:id (DELETE)', () => {
     it('should delete product', async () => {
+      const createData = generate(ProductCreateDto);
       const id = (
         await request(app.getHttpServer())
           .post('/products')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test product 5',
-            price: 500,
-            description: 'Test description 5',
-            stock: 500,
-          })
+          .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
         .delete('/products/' + id)
@@ -276,50 +244,44 @@ describe('ProductsController (e2e)', () => {
 
   describe('/products/:id/attributes (PATCH)', () => {
     it('should update product attributes', async () => {
+      const createData = generate(ProductCreateDto);
       const id = (
         await request(app.getHttpServer())
           .post('/products')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test product 6',
-            price: 600,
-            description: 'Test description 6',
-            stock: 600,
-          })
+          .send(createData)
       ).body.id;
+      const attributeTypeData = generate(AttributeTypeDto);
       const attrId = (
         await request(app.getHttpServer())
           .post('/attributes')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test attribute 1',
-            valueType: 'string',
-          })
+          .send(attributeTypeData)
       ).body.id;
+      const attributeData = generate(AttributeDto);
       const response = await request(app.getHttpServer())
         .patch('/products/' + id + '/attributes')
         .set('Cookie', cookieHeader)
         .send([
           {
-            value: 'Test attribute 1',
-            type: { id: attrId },
+            ...attributeData,
+            typeId: attrId,
           },
         ]);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
         id: expect.any(Number),
-        name: 'Test product 6',
-        price: 600,
-        description: 'Test description 6',
-        stock: 600,
+        ...createData,
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
         attributes: [
           {
             id: expect.any(Number),
-            value: 'Test attribute 1',
-            type: { id: attrId },
+            value: attributeData.value,
+            type: {
+              id: attrId,
+            },
           },
         ],
         photos: [],
@@ -341,16 +303,12 @@ describe('ProductsController (e2e)', () => {
 
   describe('/products/:id/photos (POST)', () => {
     it('should add photo to product', async () => {
+      const createData = generate(ProductCreateDto);
       const id = (
         await request(app.getHttpServer())
           .post('/products')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test product 7',
-            price: 700,
-            description: 'Test description 7',
-            stock: 700,
-          })
+          .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
         .post('/products/' + id + '/photos')
@@ -359,10 +317,7 @@ describe('ProductsController (e2e)', () => {
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
         id: expect.any(Number),
-        name: 'Test product 7',
-        price: 700,
-        description: 'Test description 7',
-        stock: 700,
+        ...createData,
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
@@ -383,16 +338,12 @@ describe('ProductsController (e2e)', () => {
     });
 
     it('should return error if wrong file type', async () => {
+      const createData = generate(ProductCreateDto);
       const id = (
         await request(app.getHttpServer())
           .post('/products')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test product 8',
-            price: 800,
-            description: 'Test description 8',
-            stock: 800,
-          })
+          .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
         .post('/products/' + id + '/photos')
@@ -423,16 +374,12 @@ describe('ProductsController (e2e)', () => {
 
   describe('/products/:id/photos/:photoId (DELETE)', () => {
     it('should delete photo from product', async () => {
+      const createData = generate(ProductCreateDto);
       const id = (
         await request(app.getHttpServer())
           .post('/products')
           .set('Cookie', cookieHeader)
-          .send({
-            name: 'Test product 8',
-            price: 800,
-            description: 'Test description 8',
-            stock: 800,
-          })
+          .send(createData)
       ).body.id;
       const photoId = (
         await request(app.getHttpServer())

@@ -6,20 +6,30 @@ import { Role } from '../src/users/entities/role.enum';
 import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
 import { parseEndpoint } from './utils/parse-endpoint';
+import { RegisterDto } from '../src/auth/dto/register.dto';
+import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
+import { UserUpdateDto } from '../src/users/dto/user-update.dto';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
+  let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule, TestUsersModule],
+      providers: [DtoGeneratorService],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     testUsers = moduleFixture.get<TestUsersService>(TestUsersService);
     await app.init();
     await testUsers.init();
+    generate = moduleFixture
+      .get<DtoGeneratorService>(DtoGeneratorService)
+      .generate.bind(
+        moduleFixture.get<DtoGeneratorService>(DtoGeneratorService),
+      );
   });
 
   afterAll(async () => {
@@ -140,11 +150,11 @@ describe('UsersController (e2e)', () => {
     let id: number;
 
     beforeAll(async () => {
+      const registerData = generate(RegisterDto);
       id = (
-        await request(app.getHttpServer()).post('/auth/register').send({
-          email: 'testuser@test.local',
-          password: 'test1234',
-        })
+        await request(app.getHttpServer())
+          .post('/auth/register')
+          .send(registerData)
       ).body.id;
       const response = await request(app.getHttpServer())
         .post('/auth/login')
@@ -155,23 +165,16 @@ describe('UsersController (e2e)', () => {
     });
 
     it('should update user by id', async () => {
+      const updateData = generate(UserUpdateDto, true);
       const response = await request(app.getHttpServer())
         .patch('/users/' + id)
         .set('Cookie', cookieHeader)
-        .send({
-          email: 'testuserupdated@test.local',
-          role: Role.Manager,
-          firstName: 'Test',
-          lastName: 'User',
-        });
+        .send(updateData);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
         id: id,
-        email: 'testuserupdated@test.local',
-        role: Role.Manager,
         registered: expect.any(String),
-        firstName: 'Test',
-        lastName: 'User',
+        ...updateData,
       });
     });
 
@@ -180,7 +183,7 @@ describe('UsersController (e2e)', () => {
         .patch('/users/' + id)
         .set('Cookie', cookieHeader)
         .send({
-          email: 'testuser',
+          email: 'test',
         });
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
@@ -208,11 +211,11 @@ describe('UsersController (e2e)', () => {
     let id: number;
 
     beforeAll(async () => {
+      const registerData = generate(RegisterDto);
       id = (
-        await request(app.getHttpServer()).post('/auth/register').send({
-          email: 'testuser2@test.local',
-          password: 'test1234',
-        })
+        await request(app.getHttpServer())
+          .post('/auth/register')
+          .send(registerData)
       ).body.id;
       const response = await request(app.getHttpServer())
         .post('/auth/login')

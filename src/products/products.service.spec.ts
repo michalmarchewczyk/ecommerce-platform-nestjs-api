@@ -8,45 +8,12 @@ import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/product-update.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
+import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 
 describe('ProductsService', () => {
   let service: ProductsService;
   let generate: DtoGeneratorService['generate'];
-  const mockProductsRepository = {
-    products: [],
-    save(product): Product {
-      const id = product.id ?? Math.floor(Math.random() * 1000000);
-      this.products.push({
-        visible: true,
-        attributes: [],
-        photos: [],
-        ...product,
-        id,
-      });
-      return {
-        visible: true,
-        attributes: [],
-        photos: [],
-        ...product,
-        id,
-      } as Product;
-    },
-    find(): Product[] {
-      return this.products;
-    },
-    findOne(options: { where: { id?: number } }): Product | null {
-      const product = this.products.find((p) => p.id === options.where.id);
-      return product ?? null;
-    },
-    delete(where: { id: number }): void {
-      this.products = this.products.filter((p) => p.id !== where.id);
-    },
-  };
-  const mockAttributesRepository = {
-    save(attributes: Attribute[]): Attribute[] {
-      return attributes;
-    },
-  };
+  let mockProductsRepository: RepositoryMockService<Product>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -54,11 +21,11 @@ describe('ProductsService', () => {
         ProductsService,
         {
           provide: getRepositoryToken(Product),
-          useValue: mockProductsRepository,
+          useValue: new RepositoryMockService(Product),
         },
         {
           provide: getRepositoryToken(Attribute),
-          useValue: mockAttributesRepository,
+          useValue: new RepositoryMockService(Attribute),
         },
         DtoGeneratorService,
       ],
@@ -68,6 +35,8 @@ describe('ProductsService', () => {
     generate = module
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
+    mockProductsRepository = module.get(getRepositoryToken(Product));
+    // mockAttributesRepository = module.get(getRepositoryToken(Attribute));
   });
 
   it('should be defined', () => {
@@ -77,7 +46,7 @@ describe('ProductsService', () => {
   describe('getProducts', () => {
     it('should return all products', async () => {
       const products = await service.getProducts();
-      expect(products).toEqual(mockProductsRepository.products);
+      expect(products).toEqual(mockProductsRepository.find());
     });
   });
 
@@ -92,6 +61,8 @@ describe('ProductsService', () => {
         visible: true,
         attributes: [],
         photos: [],
+        created: expect.any(Date),
+        updated: expect.any(Date),
       });
     });
   });
@@ -106,9 +77,11 @@ describe('ProductsService', () => {
         visible: true,
         attributes: [],
         photos: [],
+        created: expect.any(Date),
+        updated: expect.any(Date),
       });
       expect(
-        mockProductsRepository.products.some((p) => p.name === createData.name),
+        mockProductsRepository.entities.some((p) => p.name === createData.name),
       ).toBeTruthy();
     });
   });
@@ -124,9 +97,11 @@ describe('ProductsService', () => {
         id,
         attributes: [],
         photos: [],
+        created: expect.any(Date),
+        updated: expect.any(Date),
       });
       expect(
-        mockProductsRepository.products.some((p) => p.name === updateData.name),
+        mockProductsRepository.entities.some((p) => p.name === updateData.name),
       ).toBeTruthy();
     });
 
@@ -143,7 +118,7 @@ describe('ProductsService', () => {
       const deleted = await service.deleteProduct(id);
       expect(deleted).toBe(true);
       expect(
-        mockProductsRepository.products.find((p) => p.id === id),
+        mockProductsRepository.entities.find((p) => p.id === id),
       ).toBeUndefined();
     });
 
@@ -157,20 +132,24 @@ describe('ProductsService', () => {
     it('should update product attributes', async () => {
       const product = generate(ProductCreateDto, true);
       const { id } = mockProductsRepository.save(product);
-      const attributes = generate(AttributeDto, false, 4);
-      const updated = await service.updateProductAttributes(id, attributes);
-      const expectedAttributes = attributes.map((a) => ({
+      const attributesData = generate(AttributeDto, false, 4);
+      const updated = await service.updateProductAttributes(id, attributesData);
+      const expectedAttributes = attributesData.map((a) => ({
+        id: expect.any(Number),
         value: a.value,
         type: { id: a.typeId },
+        product: null,
       }));
       expect(updated).toEqual({
         ...product,
         id,
         attributes: expectedAttributes,
         photos: [],
+        created: expect.any(Date),
+        updated: expect.any(Date),
       });
       expect(
-        mockProductsRepository.products.find((p) => p.id === id)?.attributes,
+        mockProductsRepository.entities.find((p) => p.id === id)?.attributes,
       ).toEqual(expectedAttributes);
     });
 
@@ -188,7 +167,7 @@ describe('ProductsService', () => {
       const updated = await service.addProductPhoto(id, fileMetadata);
       expect(updated.photos).toHaveLength(1);
       expect(
-        mockProductsRepository.products.find((p) => p.id === id)?.photos,
+        mockProductsRepository.entities.find((p) => p.id === id)?.photos,
       ).toEqual([
         {
           path: fileMetadata.path,
@@ -214,7 +193,7 @@ describe('ProductsService', () => {
       expect(updated).toBeDefined();
       expect(updated.photos).toHaveLength(0);
       expect(
-        mockProductsRepository.products.find((p) => p.id === id)?.photos,
+        mockProductsRepository.entities.find((p) => p.id === id)?.photos,
       ).toEqual([]);
     });
 

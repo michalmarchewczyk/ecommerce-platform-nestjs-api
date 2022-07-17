@@ -25,7 +25,7 @@ export class RepositoryMockService<T> {
         unique: !!(column.options.unique || column.options.primary),
         primary: !!column.options.primary,
         optional: column.options.nullable ?? false,
-        default: column.options.default ?? null,
+        default: column.options.default ? () => column.options.default : null,
         hidden: column.options.select === false ?? false,
       });
     }
@@ -41,19 +41,25 @@ export class RepositoryMockService<T> {
         default:
           relation.relationType === 'one-to-many' ||
           relation.relationType === 'many-to-many'
-            ? []
+            ? () => []
             : null,
         hidden: false,
       });
     }
   }
 
-  public save(entity: T): T {
+  public save(entity: Partial<T>): T;
+  public save(entities: Partial<T>[]): T[];
+
+  public save(entity: Partial<T> | Partial<T>[]): T | T[] {
+    if (Array.isArray(entity)) {
+      return entity.map((entity) => this.save(entity));
+    }
     const foundByPrimary = this.entities.find((e) => {
       const primaryName = this.columns.find((c) => c.primary).name;
       return e[primaryName] === entity[primaryName];
     });
-    if (foundByPrimary || this.entities.includes(entity)) {
+    if (foundByPrimary || this.entities.includes(entity as T)) {
       const savedEntity =
         foundByPrimary ?? this.entities.find((e) => e === entity);
       for (const column of this.columns) {
@@ -70,6 +76,13 @@ export class RepositoryMockService<T> {
           savedEntity[column.name] = new Date();
         } else if (
           column.mode === 'regular' &&
+          entity[column.name] !== undefined
+        ) {
+          savedEntity[column.name] = entity[column.name];
+        } else if (
+          ['one-to-many', 'many-to-many', 'one-to-one', 'many-to-one'].includes(
+            column.mode,
+          ) &&
           entity[column.name] !== undefined
         ) {
           savedEntity[column.name] = entity[column.name];
@@ -105,7 +118,7 @@ export class RepositoryMockService<T> {
         } else if (column.mode === 'regular') {
           if (entity[column.name] === undefined) {
             if (column.default) {
-              newEntity[column.name] = column.default;
+              newEntity[column.name] = column.default();
             } else {
               if (column.optional) {
                 newEntity[column.name] = null;
@@ -116,6 +129,13 @@ export class RepositoryMockService<T> {
           } else {
             newEntity[column.name] = entity[column.name];
           }
+        } else if (
+          ['one-to-many', 'many-to-many', 'one-to-one', 'many-to-one'].includes(
+            column.mode,
+          )
+        ) {
+          newEntity[column.name] =
+            entity[column.name] ?? column.default?.() ?? null;
         }
       }
       this.entities.push(newEntity as T);
@@ -185,23 +205,4 @@ export class RepositoryMockService<T> {
       this.entities = this.entities.filter((entity) => entity !== foundEntity);
     }
   }
-
-  // private generateValue(type: ColumnType) {
-  //   if (typeof type !== 'function') {
-  //     return typeof type;
-  //   } else {
-  //     return typeof type();
-  //   }
-  // }
-  //
-  // public generate() {
-  //   const object = {};
-  //   const columnsToGenerate = getMetadataArgsStorage()
-  //     .filterColumns(this.entity)
-  //     .filter((c) => c.mode === 'regular' && !c.options.primary);
-  //   for (const column of columnsToGenerate) {
-  //     object[column.propertyName] = this.generateValue(column.options.type);
-  //   }
-  //   console.log('GENERATED OBJECT', object);
-  // }
 }

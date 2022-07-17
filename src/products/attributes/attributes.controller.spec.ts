@@ -6,42 +6,21 @@ import { AttributeType } from '../entities/attribute-type.entity';
 import { NotFoundException } from '@nestjs/common';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { AttributeTypeDto } from '../dto/attribute-type.dto';
+import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 
 describe('AttributesController', () => {
   let controller: AttributesController;
   let generate: DtoGeneratorService['generate'];
-  const mockAttributeTypesRepository = {
-    attributeTypes: [],
-    save(attributeType): AttributeType {
-      const id = attributeType.id ?? Math.floor(Math.random() * 1000000);
-      const valueType = attributeType.valueType ?? 'string';
-      this.attributeTypes.push({ ...attributeType, id, valueType });
-      return { ...attributeType, id, valueType } as AttributeType;
-    },
-    find(): AttributeType[] {
-      return this.attributeTypes;
-    },
-    findOne(options: { where: { id?: number } }): AttributeType | null {
-      const attributeType = this.attributeTypes.find(
-        (p) => p.id === options.where.id,
-      );
-      return attributeType ?? null;
-    },
-    delete(where: { id: number }): void {
-      this.attributeTypes = this.attributeTypes.filter(
-        (p) => p.id !== where.id,
-      );
-    },
-  };
+  let mockAttributeTypesRepository: RepositoryMockService<AttributeType>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AttributesController],
       providers: [
         AttributesService,
         {
           provide: getRepositoryToken(AttributeType),
-          useValue: mockAttributeTypesRepository,
+          useValue: new RepositoryMockService(AttributeType),
         },
         DtoGeneratorService,
       ],
@@ -51,6 +30,9 @@ describe('AttributesController', () => {
     generate = module
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
+    mockAttributeTypesRepository = module.get(
+      getRepositoryToken(AttributeType),
+    );
   });
 
   it('should be defined', () => {
@@ -60,7 +42,7 @@ describe('AttributesController', () => {
   describe('getAttributeTypes', () => {
     it('should return all attribute types', async () => {
       expect(await controller.getAttributeTypes()).toEqual(
-        mockAttributeTypesRepository.attributeTypes,
+        mockAttributeTypesRepository.entities,
       );
     });
   });
@@ -72,6 +54,7 @@ describe('AttributesController', () => {
       expect(created).toEqual({
         id: expect.any(Number),
         ...createData,
+        attributes: [],
       });
     });
   });
@@ -84,10 +67,11 @@ describe('AttributesController', () => {
       const updated = await controller.updateAttributeType(id, updateData);
       expect(updated).toBeDefined();
       expect(
-        mockAttributeTypesRepository.attributeTypes.find((a) => a.id === id),
+        mockAttributeTypesRepository.entities.find((a) => a.id === id),
       ).toEqual({
         id: expect.any(Number),
         ...updateData,
+        attributes: [],
       });
     });
 
@@ -105,7 +89,7 @@ describe('AttributesController', () => {
       const { id } = await controller.createAttributeType(createData);
       await controller.deleteAttributeType(id);
       expect(
-        mockAttributeTypesRepository.attributeTypes.find((a) => a.id === id),
+        mockAttributeTypesRepository.entities.find((a) => a.id === id),
       ).toBeUndefined();
     });
 

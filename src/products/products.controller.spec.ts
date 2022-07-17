@@ -10,45 +10,12 @@ import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/product-update.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
+import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
   let generate: DtoGeneratorService['generate'];
-  const mockProductsRepository = {
-    products: [],
-    save(product): Product {
-      const id = product.id ?? Math.floor(Math.random() * 1000000);
-      this.products.push({
-        visible: true,
-        attributes: [],
-        photos: [],
-        ...product,
-        id,
-      });
-      return {
-        visible: true,
-        attributes: [],
-        photos: [],
-        ...product,
-        id,
-      } as Product;
-    },
-    find(): Product[] {
-      return this.products;
-    },
-    findOne(options: { where: { id?: number } }): Product | null {
-      const product = this.products.find((p) => p.id === options.where.id);
-      return product ?? null;
-    },
-    delete(where: { id: number }): void {
-      this.products = this.products.filter((p) => p.id !== where.id);
-    },
-  };
-  const mockAttributesRepository = {
-    save(attributes: Attribute[]): Attribute[] {
-      return attributes;
-    },
-  };
+  let mockProductsRepository: RepositoryMockService<Product>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -57,11 +24,11 @@ describe('ProductsController', () => {
         ProductsService,
         {
           provide: getRepositoryToken(Product),
-          useValue: mockProductsRepository,
+          useValue: new RepositoryMockService(Product),
         },
         {
           provide: getRepositoryToken(Attribute),
-          useValue: mockAttributesRepository,
+          useValue: new RepositoryMockService(Attribute),
         },
         DtoGeneratorService,
       ],
@@ -71,6 +38,8 @@ describe('ProductsController', () => {
     generate = module
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
+    mockProductsRepository = module.get(getRepositoryToken(Product));
+    // mockAttributesRepository = module.get(getRepositoryToken(Attribute));
   });
 
   it('should be defined', () => {
@@ -80,7 +49,7 @@ describe('ProductsController', () => {
   describe('getProducts', () => {
     it('should return all products', async () => {
       expect(await controller.getProducts()).toEqual(
-        mockProductsRepository.products,
+        mockProductsRepository.entities,
       );
     });
   });
@@ -92,8 +61,13 @@ describe('ProductsController', () => {
         id: 1,
         attributes: [],
       };
-      mockProductsRepository.products.push(product);
-      expect(await controller.getProduct(1)).toEqual(product);
+      mockProductsRepository.save(product);
+      expect(await controller.getProduct(1)).toEqual({
+        ...product,
+        photos: [],
+        created: expect.any(Date),
+        updated: expect.any(Date),
+      });
     });
 
     it('should return null if product not found', async () => {
@@ -112,6 +86,8 @@ describe('ProductsController', () => {
         id: expect.any(Number),
         attributes: [],
         photos: [],
+        created: expect.any(Date),
+        updated: expect.any(Date),
       });
     });
   });
@@ -127,6 +103,8 @@ describe('ProductsController', () => {
         id: expect.any(Number),
         attributes: [],
         photos: [],
+        created: expect.any(Date),
+        updated: expect.any(Date),
       });
     });
 
@@ -143,7 +121,7 @@ describe('ProductsController', () => {
       const { id } = await controller.createProduct(createData);
       await controller.deleteProduct(id);
       expect(
-        mockProductsRepository.products.find((p) => p.id === id),
+        mockProductsRepository.entities.find((p) => p.id === id),
       ).toBeUndefined();
     });
 
@@ -164,14 +142,18 @@ describe('ProductsController', () => {
         attributesData,
       );
       const expectedAttributes = attributesData.map((a) => ({
+        id: expect.any(Number),
         value: a.value,
         type: { id: a.typeId },
+        product: null,
       }));
       expect(updated).toEqual({
         ...createData,
         id: expect.any(Number),
         photos: [],
         attributes: expectedAttributes,
+        created: expect.any(Date),
+        updated: expect.any(Date),
       });
     });
 
@@ -190,7 +172,7 @@ describe('ProductsController', () => {
       const updated = await controller.addProductPhoto(id, fileMetadata);
       expect(updated.photos).toHaveLength(1);
       expect(
-        mockProductsRepository.products.find((p) => p.id === id)?.photos,
+        mockProductsRepository.entities.find((p) => p.id === id)?.photos,
       ).toEqual([
         {
           path: fileMetadata.path,
@@ -217,7 +199,7 @@ describe('ProductsController', () => {
       expect(updated).toBeDefined();
       expect(updated.photos).toHaveLength(0);
       expect(
-        mockProductsRepository.products.find((p) => p.id === id)?.photos,
+        mockProductsRepository.entities.find((p) => p.id === id)?.photos,
       ).toEqual([]);
     });
 

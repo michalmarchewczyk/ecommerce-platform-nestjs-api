@@ -9,68 +9,13 @@ import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-gener
 import { CategoryCreateDto } from '../dto/category-create.dto';
 import { CategoryUpdateDto } from '../dto/category-update.dto';
 import { ProductCreateDto } from '../dto/product-create.dto';
+import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 
 describe('CategoriesController', () => {
   let controller: CategoriesController;
   let generate: DtoGeneratorService['generate'];
-  const mockProductsRepository = {
-    products: [],
-    save(product): Product {
-      const id = product.id ?? Math.floor(Math.random() * 1000000);
-      this.products.push({
-        visible: true,
-        attributes: [],
-        photos: [],
-        ...product,
-        id,
-      });
-      return {
-        visible: true,
-        attributes: [],
-        photos: [],
-        ...product,
-        id,
-      } as Product;
-    },
-    find(): Product[] {
-      return this.products;
-    },
-    findOne(options: { where: { id?: number } }): Product | null {
-      const product = this.products.find((p) => p.id === options.where.id);
-      return product ?? null;
-    },
-    delete(where: { id: number }): void {
-      this.products = this.products.filter((p) => p.id !== where.id);
-    },
-  };
-  const mockCategoriesRepository = {
-    categories: [],
-    save(category): Category {
-      const id = category.id ?? Math.floor(Math.random() * 1000000);
-      this.categories.push({
-        childCategories: [],
-        products: [],
-        ...category,
-        id,
-      });
-      return {
-        childCategories: [],
-        products: [],
-        ...category,
-        id,
-      } as Category;
-    },
-    find(): Category[] {
-      return this.categories;
-    },
-    findOne(options: { where: { id?: number } }): Category | null {
-      const category = this.categories.find((c) => c.id === options.where.id);
-      return category ?? null;
-    },
-    delete(where: { id: number }): void {
-      this.categories = this.categories.filter((c) => c.id !== where.id);
-    },
-  };
+  let mockProductsRepository: RepositoryMockService<Product>;
+  let mockCategoriesRepository: RepositoryMockService<Category>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -79,11 +24,11 @@ describe('CategoriesController', () => {
         CategoriesService,
         {
           provide: getRepositoryToken(Product),
-          useValue: mockProductsRepository,
+          useValue: new RepositoryMockService(Product),
         },
         {
           provide: getRepositoryToken(Category),
-          useValue: mockCategoriesRepository,
+          useValue: new RepositoryMockService(Category),
         },
         DtoGeneratorService,
       ],
@@ -93,6 +38,8 @@ describe('CategoriesController', () => {
     generate = module
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
+    mockProductsRepository = module.get(getRepositoryToken(Product));
+    mockCategoriesRepository = module.get(getRepositoryToken(Category));
   });
 
   it('should be defined', () => {
@@ -102,7 +49,7 @@ describe('CategoriesController', () => {
   describe('getCategories', () => {
     it('should return all categories', async () => {
       const categories = await controller.getCategories();
-      expect(categories).toEqual(mockCategoriesRepository.categories);
+      expect(categories).toEqual(mockCategoriesRepository.entities);
     });
   });
 
@@ -116,6 +63,8 @@ describe('CategoriesController', () => {
         ...createData,
         childCategories: [],
         products: [],
+        parentCategory: null,
+        slug: null,
       });
     });
 
@@ -135,14 +84,18 @@ describe('CategoriesController', () => {
         ...createData,
         childCategories: [],
         products: [],
+        parentCategory: null,
+        slug: null,
       });
       expect(
-        mockCategoriesRepository.categories.find((c) => c.id === created.id),
+        mockCategoriesRepository.entities.find((c) => c.id === created.id),
       ).toEqual({
         id: expect.any(Number),
         ...createData,
         childCategories: [],
         products: [],
+        parentCategory: null,
+        slug: null,
       });
     });
   });
@@ -158,14 +111,16 @@ describe('CategoriesController', () => {
         ...updateData,
         childCategories: [],
         products: [],
+        parentCategory: null,
       });
       expect(
-        mockCategoriesRepository.categories.find((c) => c.id === updated.id),
+        mockCategoriesRepository.entities.find((c) => c.id === updated.id),
       ).toEqual({
         id,
         ...updateData,
         childCategories: [],
         products: [],
+        parentCategory: null,
       });
     });
 
@@ -182,7 +137,7 @@ describe('CategoriesController', () => {
       const { id } = mockCategoriesRepository.save(createData);
       await controller.deleteCategory(id);
       expect(
-        mockCategoriesRepository.categories.find((c) => c.id === id),
+        mockCategoriesRepository.entities.find((c) => c.id === id),
       ).toBeUndefined();
     });
 
@@ -199,7 +154,7 @@ describe('CategoriesController', () => {
       const { id } = mockCategoriesRepository.save(createData);
       const products = await controller.getCategoryProducts(id);
       expect(products).toEqual(
-        mockCategoriesRepository.categories.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id).products,
       );
     });
 
@@ -222,9 +177,11 @@ describe('CategoriesController', () => {
         ...productData,
         attributes: [],
         photos: [],
+        created: expect.any(Date),
+        updated: expect.any(Date),
       });
       expect(
-        mockCategoriesRepository.categories.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id).products,
       ).toEqual([product]);
     });
 
@@ -244,7 +201,7 @@ describe('CategoriesController', () => {
       await controller.addCategoryProduct(id, productId);
       await controller.deleteCategoryProduct(id, productId);
       expect(
-        mockCategoriesRepository.categories.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id).products,
       ).toEqual([]);
     });
 

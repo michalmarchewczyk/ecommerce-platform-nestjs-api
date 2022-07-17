@@ -3,52 +3,26 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UserUpdateDto } from './dto/user-update.dto';
-import { Role } from './entities/role.enum';
 import { NotFoundException } from '@nestjs/common';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
+import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { RegisterDto } from '../auth/dto/register.dto';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  const mockUsersService = {
-    users: [
-      {
-        id: 1,
-        email: 'test@test.local',
-        role: Role.Customer,
-      },
-    ],
-    getUser(id: number): User {
-      return this.users.find((u) => u.id === id);
-    },
-    getUsers(): User[] {
-      return this.users;
-    },
-    updateUser(id: number, update: UserUpdateDto): User {
-      const user = this.users.find((u) => u.id === id);
-      if (!user) {
-        return null;
-      }
-      Object.assign(user, update);
-      return user;
-    },
-    deleteUser(id: number): boolean {
-      const user = this.users.find((u) => u.id === id);
-      if (!user) {
-        return false;
-      }
-      this.users = this.users.filter((u) => u.id !== id);
-      return true;
-    },
-  };
+  let mockUsersRepository: RepositoryMockService<User>;
+  let testUser: User;
   let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
+        UsersService,
         {
-          provide: UsersService,
-          useValue: mockUsersService,
+          provide: getRepositoryToken(User),
+          useValue: new RepositoryMockService(User),
         },
         DtoGeneratorService,
       ],
@@ -58,6 +32,11 @@ describe('UsersController', () => {
     generate = module
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
+    mockUsersRepository = module.get(getRepositoryToken(User));
+    testUser = new User();
+    testUser.email = generate(RegisterDto).email;
+    testUser.password = generate(RegisterDto).password;
+    testUser = mockUsersRepository.save(testUser);
   });
 
   it('should be defined', () => {
@@ -66,9 +45,13 @@ describe('UsersController', () => {
 
   describe('getCurrentUser', () => {
     it('should return the current user', async () => {
-      const user = await controller.getCurrentUser({ user: { id: 1 } });
+      const user = await controller.getCurrentUser({
+        user: { id: testUser.id },
+      });
       expect(user).toBeDefined();
-      expect(user).toEqual(mockUsersService.users[0]);
+      expect(user).toEqual(
+        mockUsersRepository.findOne({ where: { id: testUser.id } }),
+      );
     });
   });
 
@@ -76,26 +59,29 @@ describe('UsersController', () => {
     it('should return all users', async () => {
       const users = await controller.getUsers();
       expect(users).toBeDefined();
-      expect(users).toEqual(mockUsersService.users);
+      expect(users).toEqual(mockUsersRepository.find());
     });
   });
 
   describe('getUser', () => {
     it('should return a user', async () => {
-      const user = await controller.getUser(1);
+      const user = await controller.getUser(testUser.id);
       expect(user).toBeDefined();
-      expect(user).toEqual(mockUsersService.users[0]);
+      expect(user).toEqual(
+        mockUsersRepository.findOne({ where: { id: testUser.id } }),
+      );
     });
   });
 
   describe('updateUser', () => {
     it('should update a user', async () => {
       const updateData = generate(UserUpdateDto, true);
-      const updated = await controller.updateUser(1, updateData);
+      const updated = await controller.updateUser(testUser.id, updateData);
       expect(updated).toBeDefined();
       expect(updated).toEqual({
-        id: expect.any(Number),
+        id: testUser.id,
         ...updateData,
+        registered: testUser.registered,
       });
     });
 
@@ -108,8 +94,8 @@ describe('UsersController', () => {
 
   describe('deleteUser', () => {
     it('should delete a user', async () => {
-      await controller.deleteUser(1);
-      expect(mockUsersService.users).toEqual([]);
+      await controller.deleteUser(testUser.id);
+      expect(mockUsersRepository.find()).toEqual([]);
     });
 
     it('should throw an error if user does not exist', async () => {

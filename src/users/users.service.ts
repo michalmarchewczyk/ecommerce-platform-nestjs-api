@@ -22,8 +22,7 @@ export class UsersService {
     user.firstName = firstName;
     user.lastName = lastName;
     const savedUser = await this.usersRepository.save(user);
-    savedUser.password = undefined;
-    return savedUser;
+    return { ...savedUser, password: undefined };
   }
 
   async findUserToLogin(email: string): Promise<User | null> {

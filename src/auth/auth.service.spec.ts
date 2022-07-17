@@ -3,43 +3,25 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { RegisterDto } from './dto/register.dto';
+import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
+import { User } from '../users/entities/user.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Role } from '../users/entities/role.enum';
 
 describe('AuthService', () => {
   let service: AuthService;
   let generate: DtoGeneratorService['generate'];
-  const mockUsersService = {
-    users: [],
-    addUser: jest.fn(
-      (
-        email: string,
-        hashedPassword: string,
-        firstName?: string,
-        lastName?: string,
-      ) => {
-        const user = {
-          email,
-          firstName,
-          lastName,
-          id: Date.now(),
-          password: hashedPassword,
-        };
-        mockUsersService.users.push(user);
-        return { ...user, password: undefined };
-      },
-    ),
-    findUserToLogin: jest.fn((email: string) =>
-      mockUsersService.users.find((u) => u.email === email),
-    ),
-  };
+  let mockUsersRepository: RepositoryMockService<User>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         DtoGeneratorService,
+        UsersService,
         {
-          provide: UsersService,
-          useValue: mockUsersService,
+          provide: getRepositoryToken(User),
+          useValue: new RepositoryMockService(User),
         },
       ],
     }).compile();
@@ -48,6 +30,7 @@ describe('AuthService', () => {
     generate = module
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
+    mockUsersRepository = module.get(getRepositoryToken(User));
   });
 
   it('should be defined', () => {
@@ -59,7 +42,15 @@ describe('AuthService', () => {
       const { email, password } = generate(RegisterDto);
       const user = await service.register({ email, password });
       expect(user).toBeDefined();
-      expect(user).toEqual({ email, id: expect.any(Number) });
+      expect(user).toEqual({
+        email,
+        id: expect.any(Number),
+        role: Role.Customer,
+        firstName: null,
+        lastName: null,
+        registered: expect.any(Date),
+        password: undefined,
+      });
     });
 
     it('should return registered user with optional fields', async () => {
@@ -79,18 +70,21 @@ describe('AuthService', () => {
         firstName,
         lastName,
         id: expect.any(Number),
+        registered: expect.any(Date),
+        password: undefined,
+        role: Role.Customer,
       });
     });
 
     it('should hash password when registering', async () => {
       const { email, password } = generate(RegisterDto);
       await service.register({ email, password });
-      expect(mockUsersService.addUser).not.toHaveBeenLastCalledWith(
-        email,
-        password,
-        undefined,
-        undefined,
-      );
+      expect(
+        mockUsersRepository.findOne({
+          where: { email },
+          select: { email: true, password: true },
+        }),
+      ).toEqual({ email, password: expect.not.stringMatching(password) });
     });
   });
 

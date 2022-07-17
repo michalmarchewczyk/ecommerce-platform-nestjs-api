@@ -4,20 +4,14 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { RegisterDto } from './dto/register.dto';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from '../users/entities/user.entity';
+import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
+import { Role } from '../users/entities/role.enum';
 
 describe('AuthController', () => {
   let controller: AuthController;
   let generate: DtoGeneratorService['generate'];
-  const mockUsersService = {
-    addUser: jest.fn(
-      (
-        email: string,
-        hashedPassword: string,
-        firstName?: string,
-        lastName?: string,
-      ) => ({ email, firstName, lastName }),
-    ),
-  };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -25,9 +19,10 @@ describe('AuthController', () => {
       providers: [
         AuthService,
         DtoGeneratorService,
+        UsersService,
         {
-          provide: UsersService,
-          useValue: mockUsersService,
+          provide: getRepositoryToken(User),
+          useValue: new RepositoryMockService(User),
         },
       ],
     }).compile();
@@ -47,7 +42,15 @@ describe('AuthController', () => {
       const { email, password } = generate(RegisterDto);
       const user = await controller.register({ email, password });
       expect(user).toBeDefined();
-      expect(user).toEqual({ email });
+      expect(user).toEqual({
+        email,
+        id: expect.any(Number),
+        firstName: null,
+        lastName: null,
+        password: undefined,
+        registered: expect.any(Date),
+        role: Role.Customer,
+      });
     });
 
     it('should return registered user with optional fields', async () => {
@@ -62,7 +65,15 @@ describe('AuthController', () => {
         lastName,
       });
       expect(user).toBeDefined();
-      expect(user).toEqual({ email, firstName, lastName });
+      expect(user).toEqual({
+        email,
+        firstName,
+        lastName,
+        id: expect.any(Number),
+        registered: expect.any(Date),
+        role: Role.Customer,
+        password: undefined,
+      });
     });
   });
 

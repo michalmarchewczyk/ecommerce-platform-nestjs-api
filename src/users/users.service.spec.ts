@@ -7,50 +7,12 @@ import { Role } from './entities/role.enum';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { UserUpdateDto } from './dto/user-update.dto';
+import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 
 describe('UsersService', () => {
   let service: UsersService;
   let generate: DtoGeneratorService['generate'];
-
-  const mockUsersRepository = {
-    users: [],
-    save(user: User): User {
-      const foundUser = this.users.find((u) => u.email === user.email);
-      if (foundUser && foundUser.id !== user.id) {
-        throw new QueryFailedError('', [], '');
-      }
-      this.users.push({ ...user, id: Date.now(), role: Role.Customer });
-      return { ...user, id: Date.now() } as User;
-    },
-    find(): User[] {
-      return this.users;
-    },
-    delete(where: { id: number }): void {
-      this.users = this.users.filter((u) => u.id !== where.id);
-    },
-    findOne(options: {
-      where: { id?: number; email?: string };
-      select: { password?: boolean };
-    }) {
-      const user = this.users.find((u) => {
-        if (options.where.id) {
-          return u.id === options.where.id;
-        }
-        if (options.where.email) {
-          return u.email === options.where.email;
-        }
-        return null;
-      });
-      if (!user) {
-        return null;
-      }
-      if (options.select?.password) {
-        return { ...user };
-      } else {
-        return { ...user, password: undefined };
-      }
-    },
-  };
+  let mockUsersRepository: RepositoryMockService<User>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -58,17 +20,17 @@ describe('UsersService', () => {
         UsersService,
         {
           provide: getRepositoryToken(User),
-          useValue: mockUsersRepository,
+          useValue: new RepositoryMockService(User),
         },
         DtoGeneratorService,
       ],
     }).compile();
 
-    mockUsersRepository.users = [];
     service = module.get<UsersService>(UsersService);
     generate = module
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
+    mockUsersRepository = module.get(getRepositoryToken(User));
   });
 
   it('should be defined', () => {
@@ -80,7 +42,15 @@ describe('UsersService', () => {
       const { email, password } = generate(RegisterDto);
       const user = await service.addUser(email, password);
       expect(user).toBeDefined();
-      expect(user).toEqual({ email, id: expect.any(Number) });
+      expect(user).toEqual({
+        email,
+        id: expect.any(Number),
+        role: Role.Customer,
+        firstName: null,
+        lastName: null,
+        registered: expect.any(Date),
+        password: undefined,
+      });
     });
 
     it('should return created user with optional fields', async () => {
@@ -95,6 +65,9 @@ describe('UsersService', () => {
         firstName,
         lastName,
         id: expect.any(Number),
+        registered: expect.any(Date),
+        password: undefined,
+        role: Role.Customer,
       });
     });
 
@@ -151,7 +124,7 @@ describe('UsersService', () => {
     it('should return all users', async () => {
       const users = await service.getUsers();
       expect(users).toBeDefined();
-      expect(users).toEqual(mockUsersRepository.users);
+      expect(users).toEqual(mockUsersRepository.find());
     });
   });
 
@@ -165,9 +138,9 @@ describe('UsersService', () => {
         email,
         id: expect.any(Number),
         role: Role.Customer,
-        firstName: undefined,
-        lastName: undefined,
-        password: undefined,
+        firstName: null,
+        lastName: null,
+        registered: expect.any(Date),
       });
     });
 
@@ -186,7 +159,7 @@ describe('UsersService', () => {
       expect(updated).toBeDefined();
       expect(updated).toEqual({
         id: expect.any(Number),
-        password: undefined,
+        registered: expect.any(Date),
         ...updateData,
       });
     });
@@ -205,9 +178,7 @@ describe('UsersService', () => {
       const user = await service.getUser(id);
       expect(deleted).toBeTruthy();
       expect(user).toBeNull();
-      expect(
-        mockUsersRepository.users.find((u) => u.id === id),
-      ).toBeUndefined();
+      expect(mockUsersRepository.findOne({ where: { id } })).toBeNull();
     });
 
     it('should return false when user with given id does not exist', async () => {

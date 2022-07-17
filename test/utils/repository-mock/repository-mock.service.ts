@@ -1,51 +1,59 @@
 import { Injectable } from '@nestjs/common';
 import { getMetadataArgsStorage, QueryFailedError } from 'typeorm';
 
+interface ColumnMetadata {
+  name: string;
+  mode: string;
+  generated: string;
+  unique: boolean;
+  primary: boolean;
+  optional: boolean;
+  default: null | (() => any);
+  hidden: boolean;
+}
+
+const RELATION_TYPES = [
+  'many-to-many',
+  'one-to-one',
+  'many-to-one',
+  'one-to-many',
+];
+
 @Injectable()
 export class RepositoryMockService<T> {
   public entities: T[] = [];
   private typeormMetadata = getMetadataArgsStorage();
-  private columns = [];
+  private readonly columns: ColumnMetadata[] = [];
   private currentId = 1;
+  private readonly primaryName: string;
 
   constructor(private entity: { new (): T }) {
-    const columnsToGenerate = this.typeormMetadata.filterColumns(this.entity);
-    const relationsToGenerate = this.typeormMetadata.filterRelations(
-      this.entity,
-    );
+    const columnsMetadata = this.typeormMetadata.filterColumns(this.entity);
+    const relationsMetadata = this.typeormMetadata.filterRelations(this.entity);
     this.columns = [];
-    for (const column of columnsToGenerate) {
+    for (const column of [...columnsMetadata, ...relationsMetadata]) {
+      const options = column.options;
+      let def;
+      if ('mode' in column) {
+        def = column.options.default ? () => column.options.default : null;
+      } else {
+        def = column.relationType.endsWith('many') ? () => [] : null;
+      }
       this.columns.push({
         name: column.propertyName,
-        mode: column.mode,
-        options: column.options,
+        mode: 'mode' in column ? column.mode : column.relationType,
         generated:
           this.typeormMetadata.findGenerated(this.entity, column.propertyName)
             ?.strategy ?? null,
-        unique: !!(column.options.unique || column.options.primary),
-        primary: !!column.options.primary,
-        optional: column.options.nullable ?? false,
-        default: column.options.default ? () => column.options.default : null,
-        hidden: column.options.select === false ?? false,
+        unique:
+          'unique' in options ? !!(options.unique || options.primary) : false,
+        primary: 'primary' in options ? !!options.primary : false,
+        optional: (options.nullable || 'relationType' in column) ?? false,
+        default: def,
+        hidden: 'select' in options ? options.select === false ?? false : false,
       });
     }
-    for (const relation of relationsToGenerate) {
-      this.columns.push({
-        name: relation.propertyName,
-        mode: relation.relationType,
-        options: relation.options,
-        generated: null,
-        unique: false,
-        primary: false,
-        optional: relation.options.nullable ?? false,
-        default:
-          relation.relationType === 'one-to-many' ||
-          relation.relationType === 'many-to-many'
-            ? () => []
-            : null,
-        hidden: false,
-      });
-    }
+    this.primaryName = this.columns.find((c) => c.primary).name;
   }
 
   public save(entity: Partial<T>): T;
@@ -55,99 +63,54 @@ export class RepositoryMockService<T> {
     if (Array.isArray(entity)) {
       return entity.map((entity) => this.save(entity));
     }
-    const foundByPrimary = this.entities.find((e) => {
-      const primaryName = this.columns.find((c) => c.primary).name;
-      return e[primaryName] === entity[primaryName];
-    });
-    if (foundByPrimary || this.entities.includes(entity as T)) {
-      const savedEntity =
-        foundByPrimary ?? this.entities.find((e) => e === entity);
-      for (const column of this.columns) {
-        if (
-          column.unique &&
-          this.entities
-            .map((e) => e[column.name])
-            .includes(entity[column.name]) &&
-          entity[column.name] !== undefined &&
-          entity[column.name] !== savedEntity[column.name]
-        ) {
-          throw new QueryFailedError('', [], '');
-        } else if (column.mode === 'updateDate') {
-          savedEntity[column.name] = new Date();
-        } else if (
-          column.mode === 'regular' &&
-          entity[column.name] !== undefined
-        ) {
-          savedEntity[column.name] = entity[column.name];
-        } else if (
-          ['one-to-many', 'many-to-many', 'one-to-one', 'many-to-one'].includes(
-            column.mode,
-          ) &&
-          entity[column.name] !== undefined
-        ) {
-          savedEntity[column.name] = entity[column.name];
-        }
-      }
-      const selectedColumns = this.columns
-        .filter((column) => !column.hidden)
-        .map((column) => column.name);
-      const selectedEntity = {};
-      for (const column of selectedColumns) {
-        selectedEntity[column] = savedEntity[column];
-      }
-      return savedEntity as T;
+    const found = this.entities.find(
+      (e) => e[this.primaryName] === entity[this.primaryName] || e === entity,
+    );
+    if (found) {
+      return this.saveExistingEntity(found, entity);
     } else {
-      const newEntity = {};
-      for (const column of this.columns) {
-        if (
-          column.unique &&
-          this.entities
-            .map((e) => e[column.name])
-            .includes(entity[column.name]) &&
-          entity[column.name] !== undefined
-        ) {
-          throw new QueryFailedError('', [], '');
-        }
-        if (column.generated) {
-          newEntity[column.name] = this.generateId();
-        } else if (
-          column.mode === 'createDate' ||
-          column.mode === 'updateDate'
-        ) {
-          newEntity[column.name] = new Date();
-        } else if (column.mode === 'regular') {
-          if (entity[column.name] === undefined) {
-            if (column.default) {
-              newEntity[column.name] = column.default();
-            } else {
-              if (column.optional) {
-                newEntity[column.name] = null;
-              } else {
-                throw new QueryFailedError('', [], '');
-              }
-            }
-          } else {
-            newEntity[column.name] = entity[column.name];
-          }
-        } else if (
-          ['one-to-many', 'many-to-many', 'one-to-one', 'many-to-one'].includes(
-            column.mode,
-          )
-        ) {
-          newEntity[column.name] =
-            entity[column.name] ?? column.default?.() ?? null;
-        }
-      }
-      this.entities.push(newEntity as T);
-      const selectedColumns = this.columns
-        .filter((column) => !column.hidden)
-        .map((column) => column.name);
-      const selectedEntity = {};
-      for (const column of selectedColumns) {
-        selectedEntity[column] = newEntity[column];
-      }
-      return newEntity as T;
+      return this.saveNewEntity(entity);
     }
+  }
+
+  private checkUnique(name, value, savedValue?) {
+    return (
+      this.entities.map((e) => e[name]).includes(value) &&
+      (savedValue ? value !== savedValue : true)
+    );
+  }
+
+  private saveExistingEntity(savedEntity: T, entity: Partial<T>) {
+    for (const { name, mode, unique } of this.columns) {
+      if (unique && this.checkUnique(name, entity[name], savedEntity[name])) {
+        throw new QueryFailedError('', [], '');
+      } else if (mode === 'updateDate') {
+        savedEntity[name] = new Date();
+      } else if ([...RELATION_TYPES, 'regular'].includes(mode)) {
+        savedEntity[name] = entity[name] ?? savedEntity[name];
+      }
+    }
+    return savedEntity as T;
+  }
+
+  private saveNewEntity(entity: Partial<T>) {
+    const newEntity = {};
+    for (const column of this.columns) {
+      const { name, mode, optional, default: def } = column;
+      if (column.unique && this.checkUnique(name, entity[name])) {
+        throw new QueryFailedError('', [], '');
+      } else if (column.generated) {
+        newEntity[name] = this.generateId();
+      } else if (mode === 'createDate' || mode === 'updateDate') {
+        newEntity[name] = new Date();
+      } else if (entity[name] === undefined && !optional && !def) {
+        throw new QueryFailedError('', [], '');
+      } else if ([...RELATION_TYPES, 'regular'].includes(mode)) {
+        newEntity[name] = entity[name] ?? def?.() ?? null;
+      }
+    }
+    this.entities.push(newEntity as T);
+    return newEntity as T;
   }
 
   private generateId() {
@@ -158,32 +121,27 @@ export class RepositoryMockService<T> {
     return this.entities;
   }
 
+  private findWhere(where: Record<string, any>): T[] {
+    return this.entities.filter((e) => {
+      for (const key in where) {
+        if (e[key] !== where[key]) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
   findOne(options: {
     select?: Record<string, boolean>;
     relations?: Record<string, boolean>;
     where?: Record<string, any>;
   }): T | null {
-    const foundEntity = this.entities.find((entity) => {
-      let good = true;
-      for (const [key, value] of Object.entries(options.where)) {
-        if (entity[key] !== value) {
-          good = false;
-        }
-      }
-      return good;
-    });
+    const foundEntity = this.findWhere(options.where)[0];
     if (!foundEntity) {
       return null;
     }
-    const selectedColumns = this.columns
-      .filter((column) => {
-        if (options.select) {
-          return options.select[column.name] === true;
-        } else {
-          return !column.hidden;
-        }
-      })
-      .map((column) => column.name);
+    const selectedColumns = this.getSelectedColumns(options.select);
     const selectedEntity = {};
     for (const column of selectedColumns) {
       selectedEntity[column] = foundEntity[column];
@@ -191,16 +149,16 @@ export class RepositoryMockService<T> {
     return selectedEntity as T;
   }
 
+  private getSelectedColumns(select: Record<string, boolean>) {
+    return this.columns
+      .filter((column) => {
+        return select ? select[column.name] === true : !column.hidden;
+      })
+      .map((column) => column.name);
+  }
+
   delete(where: Record<string, any>): void {
-    const foundEntity = this.entities.find((entity) => {
-      let good = true;
-      for (const [key, value] of Object.entries(where)) {
-        if (entity[key] !== value) {
-          good = false;
-        }
-      }
-      return good;
-    });
+    const foundEntity = this.findWhere(where)[0];
     if (foundEntity) {
       this.entities = this.entities.filter((entity) => entity !== foundEntity);
     }

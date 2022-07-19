@@ -59,6 +59,9 @@ export class DtoGeneratorService {
     if (validators.includes('isEmail')) {
       return `${Math.random().toString(36).substring(2, 15)}@test.local`;
     }
+    if (validators.includes('isPhoneNumber')) {
+      return `+48 ${Math.floor(Math.random() * 9999999999)}`;
+    }
     if (validators.includes('isString')) {
       return Math.random().toString(36).substring(2, 15);
     }

@@ -10,7 +10,7 @@ import { AttributeType } from '../src/products/entities/attribute-type.entity';
 import { AttributeTypeDto } from '../src/products/dto/attribute-type.dto';
 import { setupRbacTests } from './utils/setup-rbac-tests';
 
-describe('ProductsController (e2e)', () => {
+describe('AttributesController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
   let cookieHeader: string;

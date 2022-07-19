@@ -22,14 +22,8 @@ describe('CategoriesController', () => {
       controllers: [CategoriesController],
       providers: [
         CategoriesService,
-        {
-          provide: getRepositoryToken(Product),
-          useValue: new RepositoryMockService(Product),
-        },
-        {
-          provide: getRepositoryToken(Category),
-          useValue: new RepositoryMockService(Category),
-        },
+        RepositoryMockService.getProvider(Product),
+        RepositoryMockService.getProvider(Category),
         DtoGeneratorService,
       ],
     }).compile();

@@ -18,10 +18,7 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
-        {
-          provide: getRepositoryToken(User),
-          useValue: new RepositoryMockService(User),
-        },
+        RepositoryMockService.getProvider(User),
         DtoGeneratorService,
       ],
     }).compile();

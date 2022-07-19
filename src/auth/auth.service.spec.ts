@@ -19,10 +19,7 @@ describe('AuthService', () => {
         AuthService,
         DtoGeneratorService,
         UsersService,
-        {
-          provide: getRepositoryToken(User),
-          useValue: new RepositoryMockService(User),
-        },
+        RepositoryMockService.getProvider(User),
       ],
     }).compile();
 

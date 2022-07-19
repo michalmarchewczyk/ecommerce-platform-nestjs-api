@@ -15,10 +15,7 @@ describe('AttributesService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AttributesService,
-        {
-          provide: getRepositoryToken(AttributeType),
-          useValue: new RepositoryMockService(AttributeType),
-        },
+        RepositoryMockService.getProvider(AttributeType),
         DtoGeneratorService,
       ],
     }).compile();

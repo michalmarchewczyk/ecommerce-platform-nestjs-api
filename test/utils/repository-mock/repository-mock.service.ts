@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ValueProvider } from '@nestjs/common';
 import { getMetadataArgsStorage, QueryFailedError } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 interface ColumnMetadata {
   name: string;
@@ -26,6 +27,15 @@ export class RepositoryMockService<T> {
   private readonly columns: ColumnMetadata[] = [];
   private currentId = 1;
   private readonly primaryName: string;
+
+  static getProvider<U>(entity: {
+    new (): U;
+  }): ValueProvider<RepositoryMockService<U>> {
+    return {
+      provide: getRepositoryToken(entity),
+      useValue: new RepositoryMockService<U>(entity),
+    };
+  }
 
   constructor(private entity: { new (): T }) {
     const columnsMetadata = this.typeormMetadata.filterColumns(this.entity);

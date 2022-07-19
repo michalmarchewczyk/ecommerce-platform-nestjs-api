@@ -20,10 +20,7 @@ describe('UsersController', () => {
       controllers: [UsersController],
       providers: [
         UsersService,
-        {
-          provide: getRepositoryToken(User),
-          useValue: new RepositoryMockService(User),
-        },
+        RepositoryMockService.getProvider(User),
         DtoGeneratorService,
       ],
     }).compile();

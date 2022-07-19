@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { RegisterDto } from './dto/register.dto';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../users/entities/user.entity';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 import { Role } from '../users/entities/role.enum';
@@ -20,10 +19,7 @@ describe('AuthController', () => {
         AuthService,
         DtoGeneratorService,
         UsersService,
-        {
-          provide: getRepositoryToken(User),
-          useValue: new RepositoryMockService(User),
-        },
+        RepositoryMockService.getProvider(User),
       ],
     }).compile();
 

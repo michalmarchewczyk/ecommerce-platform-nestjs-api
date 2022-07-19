@@ -19,14 +19,8 @@ describe('ProductsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
-        {
-          provide: getRepositoryToken(Product),
-          useValue: new RepositoryMockService(Product),
-        },
-        {
-          provide: getRepositoryToken(Attribute),
-          useValue: new RepositoryMockService(Attribute),
-        },
+        RepositoryMockService.getProvider(Product),
+        RepositoryMockService.getProvider(Attribute),
         DtoGeneratorService,
       ],
     }).compile();

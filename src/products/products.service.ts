@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { QueryFailedError, Repository } from 'typeorm';
+import { In, QueryFailedError, Repository } from 'typeorm';
 import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/product-update.dto';
 import { Attribute } from './entities/attribute.entity';
@@ -22,6 +22,10 @@ export class ProductsService {
 
   async getProducts(): Promise<Product[]> {
     return this.productsRepository.find();
+  }
+
+  async getProductsByIds(ids: number[]): Promise<Product[]> {
+    return this.productsRepository.find({ where: { id: In(ids) } });
   }
 
   async getProduct(id: number): Promise<Product> {

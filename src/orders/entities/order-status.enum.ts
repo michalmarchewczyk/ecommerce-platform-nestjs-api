@@ -1,5 +1,5 @@
 export enum OrderStatus {
-  Pending = 'Pending',
+  Pending = 'pending',
   Failed = 'failed',
   Confirmed = 'confirmed',
   Open = 'open',

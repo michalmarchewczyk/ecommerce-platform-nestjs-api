@@ -30,7 +30,8 @@ module.exports = {
       files: ['*.spec.ts', '*.e2e-spec.ts'],
       rules: {
         'max-lines': 'off',
-      }
-    }
-  ]
+        '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
+      },
+    },
+  ],
 };

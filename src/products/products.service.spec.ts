@@ -36,7 +36,6 @@ describe('ProductsService', () => {
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
     mockProductsRepository = module.get(getRepositoryToken(Product));
-    // mockAttributesRepository = module.get(getRepositoryToken(Attribute));
   });
 
   it('should be defined', () => {

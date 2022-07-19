@@ -6,7 +6,6 @@ import {
   NotFoundException,
   Param,
   Patch,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -15,7 +14,7 @@ import { Role } from './entities/role.enum';
 import { User } from './entities/user.entity';
 import { SessionAuthGuard } from '../auth/session-auth.guard';
 import { UserUpdateDto } from './dto/user-update.dto';
-import { RequestWithUser } from '../auth/request-with-user.interface';
+import { ReqUser } from '../auth/user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -23,8 +22,8 @@ export class UsersController {
 
   @Get('me')
   @UseGuards(SessionAuthGuard)
-  async getCurrentUser(@Request() req: RequestWithUser): Promise<User> {
-    return this.usersService.getUser(req.user.id);
+  async getCurrentUser(@ReqUser() user: User): Promise<User> {
+    return this.usersService.getUser(user.id);
   }
 
   @Get()

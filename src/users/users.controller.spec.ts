@@ -45,9 +45,7 @@ describe('UsersController', () => {
 
   describe('getCurrentUser', () => {
     it('should return the current user', async () => {
-      const user = await controller.getCurrentUser({
-        user: { id: testUser.id },
-      });
+      const user = await controller.getCurrentUser({ id: testUser.id } as User);
       expect(user).toBeDefined();
       expect(user).toEqual(
         mockUsersRepository.findOne({ where: { id: testUser.id } }),

@@ -5,6 +5,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -33,7 +34,7 @@ export class OrdersController {
 
   @Get('/:id')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
-  async getOrder(@ReqUser() user: User, @Param('id') id: number) {
+  async getOrder(@ReqUser() user: User, @Param('id', ParseIntPipe) id: number) {
     const checkUser = await this.ordersService.checkOrderUser(user?.id, id);
     if (!checkUser && user?.role === Role.Customer) {
       throw new ForbiddenException();
@@ -47,7 +48,10 @@ export class OrdersController {
 
   @Patch('/:id')
   @Roles(Role.Admin, Role.Manager, Role.Sales)
-  async updateOrder(@Param('id') id: number, @Body() body: OrderUpdateDto) {
+  async updateOrder(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: OrderUpdateDto,
+  ) {
     const order = await this.ordersService.updateOrder(id, body);
     if (!order) {
       throw new NotFoundException(['order not found']);

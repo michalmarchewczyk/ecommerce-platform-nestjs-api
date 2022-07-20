@@ -12,11 +12,14 @@ import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generato
 import { OrderCreateDto } from './dto/order-create.dto';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { OrderUpdateDto } from './dto/order-update.dto';
+import { OrderItemDto } from './dto/order-item.dto';
+import { ProductCreateDto } from '../products/dto/product-create.dto';
 
 describe('OrdersService', () => {
   let service: OrdersService;
   let mockOrdersRepository: RepositoryMockService<Order>;
   let mockUsersRepository: RepositoryMockService<User>;
+  let mockProductsRepository: RepositoryMockService<Product>;
   let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
@@ -36,6 +39,7 @@ describe('OrdersService', () => {
     service = module.get<OrdersService>(OrdersService);
     mockOrdersRepository = module.get(getRepositoryToken(Order));
     mockUsersRepository = module.get(getRepositoryToken(User));
+    mockProductsRepository = module.get(getRepositoryToken(Product));
     generate = module
       .get(DtoGeneratorService)
       .generate.bind(module.get(DtoGeneratorService));
@@ -75,6 +79,11 @@ describe('OrdersService', () => {
       const userData = generate(RegisterDto, false);
       const { id: userId } = await mockUsersRepository.save(userData);
       const createData = generate(OrderCreateDto, false);
+      createData.items = [generate(OrderItemDto, false)];
+      const { id: productId } = await mockProductsRepository.save(
+        generate(ProductCreateDto, false),
+      );
+      createData.items[0].productId = productId;
       const { id } = await service.createOrder(userId, createData);
       const order = await service.checkOrderUser(userId, id);
       expect(order).toBeTruthy();
@@ -82,6 +91,11 @@ describe('OrdersService', () => {
 
     it('should return false if order with given id does not belong to user with given id', async () => {
       const createData = generate(OrderCreateDto, false);
+      createData.items = [generate(OrderItemDto, false)];
+      const { id: productId } = await mockProductsRepository.save(
+        generate(ProductCreateDto, false),
+      );
+      createData.items[0].productId = productId;
       const { id } = await mockOrdersRepository.save(createData);
       const order = await service.checkOrderUser(12345, id);
       expect(order).toBeFalsy();
@@ -91,11 +105,16 @@ describe('OrdersService', () => {
   describe('createOrder', () => {
     it('should create an order', async () => {
       const createData = generate(OrderCreateDto, false);
+      createData.items = [generate(OrderItemDto, false)];
+      const { id: productId } = await mockProductsRepository.save(
+        generate(ProductCreateDto, false),
+      );
+      createData.items[0].productId = productId;
       const order = await service.createOrder(12345, createData);
       expect(order).toEqual(
         mockOrdersRepository.entities.find((o) => o.id === order.id),
       );
-      const { productIds, ...expected } = createData;
+      const { items, ...expected } = createData;
       expect(order).toMatchObject(expected);
     });
   });
@@ -109,7 +128,7 @@ describe('OrdersService', () => {
       expect(order).toEqual(
         mockOrdersRepository.entities.find((o) => o.id === id),
       );
-      const { productIds, ...expected } = updateData;
+      const { items, ...expected } = updateData;
       expect(order).toMatchObject(expected);
     });
 

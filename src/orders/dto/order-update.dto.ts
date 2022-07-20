@@ -1,17 +1,22 @@
 import {
   IsEmail,
   IsEnum,
-  IsInt,
+  IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { OrderStatus } from '../entities/order-status.enum';
+import { OrderItemDto } from './order-item.dto';
+import { Type } from 'class-transformer';
 
 export class OrderUpdateDto {
-  @IsInt({ each: true })
+  @IsNotEmpty({ each: true })
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
   @IsOptional()
-  productIds?: number[];
+  items?: OrderItemDto[];
 
   @IsString()
   @IsOptional()

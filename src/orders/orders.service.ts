@@ -6,6 +6,7 @@ import { OrderCreateDto } from './dto/order-create.dto';
 import { UsersService } from '../users/users.service';
 import { ProductsService } from '../products/products.service';
 import { OrderUpdateDto } from './dto/order-update.dto';
+import { OrderItem } from './entities/order-item.entity';
 
 @Injectable()
 export class OrdersService {
@@ -23,7 +24,7 @@ export class OrdersService {
   async getOrder(id: number): Promise<Order | null> {
     const order = await this.ordersRepository.findOne({
       where: { id },
-      relations: ['user', 'products'],
+      relations: ['user', 'items', 'items.product'],
     });
     if (!order) {
       return null;
@@ -44,9 +45,18 @@ export class OrdersService {
     if (userId) {
       order.user = await this.usersService.getUser(userId);
     }
-    order.products = await this.productsService.getProductsByIds(
-      orderData.productIds,
-    );
+    order.items = [];
+    for (const item of orderData.items) {
+      const product = await this.productsService.getProduct(item.productId);
+      if (!product) {
+        return null;
+      }
+      order.items.push({
+        product,
+        quantity: item.quantity,
+        price: product.price,
+      } as OrderItem);
+    }
     order.fullName = orderData.fullName;
     order.contactEmail = orderData.contactEmail;
     order.contactPhone = orderData.contactPhone;
@@ -60,15 +70,24 @@ export class OrdersService {
   ): Promise<Order | null> {
     const order = await this.ordersRepository.findOne({
       where: { id },
-      relations: ['user', 'products'],
+      relations: ['user', 'items', 'items.product'],
     });
     if (!order) {
       return null;
     }
-    if (orderData.productIds) {
-      order.products = await this.productsService.getProductsByIds(
-        orderData.productIds,
-      );
+    if (orderData.items) {
+      order.items = [];
+      for (const item of orderData.items) {
+        const product = await this.productsService.getProduct(item.productId);
+        if (!product) {
+          return null;
+        }
+        order.items.push({
+          product,
+          quantity: item.quantity,
+          price: product.price,
+        } as OrderItem);
+      }
     }
     Object.assign(order, orderData);
     return this.ordersRepository.save(order);

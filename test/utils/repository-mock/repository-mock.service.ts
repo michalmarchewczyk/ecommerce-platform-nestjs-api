@@ -1,5 +1,5 @@
 import { Injectable, ValueProvider } from '@nestjs/common';
-import { getMetadataArgsStorage, QueryFailedError } from 'typeorm';
+import { DeepPartial, getMetadataArgsStorage, QueryFailedError } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
 interface ColumnMetadata {
@@ -66,10 +66,10 @@ export class RepositoryMockService<T> {
     this.primaryName = this.columns.find((c) => c.primary).name;
   }
 
-  public save(entity: Partial<T>): T;
-  public save(entities: Partial<T>[]): T[];
+  public save(entity: DeepPartial<T>): T;
+  public save(entities: DeepPartial<T>[]): T[];
 
-  public save(entity: Partial<T> | Partial<T>[]): T | T[] {
+  public save(entity: DeepPartial<T> | DeepPartial<T>[]): T | T[] {
     if (Array.isArray(entity)) {
       return entity.map((entity) => this.save(entity));
     }
@@ -90,7 +90,7 @@ export class RepositoryMockService<T> {
     );
   }
 
-  private saveExistingEntity(savedEntity: T, entity: Partial<T>) {
+  private saveExistingEntity(savedEntity: T, entity: DeepPartial<T>) {
     for (const { name, mode, unique } of this.columns) {
       if (unique && this.checkUnique(name, entity[name], savedEntity[name])) {
         throw new QueryFailedError('', [], '');
@@ -103,7 +103,7 @@ export class RepositoryMockService<T> {
     return savedEntity as T;
   }
 
-  private saveNewEntity(entity: Partial<T>) {
+  private saveNewEntity(entity: DeepPartial<T>) {
     const newEntity = {};
     for (const column of this.columns) {
       const { name, mode, optional, default: def } = column;

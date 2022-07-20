@@ -54,7 +54,12 @@ describe.only('OrdersController (e2e)', () => {
     ).body;
 
     const createData = generate(OrderCreateDto);
-    createData.productIds = [testProduct.id];
+    createData.items = [
+      {
+        productId: testProduct.id,
+        quantity: 1,
+      },
+    ];
     testOrder = (
       await request(app.getHttpServer())
         .post('/orders')
@@ -73,7 +78,7 @@ describe.only('OrdersController (e2e)', () => {
         .get('/orders')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      const { products, user, ...expected } = testOrder;
+      const { items, user, ...expected } = testOrder;
       expect(response.body).toContainEqual({
         ...expected,
         status: 'pending',
@@ -87,11 +92,11 @@ describe.only('OrdersController (e2e)', () => {
         .get(`/orders/${testOrder.id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      const { products, user, ...expected } = testOrder;
+      const { items, user, ...expected } = testOrder;
       expect(response.body).toEqual({
         ...expected,
         status: 'pending',
-        products: [expect.any(Object)],
+        items: [expect.any(Object)],
         user: expect.any(Object),
       });
     });
@@ -104,7 +109,12 @@ describe.only('OrdersController (e2e)', () => {
         });
       const cookieHeader = response.headers['set-cookie'];
       const createData = generate(OrderCreateDto);
-      createData.productIds = [testProduct.id];
+      createData.items = [
+        {
+          productId: testProduct.id,
+          quantity: 1,
+        },
+      ];
       const response2 = await request(app.getHttpServer())
         .post('/orders')
         .set('Cookie', cookieHeader)
@@ -118,7 +128,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response3.body).toEqual({
         ...expected,
         status: 'pending',
-        products: [expect.any(Object)],
+        items: [expect.any(Object)],
         user: expect.any(Object),
       });
     });
@@ -156,7 +166,12 @@ describe.only('OrdersController (e2e)', () => {
   describe('/orders (POST)', () => {
     it('should create order', async () => {
       const createData = generate(OrderCreateDto);
-      createData.productIds = [testProduct.id];
+      createData.items = [
+        {
+          productId: testProduct.id,
+          quantity: 1,
+        },
+      ];
       const response = await request(app.getHttpServer())
         .post('/orders')
         .set('Cookie', cookieHeader)
@@ -166,7 +181,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         ...expected,
         status: 'pending',
-        products: [expect.any(Object)],
+        items: [expect.any(Object)],
         user: expect.any(Object),
       });
     });
@@ -181,8 +196,8 @@ describe.only('OrdersController (e2e)', () => {
         statusCode: 400,
         error: 'Bad Request',
         message: [
-          'each value in productIds should not be empty',
-          'each value in productIds must be an integer number',
+          'each value in items must be a non-empty object',
+          'each value in items should not be empty',
           'fullName should not be empty',
           'fullName must be a string',
           'contactEmail should not be empty',
@@ -197,7 +212,12 @@ describe.only('OrdersController (e2e)', () => {
   describe('/orders/:id (PATCH)', () => {
     it('should update order', async () => {
       const createData = generate(OrderCreateDto);
-      createData.productIds = [testProduct.id];
+      createData.items = [
+        {
+          productId: testProduct.id,
+          quantity: 1,
+        },
+      ];
       const { id } = (
         await request(app.getHttpServer())
           .post('/orders')
@@ -210,13 +230,13 @@ describe.only('OrdersController (e2e)', () => {
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(200);
-      const { productIds, ...expected } = updateData;
+      const { items, ...expected } = updateData;
       expect(response.body).toEqual({
         ...expected,
         id,
         created: expect.any(String),
         updated: expect.any(String),
-        products: [expect.any(Object)],
+        items: [expect.any(Object)],
         user: expect.any(Object),
       });
     });

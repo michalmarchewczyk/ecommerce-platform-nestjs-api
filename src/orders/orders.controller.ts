@@ -23,7 +23,11 @@ export class OrdersController {
 
   @Post()
   async createOrder(@ReqUser() user: User, @Body() body: OrderCreateDto) {
-    return this.ordersService.createOrder(user?.id, body);
+    const created = await this.ordersService.createOrder(user?.id, body);
+    if (!created) {
+      throw new NotFoundException(['product not found']);
+    }
+    return created;
   }
 
   @Get()
@@ -54,7 +58,7 @@ export class OrdersController {
   ) {
     const order = await this.ordersService.updateOrder(id, body);
     if (!order) {
-      throw new NotFoundException(['order not found']);
+      throw new NotFoundException(['order or product not found']);
     }
     return order;
   }

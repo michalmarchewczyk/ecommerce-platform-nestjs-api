@@ -2,15 +2,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Product } from '../../products/entities/product.entity';
 import { OrderStatus } from './order-status.enum';
+import { OrderItem } from './order-item.entity';
 
 @Entity('orders')
 export class Order {
@@ -28,9 +27,10 @@ export class Order {
   })
   user?: User;
 
-  @ManyToMany(() => Product)
-  @JoinTable()
-  products: Product[];
+  @OneToMany(() => OrderItem, (item) => item.order, {
+    cascade: true,
+  })
+  items: OrderItem[];
 
   @Column({
     type: 'enum',

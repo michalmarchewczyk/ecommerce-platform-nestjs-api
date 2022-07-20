@@ -2,14 +2,17 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { OrderStatus } from './order-status.enum';
 import { OrderItem } from './order-item.entity';
+import { OrderDelivery } from './order-delivery.entity';
 
 @Entity('orders')
 export class Order {
@@ -38,6 +41,10 @@ export class Order {
     default: OrderStatus.Pending,
   })
   status: OrderStatus;
+
+  @OneToOne(() => OrderDelivery, (delivery) => delivery.order)
+  @JoinColumn()
+  delivery: OrderDelivery;
 
   @Column()
   fullName: string;

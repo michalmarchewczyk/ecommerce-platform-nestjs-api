@@ -16,6 +16,6 @@ export class OrderItem {
   @Column()
   quantity: number;
 
-  @Column()
+  @Column({ type: 'double precision' })
   price: number;
 }

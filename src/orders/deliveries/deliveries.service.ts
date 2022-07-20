@@ -15,6 +15,14 @@ export class DeliveriesService {
     return this.deliveriesRepository.find();
   }
 
+  async getMethod(id: number): Promise<DeliveryMethod | null> {
+    const method = await this.deliveriesRepository.findOne({ where: { id } });
+    if (!method) {
+      return null;
+    }
+    return method;
+  }
+
   async createMethod(methodData: DeliveryMethodDto): Promise<DeliveryMethod> {
     const method = new DeliveryMethod();
     method.name = methodData.name;

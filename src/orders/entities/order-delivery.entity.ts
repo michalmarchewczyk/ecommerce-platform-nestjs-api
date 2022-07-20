@@ -13,7 +13,9 @@ export class OrderDelivery {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Order, (order) => order.delivery)
+  @OneToOne(() => Order, (order) => order.delivery, {
+    orphanedRowAction: 'delete',
+  })
   order: Order;
 
   @ManyToOne(() => DeliveryMethod, {
@@ -21,6 +23,18 @@ export class OrderDelivery {
   })
   method: DeliveryMethod;
 
-  @Column()
+  @Column({ default: '' })
   deliveryStatus: string;
+
+  @Column()
+  address: string;
+
+  @Column()
+  city: string;
+
+  @Column()
+  postalCode: string;
+
+  @Column()
+  country: string;
 }

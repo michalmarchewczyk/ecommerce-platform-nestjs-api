@@ -10,6 +10,7 @@ import {
 import { OrderStatus } from '../entities/order-status.enum';
 import { OrderItemDto } from './order-item.dto';
 import { Type } from 'class-transformer';
+import { OrderDeliveryDto } from './order-delivery.dto';
 
 export class OrderUpdateDto {
   @IsNotEmpty({ each: true })
@@ -37,4 +38,9 @@ export class OrderUpdateDto {
   @IsEnum(OrderStatus)
   @IsOptional()
   status?: OrderStatus;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => OrderDeliveryDto)
+  delivery?: OrderDeliveryDto;
 }

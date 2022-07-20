@@ -7,6 +7,8 @@ import { UsersService } from '../users/users.service';
 import { ProductsService } from '../products/products.service';
 import { OrderUpdateDto } from './dto/order-update.dto';
 import { OrderItem } from './entities/order-item.entity';
+import { OrderDelivery } from './entities/order-delivery.entity';
+import { DeliveriesService } from './deliveries/deliveries.service';
 
 @Injectable()
 export class OrdersService {
@@ -15,6 +17,7 @@ export class OrdersService {
     private readonly ordersRepository: Repository<Order>,
     private readonly usersService: UsersService,
     private readonly productsService: ProductsService,
+    private readonly deliveriesService: DeliveriesService,
   ) {}
 
   async getOrders(): Promise<Order[]> {
@@ -24,7 +27,7 @@ export class OrdersService {
   async getOrder(id: number): Promise<Order | null> {
     const order = await this.ordersRepository.findOne({
       where: { id },
-      relations: ['user', 'items', 'items.product'],
+      relations: ['user', 'items', 'items.product', 'delivery'],
     });
     if (!order) {
       return null;
@@ -61,6 +64,16 @@ export class OrdersService {
     order.contactEmail = orderData.contactEmail;
     order.contactPhone = orderData.contactPhone;
     order.message = orderData.message;
+    const method = await this.deliveriesService.getMethod(
+      orderData.delivery.methodId,
+    );
+    if (!method) {
+      return null;
+    }
+    const delivery = new OrderDelivery();
+    Object.assign(delivery, orderData.delivery);
+    order.delivery = delivery;
+    order.delivery.method = method;
     return this.ordersRepository.save(order);
   }
 
@@ -70,7 +83,7 @@ export class OrdersService {
   ): Promise<Order | null> {
     const order = await this.ordersRepository.findOne({
       where: { id },
-      relations: ['user', 'items', 'items.product'],
+      relations: ['user', 'items', 'items.product', 'delivery'],
     });
     if (!order) {
       return null;
@@ -89,7 +102,18 @@ export class OrdersService {
         } as OrderItem);
       }
     }
-    Object.assign(order, orderData);
+    if (orderData.delivery) {
+      const method = await this.deliveriesService.getMethod(
+        orderData.delivery.methodId,
+      );
+      if (!method) {
+        return null;
+      }
+      Object.assign(order.delivery, orderData.delivery);
+      order.delivery.method = method;
+    }
+    const { delivery, items, ...toAssign } = orderData;
+    Object.assign(order, toAssign);
     return this.ordersRepository.save(order);
   }
 }

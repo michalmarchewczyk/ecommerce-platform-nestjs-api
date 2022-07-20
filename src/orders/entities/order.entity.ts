@@ -42,7 +42,12 @@ export class Order {
   })
   status: OrderStatus;
 
-  @OneToOne(() => OrderDelivery, (delivery) => delivery.order)
+  @OneToOne(() => OrderDelivery, (delivery) => delivery.order, {
+    cascade: true,
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   @JoinColumn()
   delivery: OrderDelivery;
 

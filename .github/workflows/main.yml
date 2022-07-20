@@ -67,6 +67,11 @@ jobs:
         with:
           name: e2e-tests-coverage
           path: test/coverage
+      - name: Codecov
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          files: ./test/clover.xml
+
 
   lint:
     runs-on: ubuntu-latest

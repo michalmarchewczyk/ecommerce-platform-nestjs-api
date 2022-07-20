@@ -62,6 +62,9 @@ export class DtoGeneratorService {
     if (validators.includes('isPhoneNumber')) {
       return '+48 123 456 789';
     }
+    if (validators.includes('isISO31661Alpha2')) {
+      return 'PL';
+    }
     if (validators.includes('isString')) {
       return Math.random().toString(36).substring(2, 15);
     }

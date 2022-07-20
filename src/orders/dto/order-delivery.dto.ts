@@ -24,6 +24,7 @@ export class OrderDeliveryDto {
   city: string;
 
   @IsOptional()
+  @IsString()
   @IsPostalCode('any')
   postalCode: string;
 

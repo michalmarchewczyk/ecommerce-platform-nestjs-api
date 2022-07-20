@@ -32,8 +32,8 @@ export class OrderDelivery {
   @Column()
   city: string;
 
-  @Column()
-  postalCode: string;
+  @Column({ nullable: true })
+  postalCode?: string;
 
   @Column()
   country: string;

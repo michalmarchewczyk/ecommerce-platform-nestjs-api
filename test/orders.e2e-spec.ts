@@ -12,12 +12,16 @@ import { setupRbacTests } from './utils/setup-rbac-tests';
 import { OrderCreateDto } from '../src/orders/dto/order-create.dto';
 import { Order } from '../src/orders/entities/order.entity';
 import { OrderUpdateDto } from '../src/orders/dto/order-update.dto';
+import { DeliveryMethodDto } from '../src/orders/dto/delivery-method.dto';
+import { DeliveryMethod } from '../src/orders/entities/delivery-method.entity';
+import { OrderDeliveryDto } from '../src/orders/dto/order-delivery.dto';
 
 describe.only('OrdersController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
   let cookieHeader: string;
   let testProduct: Product;
+  let testMethod: DeliveryMethod;
   let testOrder: Order;
   let generate: DtoGeneratorService['generate'];
 
@@ -53,6 +57,14 @@ describe.only('OrdersController (e2e)', () => {
         .send(productData)
     ).body;
 
+    const methodData = generate(DeliveryMethodDto);
+    testMethod = (
+      await request(app.getHttpServer())
+        .post('/deliveries')
+        .set('Cookie', cookieHeader)
+        .send(methodData)
+    ).body;
+
     const createData = generate(OrderCreateDto);
     createData.items = [
       {
@@ -60,6 +72,8 @@ describe.only('OrdersController (e2e)', () => {
         quantity: 1,
       },
     ];
+    createData.delivery = generate(OrderDeliveryDto);
+    createData.delivery.methodId = testMethod.id;
     testOrder = (
       await request(app.getHttpServer())
         .post('/orders')
@@ -78,7 +92,7 @@ describe.only('OrdersController (e2e)', () => {
         .get('/orders')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      const { items, user, ...expected } = testOrder;
+      const { items, user, delivery, ...expected } = testOrder;
       expect(response.body).toContainEqual({
         ...expected,
         status: 'pending',
@@ -92,12 +106,13 @@ describe.only('OrdersController (e2e)', () => {
         .get(`/orders/${testOrder.id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      const { items, user, ...expected } = testOrder;
+      const { items, user, delivery, ...expected } = testOrder;
       expect(response.body).toEqual({
         ...expected,
         status: 'pending',
         items: [expect.any(Object)],
         user: expect.any(Object),
+        delivery: expect.any(Object),
       });
     });
 
@@ -115,6 +130,8 @@ describe.only('OrdersController (e2e)', () => {
           quantity: 1,
         },
       ];
+      createData.delivery = generate(OrderDeliveryDto);
+      createData.delivery.methodId = testMethod.id;
       const response2 = await request(app.getHttpServer())
         .post('/orders')
         .set('Cookie', cookieHeader)
@@ -124,12 +141,13 @@ describe.only('OrdersController (e2e)', () => {
         .get(`/orders/${id}`)
         .set('Cookie', cookieHeader);
       expect(response3.status).toBe(200);
-      const { products, user, ...expected } = response3.body;
+      const { products, user, delivery, ...expected } = response3.body;
       expect(response3.body).toEqual({
         ...expected,
         status: 'pending',
         items: [expect.any(Object)],
         user: expect.any(Object),
+        delivery: expect.any(Object),
       });
     });
 
@@ -172,6 +190,8 @@ describe.only('OrdersController (e2e)', () => {
           quantity: 1,
         },
       ];
+      createData.delivery = generate(OrderDeliveryDto);
+      createData.delivery.methodId = testMethod.id;
       const response = await request(app.getHttpServer())
         .post('/orders')
         .set('Cookie', cookieHeader)
@@ -204,6 +224,8 @@ describe.only('OrdersController (e2e)', () => {
           'contactEmail must be an email',
           'contactPhone should not be empty',
           'contactPhone must be a valid phone number',
+          'delivery must be a non-empty object',
+          'delivery should not be empty',
         ],
       });
     });
@@ -218,6 +240,8 @@ describe.only('OrdersController (e2e)', () => {
           quantity: 1,
         },
       ];
+      createData.delivery = generate(OrderDeliveryDto);
+      createData.delivery.methodId = testMethod.id;
       const { id } = (
         await request(app.getHttpServer())
           .post('/orders')
@@ -230,7 +254,7 @@ describe.only('OrdersController (e2e)', () => {
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(200);
-      const { items, ...expected } = updateData;
+      const { items, delivery, ...expected } = updateData;
       expect(response.body).toEqual({
         ...expected,
         id,
@@ -238,6 +262,7 @@ describe.only('OrdersController (e2e)', () => {
         updated: expect.any(String),
         items: [expect.any(Object)],
         user: expect.any(Object),
+        delivery: expect.any(Object),
       });
     });
 

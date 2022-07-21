@@ -1,5 +1,10 @@
-github_checks: false
 coverage:
   status:
-    project: off
-    patch: off
+    project:
+      default:
+        target: 85%
+        threshold: 5%
+    patch:
+      default:
+        target: 80%
+        threshold: 5%

@@ -133,23 +133,21 @@ export class RepositoryMockService<T> {
 
   private findWhere(where: Record<string, any>): T[] {
     return this.entities.filter((e) => {
-      // TODO: replace with something better
-      for (const key in where) {
-        if (typeof e[key] === 'object' && typeof where[key] === 'object') {
-          for (const key2 in where[key]) {
-            if (e[key]?.[key2] === null || e[key]?.[key2] === undefined) {
-              return false;
-            }
-            if (e[key][key2] !== where[key][key2]) {
-              return false;
-            }
-          }
-        } else if (e[key] !== where[key]) {
+      return this.matchObject(e, where);
+    });
+  }
+
+  private matchObject(obj: Record<string, any>, match: Record<string, any>) {
+    for (const key in match) {
+      if (typeof obj?.[key] === 'object' && typeof match?.[key] === 'object') {
+        if (!this.matchObject(obj?.[key], match?.[key])) {
           return false;
         }
+      } else if (obj?.[key] !== match?.[key]) {
+        return false;
       }
-      return true;
-    });
+    }
+    return true;
   }
 
   findOne(options: {

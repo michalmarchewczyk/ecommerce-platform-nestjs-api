@@ -12,6 +12,8 @@ import {
 import { PaymentsService } from './payments.service';
 import { PaymentMethod } from '../entities/payment-method.entity';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
+import { Role } from '../../users/entities/role.enum';
+import { Roles } from '../../auth/roles.decorator';
 
 @Controller('payments')
 export class PaymentsController {
@@ -23,6 +25,7 @@ export class PaymentsController {
   }
 
   @Post()
+  @Roles(Role.Admin)
   async createMethod(
     @Body() methodData: PaymentMethodDto,
   ): Promise<PaymentMethod> {
@@ -30,6 +33,7 @@ export class PaymentsController {
   }
 
   @Put(':id')
+  @Roles(Role.Admin)
   async updateMethod(
     @Param('id', ParseIntPipe) id: number,
     @Body() methodData: PaymentMethodDto,
@@ -42,6 +46,7 @@ export class PaymentsController {
   }
 
   @Delete(':id')
+  @Roles(Role.Admin)
   async deleteMethod(@Param('id', ParseIntPipe) id: number): Promise<void> {
     const deleted = await this.paymentsService.deleteMethod(id);
     if (!deleted) {

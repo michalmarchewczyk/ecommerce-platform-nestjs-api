@@ -9,10 +9,11 @@ import { OrderItem } from './entities/order-item.entity';
 import { DeliveriesModule } from './deliveries/deliveries.module';
 import { OrderDelivery } from './entities/order-delivery.entity';
 import { PaymentsModule } from './payments/payments.module';
+import { OrderPayment } from './entities/order-payment.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Order, OrderItem, OrderDelivery]),
+    TypeOrmModule.forFeature([Order, OrderItem, OrderDelivery, OrderPayment]),
     UsersModule,
     ProductsModule,
     DeliveriesModule,

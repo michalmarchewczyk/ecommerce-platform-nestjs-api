@@ -10,6 +10,7 @@ import {
 import { OrderItemDto } from './order-item.dto';
 import { Type } from 'class-transformer';
 import { OrderDeliveryDto } from './order-delivery.dto';
+import { OrderPaymentDto } from './order-payment.dto';
 
 export class OrderCreateDto {
   @IsNotEmpty({ each: true })
@@ -39,4 +40,10 @@ export class OrderCreateDto {
   @ValidateNested()
   @Type(() => OrderDeliveryDto)
   delivery: OrderDeliveryDto;
+
+  @IsNotEmpty()
+  @IsNotEmptyObject()
+  @ValidateNested()
+  @Type(() => OrderPaymentDto)
+  payment: OrderPaymentDto;
 }

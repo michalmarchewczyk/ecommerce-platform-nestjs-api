@@ -13,6 +13,7 @@ import { User } from '../../users/entities/user.entity';
 import { OrderStatus } from './order-status.enum';
 import { OrderItem } from './order-item.entity';
 import { OrderDelivery } from './order-delivery.entity';
+import { OrderPayment } from './order-payment.entity';
 
 @Entity('orders')
 export class Order {
@@ -50,6 +51,15 @@ export class Order {
   })
   @JoinColumn()
   delivery: OrderDelivery;
+
+  @OneToOne(() => OrderPayment, (payment) => payment.order, {
+    cascade: true,
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
+  @JoinColumn()
+  payment: OrderPayment;
 
   @Column()
   fullName: string;

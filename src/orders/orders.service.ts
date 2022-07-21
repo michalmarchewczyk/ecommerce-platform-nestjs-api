@@ -9,6 +9,8 @@ import { OrderUpdateDto } from './dto/order-update.dto';
 import { OrderItem } from './entities/order-item.entity';
 import { OrderDelivery } from './entities/order-delivery.entity';
 import { DeliveriesService } from './deliveries/deliveries.service';
+import { PaymentsService } from './payments/payments.service';
+import { OrderPayment } from './entities/order-payment.entity';
 
 @Injectable()
 export class OrdersService {
@@ -18,6 +20,7 @@ export class OrdersService {
     private readonly usersService: UsersService,
     private readonly productsService: ProductsService,
     private readonly deliveriesService: DeliveriesService,
+    private readonly paymentsService: PaymentsService,
   ) {}
 
   async getOrders(): Promise<Order[]> {
@@ -27,7 +30,7 @@ export class OrdersService {
   async getOrder(id: number): Promise<Order | null> {
     const order = await this.ordersRepository.findOne({
       where: { id },
-      relations: ['user', 'items', 'items.product', 'delivery'],
+      relations: ['user', 'items', 'items.product', 'delivery', 'payment'],
     });
     if (!order) {
       return null;
@@ -64,16 +67,26 @@ export class OrdersService {
     order.contactEmail = orderData.contactEmail;
     order.contactPhone = orderData.contactPhone;
     order.message = orderData.message;
-    const method = await this.deliveriesService.getMethod(
+    const deliveryMethod = await this.deliveriesService.getMethod(
       orderData.delivery.methodId,
     );
-    if (!method) {
+    if (!deliveryMethod) {
       return null;
     }
     const delivery = new OrderDelivery();
     Object.assign(delivery, orderData.delivery);
     order.delivery = delivery;
-    order.delivery.method = method;
+    order.delivery.method = deliveryMethod;
+    const paymentMethod = await this.paymentsService.getMethod(
+      orderData.payment.methodId,
+    );
+    if (!paymentMethod) {
+      return null;
+    }
+    const payment = new OrderPayment();
+    Object.assign(payment, orderData.payment);
+    order.payment = payment;
+    order.payment.method = paymentMethod;
     return this.ordersRepository.save(order);
   }
 
@@ -83,7 +96,7 @@ export class OrdersService {
   ): Promise<Order | null> {
     const order = await this.ordersRepository.findOne({
       where: { id },
-      relations: ['user', 'items', 'items.product', 'delivery'],
+      relations: ['user', 'items', 'items.product', 'delivery', 'payment'],
     });
     if (!order) {
       return null;
@@ -103,16 +116,26 @@ export class OrdersService {
       }
     }
     if (orderData.delivery) {
-      const method = await this.deliveriesService.getMethod(
+      const deliveryMethod = await this.deliveriesService.getMethod(
         orderData.delivery.methodId,
       );
-      if (!method) {
+      if (!deliveryMethod) {
         return null;
       }
       Object.assign(order.delivery, orderData.delivery);
-      order.delivery.method = method;
+      order.delivery.method = deliveryMethod;
     }
-    const { delivery, items, ...toAssign } = orderData;
+    if (orderData.payment) {
+      const paymentMethod = await this.paymentsService.getMethod(
+        orderData.payment.methodId,
+      );
+      if (!paymentMethod) {
+        return null;
+      }
+      Object.assign(order.payment, orderData.payment);
+      order.payment.method = paymentMethod;
+    }
+    const { delivery, payment, items, ...toAssign } = orderData;
     Object.assign(order, toAssign);
     return this.ordersRepository.save(order);
   }

@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Order } from './order.entity';
+import { Order } from '../../orders/entities/order.entity';
 import { ReturnStatus } from './return-status.enum';
 
 @Entity('returns')
@@ -25,8 +25,8 @@ export class Return {
   @JoinColumn()
   order: Order;
 
-  @Column()
-  message: string;
+  @Column({ nullable: true })
+  message?: string;
 
   @Column({
     type: 'enum',

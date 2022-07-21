@@ -6,6 +6,5 @@ export class ReturnCreateDto {
   orderId: number;
 
   @IsString()
-  @IsNotEmpty()
   message: string;
 }

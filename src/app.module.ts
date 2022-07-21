@@ -20,6 +20,7 @@ import { RolesGuard } from './auth/roles.guard';
 import { ProductsModule } from './products/products.module';
 import { LocalFilesModule } from './local-files/local-files.module';
 import { OrdersModule } from './orders/orders.module';
+import { ReturnsModule } from './returns/returns.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { OrdersModule } from './orders/orders.module';
     ProductsModule,
     LocalFilesModule,
     OrdersModule,
+    ReturnsModule,
   ],
   controllers: [AppController],
   providers: [

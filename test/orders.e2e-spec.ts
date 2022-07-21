@@ -15,13 +15,17 @@ import { OrderUpdateDto } from '../src/orders/dto/order-update.dto';
 import { DeliveryMethodDto } from '../src/orders/dto/delivery-method.dto';
 import { DeliveryMethod } from '../src/orders/entities/delivery-method.entity';
 import { OrderDeliveryDto } from '../src/orders/dto/order-delivery.dto';
+import { PaymentMethod } from '../src/orders/entities/payment-method.entity';
+import { PaymentMethodDto } from '../src/orders/dto/payment-method.dto';
+import { OrderPaymentDto } from '../src/orders/dto/order-payment.dto';
 
 describe.only('OrdersController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
   let cookieHeader: string;
   let testProduct: Product;
-  let testMethod: DeliveryMethod;
+  let testDeliveryMethod: DeliveryMethod;
+  let testPaymentMethod: PaymentMethod;
   let testOrder: Order;
   let generate: DtoGeneratorService['generate'];
 
@@ -57,12 +61,20 @@ describe.only('OrdersController (e2e)', () => {
         .send(productData)
     ).body;
 
-    const methodData = generate(DeliveryMethodDto);
-    testMethod = (
+    const deliveryMethodData = generate(DeliveryMethodDto);
+    testDeliveryMethod = (
       await request(app.getHttpServer())
         .post('/deliveries')
         .set('Cookie', cookieHeader)
-        .send(methodData)
+        .send(deliveryMethodData)
+    ).body;
+
+    const paymentMethodData = generate(PaymentMethodDto);
+    testPaymentMethod = (
+      await request(app.getHttpServer())
+        .post('/payments')
+        .set('Cookie', cookieHeader)
+        .send(paymentMethodData)
     ).body;
 
     const createData = generate(OrderCreateDto);
@@ -73,7 +85,9 @@ describe.only('OrdersController (e2e)', () => {
       },
     ];
     createData.delivery = generate(OrderDeliveryDto);
-    createData.delivery.methodId = testMethod.id;
+    createData.delivery.methodId = testDeliveryMethod.id;
+    createData.payment = generate(OrderPaymentDto);
+    createData.payment.methodId = testPaymentMethod.id;
     testOrder = (
       await request(app.getHttpServer())
         .post('/orders')
@@ -92,7 +106,7 @@ describe.only('OrdersController (e2e)', () => {
         .get('/orders')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      const { items, user, delivery, ...expected } = testOrder;
+      const { items, user, delivery, payment, ...expected } = testOrder;
       expect(response.body).toContainEqual({
         ...expected,
         status: 'pending',
@@ -106,13 +120,14 @@ describe.only('OrdersController (e2e)', () => {
         .get(`/orders/${testOrder.id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      const { items, user, delivery, ...expected } = testOrder;
+      const { items, user, delivery, payment, ...expected } = testOrder;
       expect(response.body).toEqual({
         ...expected,
         status: 'pending',
         items: [expect.any(Object)],
         user: expect.any(Object),
         delivery: expect.any(Object),
+        payment: expect.any(Object),
       });
     });
 
@@ -131,7 +146,9 @@ describe.only('OrdersController (e2e)', () => {
         },
       ];
       createData.delivery = generate(OrderDeliveryDto);
-      createData.delivery.methodId = testMethod.id;
+      createData.delivery.methodId = testDeliveryMethod.id;
+      createData.payment = generate(OrderPaymentDto);
+      createData.payment.methodId = testPaymentMethod.id;
       const response2 = await request(app.getHttpServer())
         .post('/orders')
         .set('Cookie', cookieHeader)
@@ -141,13 +158,14 @@ describe.only('OrdersController (e2e)', () => {
         .get(`/orders/${id}`)
         .set('Cookie', cookieHeader);
       expect(response3.status).toBe(200);
-      const { products, user, delivery, ...expected } = response3.body;
+      const { products, user, delivery, payment, ...expected } = response3.body;
       expect(response3.body).toEqual({
         ...expected,
         status: 'pending',
         items: [expect.any(Object)],
         user: expect.any(Object),
         delivery: expect.any(Object),
+        payment: expect.any(Object),
       });
     });
 
@@ -191,7 +209,9 @@ describe.only('OrdersController (e2e)', () => {
         },
       ];
       createData.delivery = generate(OrderDeliveryDto);
-      createData.delivery.methodId = testMethod.id;
+      createData.delivery.methodId = testDeliveryMethod.id;
+      createData.payment = generate(OrderPaymentDto);
+      createData.payment.methodId = testPaymentMethod.id;
       const response = await request(app.getHttpServer())
         .post('/orders')
         .set('Cookie', cookieHeader)
@@ -226,6 +246,8 @@ describe.only('OrdersController (e2e)', () => {
           'contactPhone must be a valid phone number',
           'delivery must be a non-empty object',
           'delivery should not be empty',
+          'payment must be a non-empty object',
+          'payment should not be empty',
         ],
       });
     });
@@ -241,7 +263,9 @@ describe.only('OrdersController (e2e)', () => {
         },
       ];
       createData.delivery = generate(OrderDeliveryDto);
-      createData.delivery.methodId = testMethod.id;
+      createData.delivery.methodId = testDeliveryMethod.id;
+      createData.payment = generate(OrderPaymentDto);
+      createData.payment.methodId = testPaymentMethod.id;
       const { id } = (
         await request(app.getHttpServer())
           .post('/orders')
@@ -254,7 +278,7 @@ describe.only('OrdersController (e2e)', () => {
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(200);
-      const { items, delivery, ...expected } = updateData;
+      const { items, delivery, payment, ...expected } = updateData;
       expect(response.body).toEqual({
         ...expected,
         id,
@@ -263,6 +287,7 @@ describe.only('OrdersController (e2e)', () => {
         items: [expect.any(Object)],
         user: expect.any(Object),
         delivery: expect.any(Object),
+        payment: expect.any(Object),
       });
     });
 

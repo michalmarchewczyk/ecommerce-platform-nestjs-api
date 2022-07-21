@@ -11,21 +11,17 @@ import {
   Post,
 } from '@nestjs/common';
 import { ReturnsService } from './returns.service';
-import { OrdersService } from '../orders/orders.service';
-import { Role } from 'src/users/entities/role.enum';
 import { Roles } from '../auth/roles.decorator';
 import { Return } from './entities/return.entity';
 import { User } from '../users/entities/user.entity';
 import { ReqUser } from '../auth/user.decorator';
 import { ReturnCreateDto } from './dto/return-create.dto';
 import { ReturnUpdateDto } from './dto/return-update.dto';
+import { Role } from '../users/entities/role.enum';
 
 @Controller('returns')
 export class ReturnsController {
-  constructor(
-    private readonly returnsService: ReturnsService,
-    private readonly ordersService: OrdersService,
-  ) {}
+  constructor(private readonly returnsService: ReturnsService) {}
 
   @Get()
   @Roles(Role.Admin, Role.Manager, Role.Sales)
@@ -51,11 +47,12 @@ export class ReturnsController {
   }
 
   @Post('')
+  @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   async createReturn(
     @ReqUser() user: User,
     @Body() body: ReturnCreateDto,
   ): Promise<Return> {
-    const checkUser = await this.ordersService.checkOrderUser(
+    const checkUser = await this.returnsService.checkOrderUser(
       user?.id,
       body.orderId,
     );
@@ -70,10 +67,15 @@ export class ReturnsController {
   }
 
   @Patch('/:id')
+  @Roles(Role.Admin, Role.Manager, Role.Sales)
   async updateReturn(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: ReturnUpdateDto,
   ): Promise<Return> {
-    return this.returnsService.updateReturn(id, body);
+    const updated = await this.returnsService.updateReturn(id, body);
+    if (!updated) {
+      throw new NotFoundException(['return not found']);
+    }
+    return updated;
   }
 }

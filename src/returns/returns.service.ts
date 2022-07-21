@@ -45,6 +45,13 @@ export class ReturnsService {
     return !!order;
   }
 
+  async checkOrderUser(userId: number, orderId: number): Promise<boolean> {
+    const order = await this.ordersRepository.findOne({
+      where: { id: orderId, user: { id: userId } },
+    });
+    return !!order;
+  }
+
   async createReturn(returnDto: ReturnCreateDto): Promise<Return | null> {
     const newReturn = new Return();
     const order = await this.ordersRepository.findOne({

@@ -20,6 +20,10 @@ import { DeliveriesService } from './deliveries/deliveries.service';
 import { DeliveryMethod } from './entities/delivery-method.entity';
 import { OrderDeliveryDto } from './dto/order-delivery.dto';
 import { DeliveryMethodDto } from './dto/delivery-method.dto';
+import { OrderPaymentDto } from './dto/order-payment.dto';
+import { PaymentMethodDto } from './dto/payment-method.dto';
+import { PaymentMethod } from './entities/payment-method.entity';
+import { PaymentsService } from './payments/payments.service';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
@@ -27,6 +31,7 @@ describe('OrdersController', () => {
   let mockUsersRepository: RepositoryMockService<User>;
   let mockProductsRepository: RepositoryMockService<Product>;
   let mockDeliveriesRepository: RepositoryMockService<DeliveryMethod>;
+  let mockPaymentsRepository: RepositoryMockService<PaymentMethod>;
   let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
@@ -37,11 +42,13 @@ describe('OrdersController', () => {
         UsersService,
         ProductsService,
         DeliveriesService,
+        PaymentsService,
         RepositoryMockService.getProvider(Order),
         RepositoryMockService.getProvider(User),
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(DeliveryMethod),
+        RepositoryMockService.getProvider(PaymentMethod),
         DtoGeneratorService,
       ],
     }).compile();
@@ -51,6 +58,7 @@ describe('OrdersController', () => {
     mockUsersRepository = module.get(getRepositoryToken(User));
     mockProductsRepository = module.get(getRepositoryToken(Product));
     mockDeliveriesRepository = module.get(getRepositoryToken(DeliveryMethod));
+    mockPaymentsRepository = module.get(getRepositoryToken(PaymentMethod));
     generate = module
       .get(DtoGeneratorService)
       .generate.bind(module.get(DtoGeneratorService));
@@ -85,14 +93,19 @@ describe('OrdersController', () => {
       const createData = generate(OrderCreateDto, false);
       createData.items = [generate(OrderItemDto, false)];
       createData.delivery = generate(OrderDeliveryDto);
+      createData.payment = generate(OrderPaymentDto);
       const { id: productId } = await mockProductsRepository.save(
         generate(ProductCreateDto, false),
       );
-      const { id: methodId } = await mockDeliveriesRepository.save(
+      const { id: deliveryMethodId } = await mockDeliveriesRepository.save(
         generate(DeliveryMethodDto, false),
       );
+      const { id: paymentMethodId } = await mockPaymentsRepository.save(
+        generate(PaymentMethodDto, false),
+      );
       createData.items[0].productId = productId;
-      createData.delivery.methodId = methodId;
+      createData.delivery.methodId = deliveryMethodId;
+      createData.payment.methodId = paymentMethodId;
       const { id } = await controller.createOrder(user, createData);
       const order = await controller.getOrder(user, id);
       expect(order).toEqual(
@@ -112,14 +125,19 @@ describe('OrdersController', () => {
       const createData = generate(OrderCreateDto, false);
       createData.items = [generate(OrderItemDto, false)];
       createData.delivery = generate(OrderDeliveryDto);
+      createData.payment = generate(OrderPaymentDto);
       const { id: productId } = await mockProductsRepository.save(
         generate(ProductCreateDto, false),
       );
-      const { id: methodId } = await mockDeliveriesRepository.save(
+      const { id: deliveryMethodId } = await mockDeliveriesRepository.save(
         generate(DeliveryMethodDto, false),
       );
+      const { id: paymentMethodId } = await mockPaymentsRepository.save(
+        generate(PaymentMethodDto, false),
+      );
       createData.items[0].productId = productId;
-      createData.delivery.methodId = methodId;
+      createData.delivery.methodId = deliveryMethodId;
+      createData.payment.methodId = paymentMethodId;
       const { id } = await controller.createOrder(users[0], createData);
       await expect(controller.getOrder(users[1], id)).rejects.toThrow(
         ForbiddenException,
@@ -132,14 +150,19 @@ describe('OrdersController', () => {
       const createData = generate(OrderCreateDto, false);
       createData.items = [generate(OrderItemDto, false)];
       createData.delivery = generate(OrderDeliveryDto);
+      createData.payment = generate(OrderPaymentDto);
       const { id: productId } = await mockProductsRepository.save(
         generate(ProductCreateDto, false),
       );
-      const { id: methodId } = await mockDeliveriesRepository.save(
+      const { id: deliveryMethodId } = await mockDeliveriesRepository.save(
         generate(DeliveryMethodDto, false),
       );
+      const { id: paymentMethodId } = await mockPaymentsRepository.save(
+        generate(PaymentMethodDto, false),
+      );
       createData.items[0].productId = productId;
-      createData.delivery.methodId = methodId;
+      createData.delivery.methodId = deliveryMethodId;
+      createData.payment.methodId = paymentMethodId;
       const order = await controller.createOrder(null, createData);
       expect(order).toEqual(
         mockOrdersRepository.entities.find((o) => o.id === order.id),
@@ -158,7 +181,7 @@ describe('OrdersController', () => {
       expect(order).toEqual(
         mockOrdersRepository.entities.find((o) => o.id === id),
       );
-      const { items, delivery, ...expected } = updateData;
+      const { items, delivery, payment, ...expected } = updateData;
       expect(order).toMatchObject(expected);
     });
 

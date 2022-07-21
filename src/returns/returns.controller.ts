@@ -1,6 +1,5 @@
 import {
   Body,
-  ConflictException,
   Controller,
   ForbiddenException,
   Get,
@@ -61,7 +60,7 @@ export class ReturnsController {
     }
     const created = await this.returnsService.createReturn(body);
     if (!created) {
-      throw new ConflictException(['return for given order already exists']);
+      throw new NotFoundException(['order not found']);
     }
     return created;
   }

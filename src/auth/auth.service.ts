@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as argon2 from 'argon2';
 import { User } from '../users/entities/user.entity';
@@ -26,8 +22,6 @@ export class AuthService {
     } catch (e) {
       if (e instanceof QueryFailedError) {
         throw new ConflictException(['user already exists']);
-      } else {
-        throw new InternalServerErrorException(['could not add user']);
       }
     }
   }

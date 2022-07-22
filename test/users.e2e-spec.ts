@@ -256,10 +256,10 @@ describe('UsersController (e2e)', () => {
       () => app,
       () => testUsers,
       [
-        [
-          '/users/me (GET)',
-          [Role.Customer, Role.Manager, Role.Sales, Role.Admin, Role.Disabled],
-        ],
+        // [
+        //   '/users/me (GET)',
+        //   [Role.Customer, Role.Manager, Role.Sales, Role.Admin, Role.Disabled],
+        // ],
         ['/users (GET)', [Role.Admin]],
         ['/users/:id (GET)', [Role.Admin]],
         ['/users/:id (PATCH)', [Role.Admin]],

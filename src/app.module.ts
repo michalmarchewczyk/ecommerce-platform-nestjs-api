@@ -9,7 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import configuration from './config/configuration';
+import configuration, { schema } from './config/configuration';
 import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import * as session from 'express-session';
 import * as passport from 'passport';
@@ -27,6 +27,7 @@ import { ReturnsModule } from './returns/returns.module';
     ConfigModule.forRoot({
       ignoreEnvFile: true,
       isGlobal: true,
+      validationSchema: schema,
       load: [configuration],
     }),
     TypeOrmModule.forRootAsync({

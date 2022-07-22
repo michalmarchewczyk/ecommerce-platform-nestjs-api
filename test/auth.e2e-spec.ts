@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
 import { RegisterDto } from '../src/auth/dto/register.dto';
+import { LoginDto } from '../src/auth/dto/login.dto';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -123,7 +124,7 @@ describe('AuthController (e2e)', () => {
     it('should return error when invalid email', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/login')
-        .send(generate(RegisterDto));
+        .send(generate(LoginDto, true));
       expect(response.status).toBe(401);
       expect(response.body).toEqual({
         statusCode: 401,
@@ -167,6 +168,11 @@ describe('AuthController (e2e)', () => {
         .set('Cookie', headers['set-cookie'])
         .send();
       expect(response.status).toBe(201);
+      const response2 = await request(app.getHttpServer())
+        .post('/auth/logout')
+        .set('Cookie', headers['set-cookie'])
+        .send();
+      expect(response2.status).toBe(401);
     });
 
     it('should return error when not logged in', async () => {

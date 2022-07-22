@@ -118,6 +118,37 @@ describe('CategoriesController (e2e)', () => {
       });
     });
 
+    it('should create new category with parent', async () => {
+      const createData = generate(CategoryCreateDto);
+      createData.parentCategoryId = testCategory.id;
+      const response = await request(app.getHttpServer())
+        .post('/categories')
+        .set('Cookie', cookieHeader)
+        .send(createData);
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        id: expect.any(Number),
+        ...createData,
+        slug: null,
+        parentCategory: testCategory,
+      });
+    });
+
+    it('should return error if parent category does not exist', async () => {
+      const createData = generate(CategoryCreateDto);
+      createData.parentCategoryId = 12345;
+      const response = await request(app.getHttpServer())
+        .post('/categories')
+        .set('Cookie', cookieHeader)
+        .send(createData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        message: ['category not found'],
+        statusCode: 404,
+        error: 'Not Found',
+      });
+    });
+
     it('should return error if data is invalid', async () => {
       const createData = generate(CategoryCreateDto);
       const response = await request(app.getHttpServer())
@@ -154,6 +185,50 @@ describe('CategoriesController (e2e)', () => {
       expect(response.body).toEqual({
         id,
         ...updateData,
+      });
+    });
+
+    it('should update category parent', async () => {
+      const createData = generate(CategoryCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/categories')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const updateData = generate(CategoryUpdateDto, true);
+      updateData.parentCategoryId = testCategory.id;
+      const response = await request(app.getHttpServer())
+        .patch('/categories/' + id)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        id,
+        ...updateData,
+        parentCategory: testCategory,
+      });
+    });
+
+    it('should return error if parent category does not exist', async () => {
+      const createData = generate(CategoryCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/categories')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const updateData = generate(CategoryUpdateDto, true);
+      updateData.parentCategoryId = 12345;
+      const response = await request(app.getHttpServer())
+        .patch('/categories/' + id)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        message: ['category not found'],
+        statusCode: 404,
+        error: 'Not Found',
       });
     });
 
@@ -305,9 +380,47 @@ describe('CategoriesController (e2e)', () => {
       expect(response.body).toEqual({});
     });
 
-    it('should return error if category or product with given id does not exist', async () => {
+    it('should return error if product with given id does not exist', async () => {
+      const createData = generate(ProductCreateDto);
+      const categoryId = (
+        await request(app.getHttpServer())
+          .post('/categories')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
       const response = await request(app.getHttpServer())
-        .delete('/categories/12345/products/12345')
+        .delete(`/categories/${categoryId}/products/${12345}`)
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        message: ['category or product not found'],
+        statusCode: 404,
+        error: 'Not Found',
+      });
+    });
+
+    it('should return error if product is not in category', async () => {
+      const createData = generate(ProductCreateDto);
+      const categoryId = (
+        await request(app.getHttpServer())
+          .post('/categories')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .delete(`/categories/${categoryId}/products/${testProduct.id}`)
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        message: ['category or product not found'],
+        statusCode: 404,
+        error: 'Not Found',
+      });
+    });
+
+    it('should return error if category with given id does not exist', async () => {
+      const response = await request(app.getHttpServer())
+        .delete(`/categories/12345/products/${testProduct.id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({

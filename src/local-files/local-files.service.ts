@@ -11,7 +11,7 @@ export class LocalFilesService {
   ) {}
 
   async getProductPhoto(id: number): Promise<ProductPhoto | null> {
-    const productPhoto = this.productPhotosRepository.findOne({
+    const productPhoto = await this.productPhotosRepository.findOne({
       where: { id },
     });
     if (!productPhoto) {

@@ -299,6 +299,32 @@ describe('ProductsController (e2e)', () => {
         error: 'Not Found',
       });
     });
+
+    it('should return error if attribute type not found', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const attributeData = generate(AttributeDto);
+      const response = await request(app.getHttpServer())
+        .patch('/products/' + id + '/attributes')
+        .set('Cookie', cookieHeader)
+        .send([
+          {
+            ...attributeData,
+            typeId: 12345,
+          },
+        ]);
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        statusCode: 400,
+        message: ['wrong attribute type'],
+        error: 'Bad Request',
+      });
+    });
   });
 
   describe('/products/:id/photos (POST)', () => {
@@ -334,6 +360,37 @@ describe('ProductsController (e2e)', () => {
         id: expect.any(Number),
         mimeType: 'image/jpeg',
         path: expect.any(String),
+      });
+    });
+
+    it('should be able to get product photos', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const response2 = await request(app.getHttpServer())
+        .get('/files/' + response.body.photos[0].id)
+        .set('Cookie', cookieHeader);
+      expect(response2.status).toBe(200);
+      expect(response2.headers['content-type']).toBe('image/jpeg');
+    });
+
+    it('should return error if photo not found', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/files/' + 12345)
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        message: ['product photo not found'],
+        error: 'Not Found',
       });
     });
 

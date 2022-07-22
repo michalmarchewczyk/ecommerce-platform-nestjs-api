@@ -78,12 +78,7 @@ describe.only('OrdersController (e2e)', () => {
     ).body;
 
     const createData = generate(OrderCreateDto);
-    createData.items = [
-      {
-        productId: testProduct.id,
-        quantity: 1,
-      },
-    ];
+    createData.items = [{ productId: testProduct.id, quantity: 1 }];
     createData.delivery = generate(OrderDeliveryDto);
     createData.delivery.methodId = testDeliveryMethod.id;
     createData.payment = generate(OrderPaymentDto);
@@ -139,12 +134,7 @@ describe.only('OrdersController (e2e)', () => {
         });
       const cookieHeader = response.headers['set-cookie'];
       const createData = generate(OrderCreateDto);
-      createData.items = [
-        {
-          productId: testProduct.id,
-          quantity: 1,
-        },
-      ];
+      createData.items = [{ productId: testProduct.id, quantity: 1 }];
       createData.delivery = generate(OrderDeliveryDto);
       createData.delivery.methodId = testDeliveryMethod.id;
       createData.payment = generate(OrderPaymentDto);
@@ -202,12 +192,7 @@ describe.only('OrdersController (e2e)', () => {
   describe('/orders (POST)', () => {
     it('should create order', async () => {
       const createData = generate(OrderCreateDto);
-      createData.items = [
-        {
-          productId: testProduct.id,
-          quantity: 1,
-        },
-      ];
+      createData.items = [{ productId: testProduct.id, quantity: 1 }];
       createData.delivery = generate(OrderDeliveryDto);
       createData.delivery.methodId = testDeliveryMethod.id;
       createData.payment = generate(OrderPaymentDto);
@@ -223,6 +208,82 @@ describe.only('OrdersController (e2e)', () => {
         status: 'pending',
         items: [expect.any(Object)],
         user: expect.any(Object),
+      });
+    });
+
+    it('should create order without user account', async () => {
+      const createData = generate(OrderCreateDto);
+      createData.items = [{ productId: testProduct.id, quantity: 1 }];
+      createData.delivery = generate(OrderDeliveryDto);
+      createData.delivery.methodId = testDeliveryMethod.id;
+      createData.payment = generate(OrderPaymentDto);
+      createData.payment.methodId = testPaymentMethod.id;
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(createData);
+      expect(response.status).toBe(201);
+      const { products, user, ...expected } = response.body;
+      expect(response.body).toEqual({
+        ...expected,
+        status: 'pending',
+        items: [expect.any(Object)],
+      });
+    });
+
+    it('should return error if product does not exist', async () => {
+      const createData = generate(OrderCreateDto);
+      createData.items = [{ productId: 12345, quantity: 1 }];
+      createData.delivery = generate(OrderDeliveryDto);
+      createData.delivery.methodId = testDeliveryMethod.id;
+      createData.payment = generate(OrderPaymentDto);
+      createData.payment.methodId = testPaymentMethod.id;
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .set('Cookie', cookieHeader)
+        .send(createData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product not found'],
+      });
+    });
+
+    it('should return error if delivery method does not exist', async () => {
+      const createData = generate(OrderCreateDto);
+      createData.items = [{ productId: testProduct.id, quantity: 1 }];
+      createData.delivery = generate(OrderDeliveryDto);
+      createData.delivery.methodId = 12345;
+      createData.payment = generate(OrderPaymentDto);
+      createData.payment.methodId = testPaymentMethod.id;
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .set('Cookie', cookieHeader)
+        .send(createData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product not found'],
+      });
+    });
+
+    it('should return error if payment method does not exist', async () => {
+      const createData = generate(OrderCreateDto);
+      createData.items = [{ productId: testProduct.id, quantity: 1 }];
+      createData.delivery = generate(OrderDeliveryDto);
+      createData.delivery.methodId = testDeliveryMethod.id;
+      createData.payment = generate(OrderPaymentDto);
+      createData.payment.methodId = 12345;
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .set('Cookie', cookieHeader)
+        .send(createData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product not found'],
       });
     });
 
@@ -254,34 +315,39 @@ describe.only('OrdersController (e2e)', () => {
   });
 
   describe('/orders/:id (PATCH)', () => {
-    it('should update order', async () => {
+    let testOrderId;
+
+    beforeEach(async () => {
       const createData = generate(OrderCreateDto);
-      createData.items = [
-        {
-          productId: testProduct.id,
-          quantity: 1,
-        },
-      ];
+      createData.items = [{ productId: testProduct.id, quantity: 1 }];
       createData.delivery = generate(OrderDeliveryDto);
       createData.delivery.methodId = testDeliveryMethod.id;
       createData.payment = generate(OrderPaymentDto);
       createData.payment.methodId = testPaymentMethod.id;
-      const { id } = (
+      testOrderId = (
         await request(app.getHttpServer())
           .post('/orders')
           .set('Cookie', cookieHeader)
           .send(createData)
-      ).body;
+      ).body.id;
+    });
+
+    it('should update order', async () => {
       const updateData = generate(OrderUpdateDto, true);
+      updateData.items = [{ productId: testProduct.id, quantity: 10 }];
+      updateData.delivery = generate(OrderDeliveryDto);
+      updateData.delivery.methodId = testDeliveryMethod.id;
+      updateData.payment = generate(OrderPaymentDto);
+      updateData.payment.methodId = testPaymentMethod.id;
       const response = await request(app.getHttpServer())
-        .patch(`/orders/${id}`)
+        .patch(`/orders/${testOrderId}`)
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(200);
       const { items, delivery, payment, ...expected } = updateData;
       expect(response.body).toEqual({
         ...expected,
-        id,
+        id: testOrderId,
         created: expect.any(String),
         updated: expect.any(String),
         items: [expect.any(Object)],
@@ -291,9 +357,85 @@ describe.only('OrdersController (e2e)', () => {
       });
     });
 
+    it('should return error if order does not exist', async () => {
+      const updateData = generate(OrderUpdateDto, true);
+      updateData.items = [{ productId: testProduct.id, quantity: 10 }];
+      updateData.delivery = generate(OrderDeliveryDto);
+      updateData.delivery.methodId = testDeliveryMethod.id;
+      updateData.payment = generate(OrderPaymentDto);
+      updateData.payment.methodId = testPaymentMethod.id;
+      const response = await request(app.getHttpServer())
+        .patch(`/orders/${12345}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['order or product not found'],
+      });
+    });
+
+    it('should return error if product does not exist', async () => {
+      const updateData = generate(OrderUpdateDto, true);
+      updateData.items = [{ productId: 12345, quantity: 10 }];
+      updateData.delivery = generate(OrderDeliveryDto);
+      updateData.delivery.methodId = testDeliveryMethod.id;
+      updateData.payment = generate(OrderPaymentDto);
+      updateData.payment.methodId = testPaymentMethod.id;
+      const response = await request(app.getHttpServer())
+        .patch(`/orders/${testOrderId}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['order or product not found'],
+      });
+    });
+
+    it('should return error if delivery method does not exist', async () => {
+      const updateData = generate(OrderUpdateDto, true);
+      updateData.items = [{ productId: testProduct.id, quantity: 10 }];
+      updateData.delivery = generate(OrderDeliveryDto);
+      updateData.delivery.methodId = 12345;
+      updateData.payment = generate(OrderPaymentDto);
+      updateData.payment.methodId = testPaymentMethod.id;
+      const response = await request(app.getHttpServer())
+        .patch(`/orders/${testOrderId}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['order or product not found'],
+      });
+    });
+
+    it('should return error if payment method does not exist', async () => {
+      const updateData = generate(OrderUpdateDto, true);
+      updateData.items = [{ productId: testProduct.id, quantity: 10 }];
+      updateData.delivery = generate(OrderDeliveryDto);
+      updateData.delivery.methodId = testDeliveryMethod.id;
+      updateData.payment = generate(OrderPaymentDto);
+      updateData.payment.methodId = 12345;
+      const response = await request(app.getHttpServer())
+        .patch(`/orders/${testOrderId}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['order or product not found'],
+      });
+    });
+
     it('should return error if data is invalid', async () => {
       const response = await request(app.getHttpServer())
-        .patch(`/orders/${testOrder.id}`)
+        .patch(`/orders/${testOrderId}`)
         .set('Cookie', cookieHeader)
         .send({
           status: '12345',

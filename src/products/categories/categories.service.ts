@@ -32,7 +32,13 @@ export class CategoriesService {
     const category = new Category();
     Object.assign(category, categoryData);
     if (categoryData.parentCategoryId) {
-      await this.updateParentCategory(category, categoryData.parentCategoryId);
+      const updated = await this.updateParentCategory(
+        category,
+        categoryData.parentCategoryId,
+      );
+      if (!updated) {
+        return null;
+      }
     }
     return this.categoriesRepository.save(category);
   }
@@ -47,7 +53,13 @@ export class CategoriesService {
     }
     Object.assign(category, categoryData);
     if (categoryData.parentCategoryId) {
-      await this.updateParentCategory(category, categoryData.parentCategoryId);
+      const updated = await this.updateParentCategory(
+        category,
+        categoryData.parentCategoryId,
+      );
+      if (!updated) {
+        return null;
+      }
     }
     return this.categoriesRepository.save(category);
   }
@@ -60,9 +72,10 @@ export class CategoriesService {
       where: { id: parentCategoryId },
     });
     if (!parentCategory) {
-      return null;
+      return false;
     }
-    category.parentCategory = parentCategory ?? null;
+    category.parentCategory = parentCategory;
+    return true;
   }
 
   async deleteCategory(id: number): Promise<boolean> {

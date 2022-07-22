@@ -50,5 +50,16 @@ export const setupRbacTests =
           }
         },
       );
+
+      it(`${endpoint} can be accessed by guest: ${roles.includes(
+        Role.Disabled,
+      )}`, async () => {
+        const response = await request(app.getHttpServer())[method](url);
+        if (roles.includes(Role.Disabled)) {
+          expect(response.status).not.toBe(401);
+        } else {
+          expect(response.status).toBe(401);
+        }
+      });
     });
   };

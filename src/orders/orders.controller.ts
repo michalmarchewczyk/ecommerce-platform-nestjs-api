@@ -39,8 +39,8 @@ export class OrdersController {
   @Get('/:id')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   async getOrder(@ReqUser() user: User, @Param('id', ParseIntPipe) id: number) {
-    const checkUser = await this.ordersService.checkOrderUser(user?.id, id);
-    if (!checkUser && user?.role === Role.Customer) {
+    const checkUser = await this.ordersService.checkOrderUser(user.id, id);
+    if (!checkUser && user.role === Role.Customer) {
       throw new ForbiddenException();
     }
     const order = await this.ordersService.getOrder(id);

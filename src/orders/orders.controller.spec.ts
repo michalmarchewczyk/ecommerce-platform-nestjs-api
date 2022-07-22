@@ -81,7 +81,7 @@ describe('OrdersController', () => {
     it('should return an order with given id', async () => {
       const createData = generate(OrderCreateDto, false);
       const { id } = mockOrdersRepository.save(createData);
-      const order = await controller.getOrder(null, id);
+      const order = await controller.getOrder({ id: 12345 } as User, id);
       expect(order).toEqual(
         mockOrdersRepository.entities.find((o) => o.id === id),
       );
@@ -114,9 +114,9 @@ describe('OrdersController', () => {
     });
 
     it('should throw error if order with given id does not exist', async () => {
-      await expect(controller.getOrder(null, 12345)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        controller.getOrder({ id: 12345 } as User, 12345),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw error if order has different user id', async () => {

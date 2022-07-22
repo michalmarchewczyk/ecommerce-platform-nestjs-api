@@ -34,8 +34,8 @@ export class ReturnsController {
     @ReqUser() user: User,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Return> {
-    const checkUser = await this.returnsService.checkReturnUser(user?.id, id);
-    if (!checkUser && user?.role === Role.Customer) {
+    const checkUser = await this.returnsService.checkReturnUser(user.id, id);
+    if (!checkUser && user.role === Role.Customer) {
       throw new ForbiddenException();
     }
     const foundReturn = await this.returnsService.getReturn(id);
@@ -52,10 +52,10 @@ export class ReturnsController {
     @Body() body: ReturnCreateDto,
   ): Promise<Return> {
     const checkUser = await this.returnsService.checkOrderUser(
-      user?.id,
+      user.id,
       body.orderId,
     );
-    if (!checkUser && (!user?.role || user?.role === Role.Customer)) {
+    if (!checkUser && (!user.role || user.role === Role.Customer)) {
       throw new ForbiddenException();
     }
     const created = await this.returnsService.createReturn(body);

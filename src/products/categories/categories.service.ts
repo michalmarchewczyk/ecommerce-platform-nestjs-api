@@ -74,7 +74,7 @@ export class CategoriesService {
     if (!parentCategory) {
       return false;
     }
-    category.parentCategory = parentCategory ?? null;
+    category.parentCategory = parentCategory;
     return true;
   }
 

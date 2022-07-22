@@ -10,7 +10,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration, { schema } from './config/configuration';
-import { APP_GUARD, APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import * as createRedisStore from 'connect-redis';
@@ -21,6 +21,7 @@ import { ProductsModule } from './products/products.module';
 import { LocalFilesModule } from './local-files/local-files.module';
 import { OrdersModule } from './orders/orders.module';
 import { ReturnsModule } from './returns/returns.module';
+import { ServiceErrorInterceptor } from './errors/service-error.interceptor';
 
 @Module({
   imports: [
@@ -68,6 +69,10 @@ import { ReturnsModule } from './returns/returns.module';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ServiceErrorInterceptor,
     },
   ],
 })

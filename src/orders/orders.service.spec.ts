@@ -130,6 +130,8 @@ describe('OrdersService', () => {
 
   describe('createOrder', () => {
     it('should create an order', async () => {
+      const userData = generate(RegisterDto, false);
+      const { id: userId } = await mockUsersRepository.save(userData);
       const createData = generate(OrderCreateDto, false);
       createData.items = [generate(OrderItemDto, false)];
       createData.delivery = generate(OrderDeliveryDto);
@@ -146,7 +148,7 @@ describe('OrdersService', () => {
       createData.items[0].productId = productId;
       createData.delivery.methodId = deliveryMethodId;
       createData.payment.methodId = paymentMethodId;
-      const order = await service.createOrder(12345, createData);
+      const order = await service.createOrder(userId, createData);
       expect(order).toEqual(
         mockOrdersRepository.entities.find((o) => o.id === order.id),
       );

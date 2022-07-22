@@ -4,7 +4,7 @@ export const schema = Joi.object({
   PORT: Joi.number().default(3000),
   POSTGRES_HOST: Joi.string().default('postgres'),
   POSTGRES_PORT: Joi.number().default(5432),
-  POSTGRES_USERNAME: Joi.string().default('postgres'),
+  POSTGRES_USER: Joi.string().default('postgres'),
   POSTGRES_PASSWORD: Joi.string().default('postgres'),
   POSTGRES_DB: Joi.string().default('ecommerce-platform'),
   SESSION_SECRET: Joi.string().default('secret'),

@@ -11,11 +11,17 @@ import { AttributeDto } from './dto/attribute.dto';
 import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 import { NotFoundError } from '../errors/not-found.error';
+import {
+  AttributeType,
+  AttributeValueType,
+} from './entities/attribute-type.entity';
+import { AttributeTypeDto } from './dto/attribute-type.dto';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
   let generate: DtoGeneratorService['generate'];
   let mockProductsRepository: RepositoryMockService<Product>;
+  let mockAttributesTypesRepository: RepositoryMockService<AttributeType>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,6 +30,7 @@ describe('ProductsController', () => {
         ProductsService,
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(Attribute),
+        RepositoryMockService.getProvider(AttributeType),
         DtoGeneratorService,
       ],
     }).compile();
@@ -33,6 +40,9 @@ describe('ProductsController', () => {
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
     mockProductsRepository = module.get(getRepositoryToken(Product));
+    mockAttributesTypesRepository = module.get(
+      getRepositoryToken(AttributeType),
+    );
   });
 
   it('should be defined', () => {
@@ -63,7 +73,7 @@ describe('ProductsController', () => {
       });
     });
 
-    it('should return null if product not found', async () => {
+    it('should throw error if product not found', async () => {
       await expect(controller.getProduct(12345)).rejects.toThrow(NotFoundError);
     });
   });
@@ -127,7 +137,12 @@ describe('ProductsController', () => {
     it('should update a product attributes', async () => {
       const createData = generate(ProductCreateDto, true);
       const { id } = await controller.createProduct(createData);
-      const attributesData = generate(AttributeDto, false, 4);
+      const attributeTypeData = generate(AttributeTypeDto);
+      attributeTypeData.valueType = AttributeValueType.String;
+      const { id: attrId } =
+        mockAttributesTypesRepository.save(attributeTypeData);
+      let attributesData = generate(AttributeDto, false, 4);
+      attributesData = attributesData.map((a) => ({ ...a, typeId: attrId }));
       const updated = await controller.updateProductAttributes(
         id,
         attributesData,
@@ -135,7 +150,12 @@ describe('ProductsController', () => {
       const expectedAttributes = attributesData.map((a) => ({
         id: expect.any(Number),
         value: a.value,
-        type: { id: a.typeId },
+        type: {
+          id: a.typeId,
+          name: expect.any(String),
+          valueType: expect.any(String),
+          attributes: [],
+        },
         product: null,
       }));
       expect(updated).toEqual({

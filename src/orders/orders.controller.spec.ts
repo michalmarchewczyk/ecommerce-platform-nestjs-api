@@ -25,6 +25,7 @@ import { PaymentMethodDto } from './dto/payment-method.dto';
 import { PaymentMethod } from './entities/payment-method.entity';
 import { PaymentsService } from './payments/payments.service';
 import { NotFoundError } from '../errors/not-found.error';
+import { AttributeType } from '../products/entities/attribute-type.entity';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
@@ -50,6 +51,7 @@ describe('OrdersController', () => {
         RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(DeliveryMethod),
         RepositoryMockService.getProvider(PaymentMethod),
+        RepositoryMockService.getProvider(AttributeType),
         DtoGeneratorService,
       ],
     }).compile();

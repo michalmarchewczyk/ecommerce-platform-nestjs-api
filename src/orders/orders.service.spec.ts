@@ -23,6 +23,7 @@ import { OrderPaymentDto } from './dto/order-payment.dto';
 import { PaymentMethodDto } from './dto/payment-method.dto';
 import { PaymentsService } from './payments/payments.service';
 import { NotFoundError } from '../errors/not-found.error';
+import { AttributeType } from '../products/entities/attribute-type.entity';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -47,6 +48,7 @@ describe('OrdersService', () => {
         RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(DeliveryMethod),
         RepositoryMockService.getProvider(PaymentMethod),
+        RepositoryMockService.getProvider(AttributeType),
         DtoGeneratorService,
       ],
     }).compile();

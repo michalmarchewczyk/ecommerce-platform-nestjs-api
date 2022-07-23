@@ -12,6 +12,7 @@ import { ProductUpdateDto } from '../src/products/dto/product-update.dto';
 import { AttributeDto } from '../src/products/dto/attribute.dto';
 import { AttributeTypeDto } from '../src/products/dto/attribute-type.dto';
 import { setupRbacTests } from './utils/setup-rbac-tests';
+import { AttributeValueType } from '../src/products/entities/attribute-type.entity';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;
@@ -252,6 +253,7 @@ describe('ProductsController (e2e)', () => {
           .send(createData)
       ).body.id;
       const attributeTypeData = generate(AttributeTypeDto);
+      attributeTypeData.valueType = AttributeValueType.String;
       const attrId = (
         await request(app.getHttpServer())
           .post('/attributes')
@@ -281,10 +283,45 @@ describe('ProductsController (e2e)', () => {
             value: attributeData.value,
             type: {
               id: attrId,
+              ...attributeTypeData,
             },
           },
         ],
         photos: [],
+      });
+    });
+
+    it('should return error if value does not match attribute type', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const attributeTypeData = generate(AttributeTypeDto);
+      attributeTypeData.valueType = AttributeValueType.Number;
+      const attrId = (
+        await request(app.getHttpServer())
+          .post('/attributes')
+          .set('Cookie', cookieHeader)
+          .send(attributeTypeData)
+      ).body.id;
+      const attributeData = generate(AttributeDto);
+      const response = await request(app.getHttpServer())
+        .patch('/products/' + id + '/attributes')
+        .set('Cookie', cookieHeader)
+        .send([
+          {
+            ...attributeData,
+            typeId: attrId,
+          },
+        ]);
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        statusCode: 400,
+        message: ['attribute value is not of type number'],
+        error: 'Bad Request',
       });
     });
 

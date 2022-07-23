@@ -13,6 +13,7 @@ import { ServiceError } from './service-error';
 import { NotFoundError } from './not-found.error';
 import { ConflictError } from './conflict.error';
 import { NotRelatedError } from './not-related.error';
+import { TypeCheckError } from './type-check.error';
 
 @Injectable()
 export class ServiceErrorInterceptor implements NestInterceptor {
@@ -33,6 +34,8 @@ export class ServiceErrorInterceptor implements NestInterceptor {
     } else if (error instanceof ConflictError) {
       return new ConflictException([error.message]);
     } else if (error instanceof NotRelatedError) {
+      return new BadRequestException([error.message]);
+    } else if (error instanceof TypeCheckError) {
       return new BadRequestException([error.message]);
     }
   }

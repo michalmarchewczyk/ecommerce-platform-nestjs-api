@@ -23,7 +23,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     'no-console': 1,
     'no-inline-comments': 1,
-    'max-lines': [1, 120],
+    'max-lines': [1, 150],
     '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
   },
   overrides: [

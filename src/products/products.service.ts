@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { QueryFailedError, Repository } from 'typeorm';
@@ -7,6 +7,7 @@ import { ProductUpdateDto } from './dto/product-update.dto';
 import { Attribute } from './entities/attribute.entity';
 import { AttributeDto } from './dto/attribute.dto';
 import { ProductPhoto } from './entities/product-photo.entity';
+import { NotFoundError } from '../errors/not-found.error';
 
 @Injectable()
 export class ProductsService {
@@ -21,7 +22,11 @@ export class ProductsService {
   }
 
   async getProduct(id: number): Promise<Product> {
-    return this.productsRepository.findOne({ where: { id } });
+    const product = await this.productsRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundError('product', 'id', id.toString());
+    }
+    return product;
   }
 
   async createProduct(productData: ProductCreateDto): Promise<Product> {
@@ -36,7 +41,7 @@ export class ProductsService {
   ): Promise<Product | null> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return null;
+      throw new NotFoundError('product', 'id', id.toString());
     }
     Object.assign(product, productData);
     return this.productsRepository.save(product);
@@ -45,7 +50,7 @@ export class ProductsService {
   async deleteProduct(id: number): Promise<boolean> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return false;
+      throw new NotFoundError('product', 'id', id.toString());
     }
     await this.productsRepository.delete({ id });
     return true;
@@ -57,7 +62,7 @@ export class ProductsService {
   ): Promise<Product | null> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return null;
+      throw new NotFoundError('product', 'id', id.toString());
     }
     try {
       // TODO: type-check attribute values
@@ -70,7 +75,7 @@ export class ProductsService {
       );
     } catch (e) {
       if (e instanceof QueryFailedError) {
-        throw new BadRequestException(['wrong attribute type']);
+        throw new NotFoundError('attribute type');
       }
     }
 
@@ -83,7 +88,7 @@ export class ProductsService {
   ): Promise<Product | null> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return null;
+      throw new NotFoundError('product', 'id', id.toString());
     }
     const photo = new ProductPhoto();
     photo.path = file.path;
@@ -98,7 +103,7 @@ export class ProductsService {
   ): Promise<Product | null> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return null;
+      throw new NotFoundError('product', 'id', id.toString());
     }
     product.photos = product.photos.filter((p) => p.id !== photoId);
     return this.productsRepository.save(product);

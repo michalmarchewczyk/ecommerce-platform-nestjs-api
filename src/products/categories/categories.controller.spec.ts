@@ -4,12 +4,12 @@ import { Product } from '../entities/product.entity';
 import { Category } from '../entities/category.entity';
 import { CategoriesService } from './categories.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { CategoryCreateDto } from '../dto/category-create.dto';
 import { CategoryUpdateDto } from '../dto/category-update.dto';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
+import { NotFoundError } from '../../errors/not-found.error';
 
 describe('CategoriesController', () => {
   let controller: CategoriesController;
@@ -64,7 +64,7 @@ describe('CategoriesController', () => {
 
     it('should throw error if category not found', async () => {
       await expect(controller.getCategory(12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -120,7 +120,7 @@ describe('CategoriesController', () => {
 
     it('should throw error if category not found', async () => {
       await expect(controller.updateCategory(12345, {})).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -137,7 +137,7 @@ describe('CategoriesController', () => {
 
     it('should throw error if category not found', async () => {
       await expect(controller.deleteCategory(12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -154,7 +154,7 @@ describe('CategoriesController', () => {
 
     it('should throw error if category not found', async () => {
       await expect(controller.getCategoryProducts(12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -181,7 +181,7 @@ describe('CategoriesController', () => {
 
     it('should throw error if category not found', async () => {
       await expect(controller.addCategoryProduct(12345, 12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -202,7 +202,7 @@ describe('CategoriesController', () => {
     it('should throw error if category not found', async () => {
       await expect(
         controller.deleteCategoryProduct(12345, 12345),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(NotFoundError);
     });
   });
 });

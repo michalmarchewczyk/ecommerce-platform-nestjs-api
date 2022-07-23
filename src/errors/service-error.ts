@@ -1,5 +1,5 @@
-export class ServiceError extends Error {
-  constructor(public message: string = '') {
+export abstract class ServiceError extends Error {
+  protected constructor(public message: string = '') {
     super(message);
 
     if (Object.setPrototypeOf) {
@@ -7,9 +7,5 @@ export class ServiceError extends Error {
     } else {
       (this as any).__proto__ = new.target.prototype;
     }
-  }
-
-  get name(): string {
-    return this.constructor.name;
   }
 }

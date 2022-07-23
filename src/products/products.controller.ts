@@ -5,7 +5,6 @@ import {
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
-  NotFoundException,
   Param,
   ParseFilePipe,
   ParseIntPipe,
@@ -34,11 +33,7 @@ export class ProductsController {
 
   @Get('/:id')
   async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
-    const product = await this.productsService.getProduct(id);
-    if (!product) {
-      throw new NotFoundException(['product not found']);
-    }
-    return product;
+    return await this.productsService.getProduct(id);
   }
 
   @Post()
@@ -53,24 +48,13 @@ export class ProductsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() product: ProductUpdateDto,
   ): Promise<Product> {
-    const updatedProduct = await this.productsService.updateProduct(
-      id,
-      product,
-    );
-    if (!updatedProduct) {
-      throw new NotFoundException(['product not found']);
-    }
-    return updatedProduct;
+    return await this.productsService.updateProduct(id, product);
   }
 
   @Delete('/:id')
   @Roles(Role.Admin, Role.Manager)
   async deleteProduct(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    const deletedProduct = await this.productsService.deleteProduct(id);
-    if (!deletedProduct) {
-      throw new NotFoundException(['product not found']);
-    }
-    return;
+    await this.productsService.deleteProduct(id);
   }
 
   @Patch('/:id/attributes')
@@ -79,14 +63,7 @@ export class ProductsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() attributes: AttributeDto[],
   ): Promise<Product> {
-    const updatedProduct = await this.productsService.updateProductAttributes(
-      id,
-      attributes,
-    );
-    if (!updatedProduct) {
-      throw new NotFoundException(['product not found']);
-    }
-    return updatedProduct;
+    return await this.productsService.updateProductAttributes(id, attributes);
   }
 
   @Post('/:id/photos')
@@ -104,11 +81,7 @@ export class ProductsController {
     )
     file: Express.Multer.File,
   ): Promise<Product> {
-    const updatedProduct = await this.productsService.addProductPhoto(id, file);
-    if (!updatedProduct) {
-      throw new NotFoundException(['product not found']);
-    }
-    return updatedProduct;
+    return await this.productsService.addProductPhoto(id, file);
   }
 
   @Delete('/:id/photos/:photoId')
@@ -117,13 +90,6 @@ export class ProductsController {
     @Param('id', ParseIntPipe) id: number,
     @Param('photoId', ParseIntPipe) photoId: number,
   ): Promise<Product> {
-    const updatedProduct = await this.productsService.deleteProductPhoto(
-      id,
-      photoId,
-    );
-    if (!updatedProduct) {
-      throw new NotFoundException(['product not found']);
-    }
-    return updatedProduct;
+    return await this.productsService.deleteProductPhoto(id, photoId);
   }
 }

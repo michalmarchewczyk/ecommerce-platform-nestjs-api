@@ -5,6 +5,7 @@ import { AttributeType } from '../entities/attribute-type.entity';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { AttributeTypeDto } from '../dto/attribute-type.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
+import { NotFoundError } from '../../errors/not-found.error';
 
 describe('AttributesService', () => {
   let service: AttributesService;
@@ -69,10 +70,11 @@ describe('AttributesService', () => {
       });
     });
 
-    it('should return null if attribute type does not exist', async () => {
+    it('should throw error if attribute type does not exist', async () => {
       const updateData = generate(AttributeTypeDto);
-      const updated = await service.updateAttributeType(12345, updateData);
-      expect(updated).toBeNull();
+      await expect(
+        service.updateAttributeType(12345, updateData),
+      ).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -87,9 +89,10 @@ describe('AttributesService', () => {
       ).toBeUndefined();
     });
 
-    it('should return false if attribute type does not exist', async () => {
-      const deleted = await service.deleteAttributeType(12345);
-      expect(deleted).toBe(false);
+    it('should throw error if attribute type does not exist', async () => {
+      await expect(service.deleteAttributeType(12345)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 });

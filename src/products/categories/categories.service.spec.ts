@@ -8,6 +8,7 @@ import { CategoryCreateDto } from '../dto/category-create.dto';
 import { CategoryUpdateDto } from '../dto/category-update.dto';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
+import { NotFoundError } from '../../errors/not-found.error';
 
 describe('CategoriesService', () => {
   let service: CategoriesService;
@@ -54,9 +55,8 @@ describe('CategoriesService', () => {
       );
     });
 
-    it('should return null if category not found', async () => {
-      const category = await service.getCategory(12345);
-      expect(category).toBeNull();
+    it('should throw error if category not found', async () => {
+      await expect(service.getCategory(12345)).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -113,10 +113,11 @@ describe('CategoriesService', () => {
       });
     });
 
-    it('should return null if category not found', async () => {
+    it('should throw error if category not found', async () => {
       const updateData = generate(CategoryUpdateDto, true);
-      const updated = await service.updateCategory(12345, updateData);
-      expect(updated).toBeNull();
+      await expect(service.updateCategory(12345, updateData)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -131,9 +132,10 @@ describe('CategoriesService', () => {
       ).toBeUndefined();
     });
 
-    it('should return false if category not found', async () => {
-      const deleted = await service.deleteCategory(12345);
-      expect(deleted).toBe(false);
+    it('should throw error if category not found', async () => {
+      await expect(service.deleteCategory(12345)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -147,9 +149,10 @@ describe('CategoriesService', () => {
       );
     });
 
-    it('should return null if category not found', async () => {
-      const products = await service.getCategoryProducts(12345);
-      expect(products).toBeNull();
+    it('should throw error if category not found', async () => {
+      await expect(service.getCategoryProducts(12345)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -173,9 +176,10 @@ describe('CategoriesService', () => {
       ).toEqual([product]);
     });
 
-    it('should return null if category not found', async () => {
-      const product = await service.addCategoryProduct(12345, 12345);
-      expect(product).toBeNull();
+    it('should throw error if category not found', async () => {
+      await expect(service.addCategoryProduct(12345, 12345)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -193,9 +197,10 @@ describe('CategoriesService', () => {
       ).toEqual([]);
     });
 
-    it('should return false if category not found', async () => {
-      const deleted = await service.deleteCategoryProduct(12345, 12345);
-      expect(deleted).toBe(false);
+    it('should throw error if category not found', async () => {
+      await expect(service.deleteCategoryProduct(12345, 12345)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 });

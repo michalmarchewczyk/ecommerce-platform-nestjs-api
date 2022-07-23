@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -28,23 +27,13 @@ export class CategoriesController {
 
   @Get('/:id')
   async getCategory(@Param('id', ParseIntPipe) id: number): Promise<Category> {
-    const category = await this.categoriesService.getCategory(id);
-    if (!category) {
-      throw new NotFoundException(['category not found']);
-    }
-    return category;
+    return await this.categoriesService.getCategory(id);
   }
 
   @Post()
   @Roles(Role.Admin, Role.Manager)
   async createCategory(@Body() category: CategoryCreateDto): Promise<Category> {
-    const createdCategory = await this.categoriesService.createCategory(
-      category,
-    );
-    if (!createdCategory) {
-      throw new NotFoundException(['category not found']);
-    }
-    return createdCategory;
+    return await this.categoriesService.createCategory(category);
   }
 
   @Patch('/:id')
@@ -53,35 +42,20 @@ export class CategoriesController {
     @Param('id', ParseIntPipe) id: number,
     @Body() category: CategoryUpdateDto,
   ): Promise<Category> {
-    const updatedCategory = await this.categoriesService.updateCategory(
-      id,
-      category,
-    );
-    if (!updatedCategory) {
-      throw new NotFoundException(['category not found']);
-    }
-    return updatedCategory;
+    return await this.categoriesService.updateCategory(id, category);
   }
 
   @Delete('/:id')
   @Roles(Role.Admin, Role.Manager)
   async deleteCategory(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    const deletedCategory = await this.categoriesService.deleteCategory(id);
-    if (!deletedCategory) {
-      throw new NotFoundException(['category not found']);
-    }
-    return;
+    await this.categoriesService.deleteCategory(id);
   }
 
   @Get('/:id/products')
   async getCategoryProducts(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Product[]> {
-    const products = await this.categoriesService.getCategoryProducts(id);
-    if (!products) {
-      throw new NotFoundException(['category not found']);
-    }
-    return products;
+    return await this.categoriesService.getCategoryProducts(id);
   }
 
   @Post('/:id/products')
@@ -90,14 +64,7 @@ export class CategoriesController {
     @Param('id', ParseIntPipe) id: number,
     @Body('productId') productId: number,
   ): Promise<Product> {
-    const updatedCategory = await this.categoriesService.addCategoryProduct(
-      id,
-      productId,
-    );
-    if (!updatedCategory) {
-      throw new NotFoundException(['category or product not found']);
-    }
-    return updatedCategory;
+    return await this.categoriesService.addCategoryProduct(id, productId);
   }
 
   @Delete('/:id/products/:productId')
@@ -106,13 +73,6 @@ export class CategoriesController {
     @Param('id', ParseIntPipe) id: number,
     @Param('productId', ParseIntPipe) productId: number,
   ): Promise<void> {
-    const deleted = await this.categoriesService.deleteCategoryProduct(
-      id,
-      productId,
-    );
-    if (!deleted) {
-      throw new NotFoundException(['category or product not found']);
-    }
-    return;
+    await this.categoriesService.deleteCategoryProduct(id, productId);
   }
 }

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AttributeType } from '../entities/attribute-type.entity';
 import { Repository } from 'typeorm';
 import { AttributeTypeDto } from '../dto/attribute-type.dto';
+import { NotFoundError } from '../../errors/not-found.error';
 
 @Injectable()
 export class AttributesService {
@@ -32,7 +33,7 @@ export class AttributesService {
       where: { id: attributeTypeId },
     });
     if (!attributeType) {
-      return null;
+      throw new NotFoundError('attribute type');
     }
     attributeType.name = attributeTypeData.name;
     attributeType.valueType = attributeTypeData.valueType;
@@ -44,7 +45,7 @@ export class AttributesService {
       where: { id: attributeTypeId },
     });
     if (!attributeType) {
-      return false;
+      throw new NotFoundError('attribute type');
     }
     await this.attributeTypesRepository.delete({ id: attributeTypeId });
     return true;

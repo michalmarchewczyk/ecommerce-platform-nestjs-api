@@ -4,13 +4,13 @@ import { ProductsService } from './products.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Attribute } from './entities/attribute.entity';
-import { NotFoundException } from '@nestjs/common';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/product-update.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
+import { NotFoundError } from '../errors/not-found.error';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -64,9 +64,7 @@ describe('ProductsController', () => {
     });
 
     it('should return null if product not found', async () => {
-      await expect(controller.getProduct(12345)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(controller.getProduct(12345)).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -103,7 +101,7 @@ describe('ProductsController', () => {
 
     it('should throw error when product not found', async () => {
       await expect(controller.updateProduct(12345, {})).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -120,7 +118,7 @@ describe('ProductsController', () => {
 
     it('should throw error when product not found', async () => {
       await expect(controller.deleteProduct(12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -153,7 +151,7 @@ describe('ProductsController', () => {
     it('should throw error when product not found', async () => {
       await expect(
         controller.updateProductAttributes(12345, []),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -176,7 +174,7 @@ describe('ProductsController', () => {
 
     it('should throw error when product not found', async () => {
       await expect(controller.addProductPhoto(12345, null)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -198,7 +196,7 @@ describe('ProductsController', () => {
 
     it('should throw error when product not found', async () => {
       await expect(controller.deleteProductPhoto(12345, 12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });

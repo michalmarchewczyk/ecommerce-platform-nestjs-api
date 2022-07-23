@@ -3,10 +3,10 @@ import { AttributesController } from './attributes.controller';
 import { AttributesService } from './attributes.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AttributeType } from '../entities/attribute-type.entity';
-import { NotFoundException } from '@nestjs/common';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { AttributeTypeDto } from '../dto/attribute-type.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
+import { NotFoundError } from '../../errors/not-found.error';
 
 describe('AttributesController', () => {
   let controller: AttributesController;
@@ -76,7 +76,7 @@ describe('AttributesController', () => {
       const updateData = generate(AttributeTypeDto);
       await expect(
         controller.updateAttributeType(12345, updateData),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -92,7 +92,7 @@ describe('AttributesController', () => {
 
     it('should throw error if attribute type does not exist', async () => {
       await expect(controller.deleteAttributeType(12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });

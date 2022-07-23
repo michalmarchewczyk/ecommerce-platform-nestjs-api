@@ -9,6 +9,7 @@ import { ProductUpdateDto } from './dto/product-update.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
+import { NotFoundError } from '../errors/not-found.error';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -98,9 +99,10 @@ describe('ProductsService', () => {
       ).toBeTruthy();
     });
 
-    it('should return null if product not found', async () => {
-      const updated = await service.updateProduct(12345, {});
-      expect(updated).toBeNull();
+    it('should throw error if product not found', async () => {
+      await expect(service.updateProduct(12345, {})).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -115,9 +117,8 @@ describe('ProductsService', () => {
       ).toBeUndefined();
     });
 
-    it('should return false if product not found', async () => {
-      const deleted = await service.deleteProduct(12345);
-      expect(deleted).toBe(false);
+    it('should throw error if product not found', async () => {
+      await expect(service.deleteProduct(12345)).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -146,9 +147,10 @@ describe('ProductsService', () => {
       ).toEqual(expectedAttributes);
     });
 
-    it('should return null if product not found', async () => {
-      const updated = await service.updateProductAttributes(12345, []);
-      expect(updated).toBeNull();
+    it('should throw error if product not found', async () => {
+      await expect(service.updateProductAttributes(12345, [])).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -169,9 +171,10 @@ describe('ProductsService', () => {
       ]);
     });
 
-    it('should return null if product not found', async () => {
-      const updated = await service.addProductPhoto(12345, null);
-      expect(updated).toBeNull();
+    it('should throw error if product not found', async () => {
+      await expect(service.addProductPhoto(12345, null)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -190,9 +193,10 @@ describe('ProductsService', () => {
       ).toEqual([]);
     });
 
-    it('should return null if product not found', async () => {
-      const updated = await service.deleteProductPhoto(12345, 12345);
-      expect(updated).toBeNull();
+    it('should throw error if product not found', async () => {
+      await expect(service.deleteProductPhoto(12345, 12345)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 });

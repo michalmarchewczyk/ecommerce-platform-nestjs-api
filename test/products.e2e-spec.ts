@@ -91,7 +91,7 @@ describe('ProductsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -175,7 +175,7 @@ describe('ProductsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -236,7 +236,7 @@ describe('ProductsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -295,7 +295,7 @@ describe('ProductsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -318,11 +318,11 @@ describe('ProductsController (e2e)', () => {
             typeId: 12345,
           },
         ]);
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        statusCode: 400,
-        message: ['wrong attribute type'],
-        error: 'Bad Request',
+        statusCode: 404,
+        message: ['attribute type not found'],
+        error: 'Not Found',
       });
     });
   });
@@ -423,7 +423,7 @@ describe('ProductsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -458,7 +458,7 @@ describe('ProductsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });

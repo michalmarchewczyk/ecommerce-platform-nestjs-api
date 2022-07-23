@@ -8,6 +8,7 @@ import { ReturnCreateDto } from './dto/return-create.dto';
 import { Order } from '../orders/entities/order.entity';
 import { OrderCreateDto } from '../orders/dto/order-create.dto';
 import { User } from '../users/entities/user.entity';
+import { NotFoundError } from '../errors/not-found.error';
 
 describe('ReturnsService', () => {
   let service: ReturnsService;
@@ -56,22 +57,21 @@ describe('ReturnsService', () => {
       });
     });
 
-    it('should return null if return not found', async () => {
-      const returnFound = await service.getReturn(12345);
-      expect(returnFound).toBeNull();
+    it('should throw error if return not found', async () => {
+      await expect(service.getReturn(12345)).rejects.toThrow(NotFoundError);
     });
   });
 
   describe('checkReturnUser', () => {
     it('should return true if user is order owner', async () => {
       const orderData = generate(OrderCreateDto);
-      const order = await mockOrdersRepository.save({
+      const order = mockOrdersRepository.save({
         ...orderData,
         user: { id: 123 },
       });
       const createData = generate(ReturnCreateDto);
-      const { id } = await mockReturnsRepository.save({ ...createData, order });
-      const returnFound = await service.checkReturnUser(order.user.id, id);
+      const { id } = mockReturnsRepository.save({ ...createData, order });
+      const returnFound = await service.checkReturnUser(123, id);
       expect(returnFound).toBeTruthy();
     });
 
@@ -131,9 +131,10 @@ describe('ReturnsService', () => {
       });
     });
 
-    it('should return null if return not found', async () => {
-      const updated = await service.updateReturn(12345, {});
-      expect(updated).toBeNull();
+    it('should throw error if return not found', async () => {
+      await expect(service.updateReturn(12345, {})).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 });

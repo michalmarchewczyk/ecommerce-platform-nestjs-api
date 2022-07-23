@@ -5,8 +5,8 @@ import { RepositoryMockService } from '../../../test/utils/repository-mock/repos
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PaymentsService } from './payments.service';
-import { NotFoundException } from '@nestjs/common';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
+import { NotFoundError } from '../../errors/not-found.error';
 
 describe('PaymentsController', () => {
   let controller: PaymentsController;
@@ -61,7 +61,7 @@ describe('PaymentsController', () => {
     it('should throw error if no payment method found', async () => {
       const updateData = generate(PaymentMethodDto);
       await expect(controller.updateMethod(12345, updateData)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -78,7 +78,7 @@ describe('PaymentsController', () => {
 
     it('should throw error if no payment method found', async () => {
       await expect(controller.deleteMethod(12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });

@@ -1,12 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/product-update.dto';
 import { Attribute } from './entities/attribute.entity';
 import { AttributeDto } from './dto/attribute.dto';
 import { ProductPhoto } from './entities/product-photo.entity';
+import { NotFoundError } from '../errors/not-found.error';
+import {
+  AttributeType,
+  AttributeValueType,
+} from './entities/attribute-type.entity';
+import { isBoolean, isHexColor, isNumber, isString } from 'class-validator';
+import { TypeCheckError } from '../errors/type-check.error';
 
 @Injectable()
 export class ProductsService {
@@ -14,6 +21,8 @@ export class ProductsService {
     @InjectRepository(Product) private productsRepository: Repository<Product>,
     @InjectRepository(Attribute)
     private attributesRepository: Repository<Attribute>,
+    @InjectRepository(AttributeType)
+    private attributeTypesRepository: Repository<AttributeType>,
   ) {}
 
   async getProducts(): Promise<Product[]> {
@@ -21,7 +30,11 @@ export class ProductsService {
   }
 
   async getProduct(id: number): Promise<Product> {
-    return this.productsRepository.findOne({ where: { id } });
+    const product = await this.productsRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundError('product', 'id', id.toString());
+    }
+    return product;
   }
 
   async createProduct(productData: ProductCreateDto): Promise<Product> {
@@ -33,10 +46,10 @@ export class ProductsService {
   async updateProduct(
     id: number,
     productData: ProductUpdateDto,
-  ): Promise<Product | null> {
+  ): Promise<Product> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return null;
+      throw new NotFoundError('product', 'id', id.toString());
     }
     Object.assign(product, productData);
     return this.productsRepository.save(product);
@@ -45,7 +58,7 @@ export class ProductsService {
   async deleteProduct(id: number): Promise<boolean> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return false;
+      throw new NotFoundError('product', 'id', id.toString());
     }
     await this.productsRepository.delete({ id });
     return true;
@@ -54,36 +67,49 @@ export class ProductsService {
   async updateProductAttributes(
     id: number,
     attributes: AttributeDto[],
-  ): Promise<Product | null> {
+  ): Promise<Product> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return null;
+      throw new NotFoundError('product', 'id', id.toString());
     }
-    try {
-      // TODO: type-check attribute values
-      const attributesToSave = attributes.map((a) => ({
-        value: a.value,
-        type: { id: a.typeId },
-      }));
-      product.attributes = await this.attributesRepository.save(
-        attributesToSave,
-      );
-    } catch (e) {
-      if (e instanceof QueryFailedError) {
-        throw new BadRequestException(['wrong attribute type']);
+    const attributesToSave = [];
+    for (const attribute of attributes) {
+      const attributeType = await this.attributeTypesRepository.findOne({
+        where: { id: attribute.typeId },
+      });
+      if (!attributeType) {
+        throw new NotFoundError('attribute type');
       }
+      await this.checkAttributeType(attributeType.valueType, attribute.value);
+      const newAttribute = new Attribute();
+      newAttribute.type = attributeType;
+      newAttribute.value = attribute.value;
+      attributesToSave.push(newAttribute);
     }
-
+    product.attributes = await this.attributesRepository.save(attributesToSave);
     return this.productsRepository.save(product);
+  }
+
+  private async checkAttributeType(type: AttributeValueType, value: any) {
+    (<[AttributeValueType, (value: any) => boolean][]>[
+      [AttributeValueType.String, isString],
+      [AttributeValueType.Number, isNumber],
+      [AttributeValueType.Boolean, isBoolean],
+      [AttributeValueType.Color, isHexColor],
+    ]).forEach((check) => {
+      if (type === check[0] && !check[1](value)) {
+        throw new TypeCheckError('attribute value', check[0]);
+      }
+    });
   }
 
   async addProductPhoto(
     id: number,
     file: Express.Multer.File,
-  ): Promise<Product | null> {
+  ): Promise<Product> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return null;
+      throw new NotFoundError('product', 'id', id.toString());
     }
     const photo = new ProductPhoto();
     photo.path = file.path;
@@ -92,13 +118,10 @@ export class ProductsService {
     return this.productsRepository.save(product);
   }
 
-  async deleteProductPhoto(
-    id: number,
-    photoId: number,
-  ): Promise<Product | null> {
+  async deleteProductPhoto(id: number, photoId: number): Promise<Product> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      return null;
+      throw new NotFoundError('product', 'id', id.toString());
     }
     product.photos = product.photos.filter((p) => p.id !== photoId);
     return this.productsRepository.save(product);

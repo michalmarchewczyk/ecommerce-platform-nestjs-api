@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -39,12 +38,7 @@ export class AttributesController {
     @Param('id', ParseIntPipe) id: number,
     @Body() attributeType: AttributeTypeDto,
   ): Promise<AttributeType> {
-    const updatedAttributeType =
-      await this.attributesService.updateAttributeType(id, attributeType);
-    if (!updatedAttributeType) {
-      throw new NotFoundException(['attribute type not found']);
-    }
-    return updatedAttributeType;
+    return await this.attributesService.updateAttributeType(id, attributeType);
   }
 
   @Delete('/:id')
@@ -52,11 +46,6 @@ export class AttributesController {
   async deleteAttributeType(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    const deletedAttributeType =
-      await this.attributesService.deleteAttributeType(id);
-    if (!deletedAttributeType) {
-      throw new NotFoundException(['attribute type not found']);
-    }
-    return;
+    await this.attributesService.deleteAttributeType(id);
   }
 }

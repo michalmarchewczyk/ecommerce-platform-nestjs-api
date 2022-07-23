@@ -96,7 +96,7 @@ describe('CategoriesController (e2e)', () => {
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['category not found'],
+        message: ['category with id=12345 not found'],
         statusCode: 404,
         error: 'Not Found',
       });
@@ -143,7 +143,7 @@ describe('CategoriesController (e2e)', () => {
         .send(createData);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['category not found'],
+        message: ['category with id=12345 not found'],
         statusCode: 404,
         error: 'Not Found',
       });
@@ -226,7 +226,7 @@ describe('CategoriesController (e2e)', () => {
         .send(updateData);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['category not found'],
+        message: ['category with id=12345 not found'],
         statusCode: 404,
         error: 'Not Found',
       });
@@ -240,7 +240,7 @@ describe('CategoriesController (e2e)', () => {
         .send(updateData);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['category not found'],
+        message: ['category with id=12345 not found'],
         statusCode: 404,
         error: 'Not Found',
       });
@@ -286,7 +286,7 @@ describe('CategoriesController (e2e)', () => {
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['category not found'],
+        message: ['category with id=12345 not found'],
         statusCode: 404,
         error: 'Not Found',
       });
@@ -312,7 +312,7 @@ describe('CategoriesController (e2e)', () => {
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['category not found'],
+        message: ['category with id=12345 not found'],
         statusCode: 404,
         error: 'Not Found',
       });
@@ -351,7 +351,7 @@ describe('CategoriesController (e2e)', () => {
         });
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['category or product not found'],
+        message: ['category with id=12345 not found'],
         statusCode: 404,
         error: 'Not Found',
       });
@@ -393,7 +393,7 @@ describe('CategoriesController (e2e)', () => {
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['category or product not found'],
+        message: ['product not found'],
         statusCode: 404,
         error: 'Not Found',
       });
@@ -410,11 +410,11 @@ describe('CategoriesController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .delete(`/categories/${categoryId}/products/${testProduct.id}`)
         .set('Cookie', cookieHeader);
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(400);
       expect(response.body).toEqual({
-        message: ['category or product not found'],
-        statusCode: 404,
-        error: 'Not Found',
+        message: ['there is no relation between category and product'],
+        statusCode: 400,
+        error: 'Bad Request',
       });
     });
 
@@ -424,7 +424,7 @@ describe('CategoriesController (e2e)', () => {
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['category or product not found'],
+        message: ['category with id=12345 not found'],
         statusCode: 404,
         error: 'Not Found',
       });

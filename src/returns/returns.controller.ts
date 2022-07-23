@@ -3,7 +3,6 @@ import {
   Controller,
   ForbiddenException,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -38,11 +37,7 @@ export class ReturnsController {
     if (!checkUser && user.role === Role.Customer) {
       throw new ForbiddenException();
     }
-    const foundReturn = await this.returnsService.getReturn(id);
-    if (!foundReturn) {
-      throw new NotFoundException(['return not found']);
-    }
-    return foundReturn;
+    return await this.returnsService.getReturn(id);
   }
 
   @Post('')
@@ -58,11 +53,7 @@ export class ReturnsController {
     if (!checkUser && (!user.role || user.role === Role.Customer)) {
       throw new ForbiddenException();
     }
-    const created = await this.returnsService.createReturn(body);
-    if (!created) {
-      throw new NotFoundException(['order not found']);
-    }
-    return created;
+    return await this.returnsService.createReturn(body);
   }
 
   @Patch('/:id')
@@ -71,10 +62,6 @@ export class ReturnsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: ReturnUpdateDto,
   ): Promise<Return> {
-    const updated = await this.returnsService.updateReturn(id, body);
-    if (!updated) {
-      throw new NotFoundException(['return not found']);
-    }
-    return updated;
+    return await this.returnsService.updateReturn(id, body);
   }
 }

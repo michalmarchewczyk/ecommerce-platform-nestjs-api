@@ -5,6 +5,7 @@ import { DeliveryMethod } from '../entities/delivery-method.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { DeliveryMethodDto } from '../dto/delivery-method.dto';
+import { NotFoundError } from '../../errors/not-found.error';
 
 describe('DeliveriesService', () => {
   let service: DeliveriesService;
@@ -55,10 +56,11 @@ describe('DeliveriesService', () => {
       expect(updated).toMatchObject(updateData);
     });
 
-    it('should return null if no delivery method found', async () => {
+    it('should throw error if no delivery method found', async () => {
       const updateData = generate(DeliveryMethodDto);
-      const updated = await service.updateMethod(12345, updateData);
-      expect(updated).toBeNull();
+      await expect(service.updateMethod(12345, updateData)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -73,9 +75,8 @@ describe('DeliveriesService', () => {
       ).toBeUndefined();
     });
 
-    it('should return false if no delivery method found', async () => {
-      const deleted = await service.deleteMethod(12345);
-      expect(deleted).toBe(false);
+    it('should throw error if no delivery method found', async () => {
+      await expect(service.deleteMethod(12345)).rejects.toThrow(NotFoundError);
     });
   });
 });

@@ -9,11 +9,18 @@ import { ProductUpdateDto } from './dto/product-update.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
+import { NotFoundError } from '../errors/not-found.error';
+import {
+  AttributeType,
+  AttributeValueType,
+} from './entities/attribute-type.entity';
+import { AttributeTypeDto } from './dto/attribute-type.dto';
 
 describe('ProductsService', () => {
   let service: ProductsService;
   let generate: DtoGeneratorService['generate'];
   let mockProductsRepository: RepositoryMockService<Product>;
+  let mockAttributesTypesRepository: RepositoryMockService<AttributeType>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,6 +28,7 @@ describe('ProductsService', () => {
         ProductsService,
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(Attribute),
+        RepositoryMockService.getProvider(AttributeType),
         DtoGeneratorService,
       ],
     }).compile();
@@ -30,6 +38,9 @@ describe('ProductsService', () => {
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
     mockProductsRepository = module.get(getRepositoryToken(Product));
+    mockAttributesTypesRepository = module.get(
+      getRepositoryToken(AttributeType),
+    );
   });
 
   it('should be defined', () => {
@@ -98,9 +109,10 @@ describe('ProductsService', () => {
       ).toBeTruthy();
     });
 
-    it('should return null if product not found', async () => {
-      const updated = await service.updateProduct(12345, {});
-      expect(updated).toBeNull();
+    it('should throw error if product not found', async () => {
+      await expect(service.updateProduct(12345, {})).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -115,9 +127,8 @@ describe('ProductsService', () => {
       ).toBeUndefined();
     });
 
-    it('should return false if product not found', async () => {
-      const deleted = await service.deleteProduct(12345);
-      expect(deleted).toBe(false);
+    it('should throw error if product not found', async () => {
+      await expect(service.deleteProduct(12345)).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -125,12 +136,22 @@ describe('ProductsService', () => {
     it('should update product attributes', async () => {
       const product = generate(ProductCreateDto, true);
       const { id } = mockProductsRepository.save(product);
-      const attributesData = generate(AttributeDto, false, 4);
+      const attributeTypeData = generate(AttributeTypeDto);
+      attributeTypeData.valueType = AttributeValueType.String;
+      const { id: attrId } =
+        mockAttributesTypesRepository.save(attributeTypeData);
+      let attributesData = generate(AttributeDto, false, 4);
+      attributesData = attributesData.map((a) => ({ ...a, typeId: attrId }));
       const updated = await service.updateProductAttributes(id, attributesData);
       const expectedAttributes = attributesData.map((a) => ({
         id: expect.any(Number),
         value: a.value,
-        type: { id: a.typeId },
+        type: {
+          id: a.typeId,
+          name: expect.any(String),
+          valueType: expect.any(String),
+          attributes: [],
+        },
         product: null,
       }));
       expect(updated).toEqual({
@@ -146,9 +167,10 @@ describe('ProductsService', () => {
       ).toEqual(expectedAttributes);
     });
 
-    it('should return null if product not found', async () => {
-      const updated = await service.updateProductAttributes(12345, []);
-      expect(updated).toBeNull();
+    it('should throw error if product not found', async () => {
+      await expect(service.updateProductAttributes(12345, [])).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -169,9 +191,11 @@ describe('ProductsService', () => {
       ]);
     });
 
-    it('should return null if product not found', async () => {
-      const updated = await service.addProductPhoto(12345, null);
-      expect(updated).toBeNull();
+    it('should throw error if product not found', async () => {
+      const fileMetadata = generateFileMetadata();
+      await expect(
+        service.addProductPhoto(12345, fileMetadata),
+      ).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -190,9 +214,10 @@ describe('ProductsService', () => {
       ).toEqual([]);
     });
 
-    it('should return null if product not found', async () => {
-      const updated = await service.deleteProductPhoto(12345, 12345);
-      expect(updated).toBeNull();
+    it('should throw error if product not found', async () => {
+      await expect(service.deleteProductPhoto(12345, 12345)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 });

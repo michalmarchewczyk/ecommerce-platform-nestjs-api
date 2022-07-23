@@ -1,4 +1,4 @@
-# [WIP] E-Commerce Platform - NestJS API
+# E-Commerce Platform - NestJS API
 
 REST API for the E-commerce Platform project.
 

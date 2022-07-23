@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -38,20 +37,12 @@ export class PaymentsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() methodData: PaymentMethodDto,
   ): Promise<PaymentMethod | null> {
-    const updated = await this.paymentsService.updateMethod(id, methodData);
-    if (!updated) {
-      throw new NotFoundException(['payment method not found']);
-    }
-    return updated;
+    return await this.paymentsService.updateMethod(id, methodData);
   }
 
   @Delete(':id')
   @Roles(Role.Admin)
   async deleteMethod(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    const deleted = await this.paymentsService.deleteMethod(id);
-    if (!deleted) {
-      throw new NotFoundException(['payment method not found']);
-    }
-    return;
+    await this.paymentsService.deleteMethod(id);
   }
 }

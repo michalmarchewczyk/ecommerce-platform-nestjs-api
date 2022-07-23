@@ -5,7 +5,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 interface ColumnMetadata {
   name: string;
   mode: string;
-  generated: string;
+  generated: string | null;
   unique: boolean;
   primary: boolean;
   optional: boolean;
@@ -21,7 +21,7 @@ const RELATION_TYPES = [
 ];
 
 @Injectable()
-export class RepositoryMockService<T> {
+export class RepositoryMockService<T extends { [key: string]: any }> {
   public entities: T[] = [];
   private typeormMetadata = getMetadataArgsStorage();
   private readonly columns: ColumnMetadata[] = [];
@@ -63,7 +63,7 @@ export class RepositoryMockService<T> {
         hidden: 'select' in options ? options.select === false ?? false : false,
       });
     }
-    this.primaryName = this.columns.find((c) => c.primary).name;
+    this.primaryName = this.columns.find((c) => c.primary)?.name ?? '';
   }
 
   public save(entity: DeepPartial<T>): T;
@@ -74,7 +74,8 @@ export class RepositoryMockService<T> {
       return entity.map((entity) => this.save(entity));
     }
     const found = this.entities.find(
-      (e) => e[this.primaryName] === entity[this.primaryName] || e === entity,
+      (e: { [key: string]: any }) =>
+        e[this.primaryName] === entity[this.primaryName] || e === entity,
     );
     if (found) {
       return this.saveExistingEntity(found, entity);
@@ -83,14 +84,17 @@ export class RepositoryMockService<T> {
     }
   }
 
-  private checkUnique(name, value, savedValue?) {
+  private checkUnique(name: string, value: any, savedValue?: any) {
     return (
       this.entities.map((e) => e[name]).includes(value) &&
       (savedValue ? value !== savedValue : true)
     );
   }
 
-  private saveExistingEntity(savedEntity: T, entity: DeepPartial<T>) {
+  private saveExistingEntity(
+    savedEntity: { [key: string]: any },
+    entity: DeepPartial<T>,
+  ) {
     for (const { name, mode, unique } of this.columns) {
       if (unique && this.checkUnique(name, entity[name], savedEntity[name])) {
         throw new QueryFailedError('', [], '');
@@ -104,7 +108,7 @@ export class RepositoryMockService<T> {
   }
 
   private saveNewEntity(entity: DeepPartial<T>) {
-    const newEntity = {};
+    const newEntity: { [key: string]: any } = {};
     for (const column of this.columns) {
       const { name, mode, optional, default: def } = column;
       if (column.unique && this.checkUnique(name, entity[name])) {
@@ -131,13 +135,13 @@ export class RepositoryMockService<T> {
     return this.entities;
   }
 
-  private findWhere(where: Record<string, any>): T[] {
+  private findWhere(where?: Record<string, any>): T[] {
     return this.entities.filter((e) => {
       return this.matchObject(e, where);
     });
   }
 
-  private matchObject(obj: Record<string, any>, match: Record<string, any>) {
+  private matchObject(obj: Record<string, any>, match?: Record<string, any>) {
     for (const key in match) {
       if (typeof obj?.[key] === 'object' && typeof match?.[key] === 'object') {
         if (!this.matchObject(obj?.[key], match?.[key])) {
@@ -160,17 +164,17 @@ export class RepositoryMockService<T> {
       return null;
     }
     const selectedColumns = this.getSelectedColumns(options.select);
-    const selectedEntity = {};
+    const selectedEntity: { [key: string]: any } = {};
     for (const column of selectedColumns) {
       selectedEntity[column] = foundEntity[column];
     }
     return selectedEntity as T;
   }
 
-  private getSelectedColumns(select: Record<string, boolean>) {
+  private getSelectedColumns(select?: Record<string, boolean>) {
     return this.columns
       .filter((column) => {
-        return select ? select[column.name] === true : !column.hidden;
+        return select ? select[column.name] : !column.hidden;
       })
       .map((column) => column.name);
   }

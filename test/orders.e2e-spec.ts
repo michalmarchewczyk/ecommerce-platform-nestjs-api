@@ -167,7 +167,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         error: 'Not Found',
-        message: ['order not found'],
+        message: ['order with id=12345 not found'],
       });
     });
 
@@ -245,7 +245,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         error: 'Not Found',
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
       });
     });
 
@@ -264,7 +264,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         error: 'Not Found',
-        message: ['product not found'],
+        message: ['delivery method with id=12345 not found'],
       });
     });
 
@@ -283,7 +283,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         error: 'Not Found',
-        message: ['product not found'],
+        message: ['payment method with id=12345 not found'],
       });
     });
 
@@ -315,7 +315,7 @@ describe.only('OrdersController (e2e)', () => {
   });
 
   describe('/orders/:id (PATCH)', () => {
-    let testOrderId;
+    let testOrderId: number;
 
     beforeEach(async () => {
       const createData = generate(OrderCreateDto);
@@ -372,7 +372,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         error: 'Not Found',
-        message: ['order or product not found'],
+        message: ['order with id=12345 not found'],
       });
     });
 
@@ -391,7 +391,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         error: 'Not Found',
-        message: ['order or product not found'],
+        message: ['product with id=12345 not found'],
       });
     });
 
@@ -410,7 +410,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         error: 'Not Found',
-        message: ['order or product not found'],
+        message: ['delivery method with id=12345 not found'],
       });
     });
 
@@ -429,7 +429,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         error: 'Not Found',
-        message: ['order or product not found'],
+        message: ['payment method with id=12345 not found'],
       });
     });
 

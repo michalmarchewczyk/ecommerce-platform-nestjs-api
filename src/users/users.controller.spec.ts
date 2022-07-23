@@ -3,11 +3,11 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UserUpdateDto } from './dto/user-update.dto';
-import { NotFoundException } from '@nestjs/common';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { RegisterDto } from '../auth/dto/register.dto';
+import { NotFoundError } from '../errors/not-found.error';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -82,7 +82,7 @@ describe('UsersController', () => {
 
     it('should throw an error if user does not exist', async () => {
       await expect(controller.updateUser(12345, {})).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -94,9 +94,7 @@ describe('UsersController', () => {
     });
 
     it('should throw an error if user does not exist', async () => {
-      await expect(controller.deleteUser(12345)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(controller.deleteUser(12345)).rejects.toThrow(NotFoundError);
     });
   });
 });

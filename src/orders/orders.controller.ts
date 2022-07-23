@@ -3,7 +3,6 @@ import {
   Controller,
   ForbiddenException,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Patch,
@@ -22,12 +21,11 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  async createOrder(@ReqUser() user: User, @Body() body: OrderCreateDto) {
-    const created = await this.ordersService.createOrder(user?.id, body);
-    if (!created) {
-      throw new NotFoundException(['product not found']);
-    }
-    return created;
+  async createOrder(
+    @ReqUser() user: User | null,
+    @Body() body: OrderCreateDto,
+  ) {
+    return await this.ordersService.createOrder(user?.id ?? null, body);
   }
 
   @Get()
@@ -43,11 +41,7 @@ export class OrdersController {
     if (!checkUser && user.role === Role.Customer) {
       throw new ForbiddenException();
     }
-    const order = await this.ordersService.getOrder(id);
-    if (!order) {
-      throw new NotFoundException(['order not found']);
-    }
-    return order;
+    return await this.ordersService.getOrder(id);
   }
 
   @Patch('/:id')
@@ -56,10 +50,6 @@ export class OrdersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: OrderUpdateDto,
   ) {
-    const order = await this.ordersService.updateOrder(id, body);
-    if (!order) {
-      throw new NotFoundException(['order or product not found']);
-    }
-    return order;
+    return await this.ordersService.updateOrder(id, body);
   }
 }

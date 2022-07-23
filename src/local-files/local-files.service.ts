@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductPhoto } from '../products/entities/product-photo.entity';
 import { Repository } from 'typeorm';
+import { NotFoundError } from '../errors/not-found.error';
 
 @Injectable()
 export class LocalFilesService {
@@ -10,12 +11,12 @@ export class LocalFilesService {
     private productPhotosRepository: Repository<ProductPhoto>,
   ) {}
 
-  async getProductPhoto(id: number): Promise<ProductPhoto | null> {
+  async getProductPhoto(id: number): Promise<ProductPhoto> {
     const productPhoto = await this.productPhotosRepository.findOne({
       where: { id },
     });
     if (!productPhoto) {
-      return null;
+      throw new NotFoundError('product photo', 'id', id.toString());
     }
     return productPhoto;
   }

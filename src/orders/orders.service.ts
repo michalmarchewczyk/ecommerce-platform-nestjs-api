@@ -11,6 +11,7 @@ import { OrderDelivery } from './entities/order-delivery.entity';
 import { DeliveriesService } from './deliveries/deliveries.service';
 import { PaymentsService } from './payments/payments.service';
 import { OrderPayment } from './entities/order-payment.entity';
+import { NotFoundError } from '../errors/not-found.error';
 
 @Injectable()
 export class OrdersService {
@@ -33,7 +34,7 @@ export class OrdersService {
       relations: ['user', 'items', 'items.product', 'delivery', 'payment'],
     });
     if (!order) {
-      return null;
+      throw new NotFoundError('order', 'id', id.toString());
     }
     return order;
   }
@@ -46,7 +47,10 @@ export class OrdersService {
     return !!order;
   }
 
-  async createOrder(userId: number, orderData: OrderCreateDto): Promise<Order> {
+  async createOrder(
+    userId: number | null,
+    orderData: OrderCreateDto,
+  ): Promise<Order> {
     const order = new Order();
     if (userId) {
       order.user = await this.usersService.getUser(userId);
@@ -54,9 +58,6 @@ export class OrdersService {
     order.items = [];
     for (const item of orderData.items) {
       const product = await this.productsService.getProduct(item.productId);
-      if (!product) {
-        return null;
-      }
       order.items.push({
         product,
         quantity: item.quantity,
@@ -70,9 +71,6 @@ export class OrdersService {
     const deliveryMethod = await this.deliveriesService.getMethod(
       orderData.delivery.methodId,
     );
-    if (!deliveryMethod) {
-      return null;
-    }
     const delivery = new OrderDelivery();
     Object.assign(delivery, orderData.delivery);
     order.delivery = delivery;
@@ -80,9 +78,6 @@ export class OrdersService {
     const paymentMethod = await this.paymentsService.getMethod(
       orderData.payment.methodId,
     );
-    if (!paymentMethod) {
-      return null;
-    }
     const payment = new OrderPayment();
     Object.assign(payment, orderData.payment);
     order.payment = payment;
@@ -99,15 +94,12 @@ export class OrdersService {
       relations: ['user', 'items', 'items.product', 'delivery', 'payment'],
     });
     if (!order) {
-      return null;
+      throw new NotFoundError('order', 'id', id.toString());
     }
     if (orderData.items) {
       order.items = [];
       for (const item of orderData.items) {
         const product = await this.productsService.getProduct(item.productId);
-        if (!product) {
-          return null;
-        }
         order.items.push({
           product,
           quantity: item.quantity,
@@ -119,9 +111,6 @@ export class OrdersService {
       const deliveryMethod = await this.deliveriesService.getMethod(
         orderData.delivery.methodId,
       );
-      if (!deliveryMethod) {
-        return null;
-      }
       Object.assign(order.delivery, orderData.delivery);
       order.delivery.method = deliveryMethod;
     }
@@ -129,9 +118,6 @@ export class OrdersService {
       const paymentMethod = await this.paymentsService.getMethod(
         orderData.payment.methodId,
       );
-      if (!paymentMethod) {
-        return null;
-      }
       Object.assign(order.payment, orderData.payment);
       order.payment.method = paymentMethod;
     }

@@ -1,16 +1,15 @@
 import {
   Controller,
   Get,
-  InternalServerErrorException,
-  NotFoundException,
   Param,
   ParseIntPipe,
-  Response,
+  Res,
   StreamableFile,
 } from '@nestjs/common';
 import { LocalFilesService } from './local-files.service';
 import { createReadStream } from 'fs';
 import * as path from 'path';
+import { Response } from 'express';
 
 @Controller('files')
 export class LocalFilesController {
@@ -19,29 +18,21 @@ export class LocalFilesController {
   @Get('/:id')
   async getProductPhoto(
     @Param('id', ParseIntPipe) id: number,
-    @Response({ passthrough: true }) res,
+    @Res({ passthrough: true }) res: Response,
   ) {
     const productPhoto = await this.localFilesService.getProductPhoto(id);
-    if (!productPhoto) {
-      throw new NotFoundException(['product photo not found']);
-    }
 
-    try {
-      const stream = createReadStream(
-        path.join(process.cwd(), productPhoto.path),
-      );
+    const stream = createReadStream(
+      path.join(process.cwd(), productPhoto.path),
+    );
 
-      stream.on('error', () => {
-        res.sendStatus(500);
-        res.end();
-      });
+    stream.on('error', () => {
+      res.sendStatus(500);
+    });
 
-      return new StreamableFile(stream, {
-        type: productPhoto.mimeType,
-        disposition: 'inline',
-      });
-    } catch (e) {
-      throw new InternalServerErrorException(['could not get product photo']);
-    }
+    return new StreamableFile(stream, {
+      type: productPhoto.mimeType,
+      disposition: 'inline',
+    });
   }
 }

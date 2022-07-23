@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   UseGuards,
@@ -35,11 +34,7 @@ export class UsersController {
   @Get('/:id')
   @Roles(Role.Admin)
   async getUser(@Param('id') id: number): Promise<User> {
-    const user = await this.usersService.getUser(id);
-    if (!user) {
-      throw new NotFoundException(['user not found']);
-    }
-    return user;
+    return await this.usersService.getUser(id);
   }
 
   @Patch('/:id')
@@ -48,20 +43,12 @@ export class UsersController {
     @Param('id') id: number,
     @Body() update: UserUpdateDto,
   ): Promise<User> {
-    const updatedUser = await this.usersService.updateUser(id, update);
-    if (!updatedUser) {
-      throw new NotFoundException(['user not found']);
-    }
-    return updatedUser;
+    return await this.usersService.updateUser(id, update);
   }
 
   @Delete('/:id')
   @Roles(Role.Admin)
   async deleteUser(@Param('id') id: number): Promise<void> {
-    const deleted = await this.usersService.deleteUser(id);
-    if (!deleted) {
-      throw new NotFoundException(['user not found']);
-    }
-    return;
+    await this.usersService.deleteUser(id);
   }
 }

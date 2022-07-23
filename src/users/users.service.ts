@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserUpdateDto } from './dto/user-update.dto';
+import { NotFoundError } from '../errors/not-found.error';
+import { ConflictError } from '../errors/conflict.error';
 
 @Injectable()
 export class UsersService {
@@ -16,13 +18,18 @@ export class UsersService {
     firstName?: string,
     lastName?: string,
   ): Promise<User> {
-    const user = new User();
-    user.email = email;
-    user.password = hashedPassword;
-    user.firstName = firstName;
-    user.lastName = lastName;
-    const savedUser = await this.usersRepository.save(user);
-    return { ...savedUser, password: undefined };
+    try {
+      const user = new User();
+      user.email = email;
+      user.password = hashedPassword;
+      user.firstName = firstName;
+      user.lastName = lastName;
+      const savedUser = await this.usersRepository.save(user);
+      const { password, ...toReturn } = savedUser;
+      return toReturn as User;
+    } catch (error) {
+      throw new ConflictError('user', 'email', email);
+    }
   }
 
   async findUserToLogin(email: string): Promise<User | null> {
@@ -43,18 +50,18 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  async getUser(id: number): Promise<User | null> {
-    return await this.usersRepository.findOne({
-      where: { id },
-    });
+  async getUser(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundError('user', 'id', id.toString());
+    }
+    return user;
   }
 
-  async updateUser(id: number, update: UserUpdateDto): Promise<User | null> {
-    const user = await this.usersRepository.findOne({
-      where: { id },
-    });
+  async updateUser(id: number, update: UserUpdateDto): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
-      return null;
+      throw new NotFoundError('user', 'id', id.toString());
     }
     Object.assign(user, update);
     await this.usersRepository.save(user);
@@ -66,7 +73,7 @@ export class UsersService {
       where: { id },
     });
     if (!user) {
-      return false;
+      throw new NotFoundError('user', 'id', id.toString());
     }
     await this.usersRepository.delete({ id });
     return true;

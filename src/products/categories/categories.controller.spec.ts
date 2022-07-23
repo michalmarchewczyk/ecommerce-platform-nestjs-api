@@ -4,12 +4,12 @@ import { Product } from '../entities/product.entity';
 import { Category } from '../entities/category.entity';
 import { CategoriesService } from './categories.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { NotFoundException } from '@nestjs/common';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { CategoryCreateDto } from '../dto/category-create.dto';
 import { CategoryUpdateDto } from '../dto/category-update.dto';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
+import { NotFoundError } from '../../errors/not-found.error';
 
 describe('CategoriesController', () => {
   let controller: CategoriesController;
@@ -64,7 +64,7 @@ describe('CategoriesController', () => {
 
     it('should throw error if category not found', async () => {
       await expect(controller.getCategory(12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -120,7 +120,7 @@ describe('CategoriesController', () => {
 
     it('should throw error if category not found', async () => {
       await expect(controller.updateCategory(12345, {})).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -137,7 +137,7 @@ describe('CategoriesController', () => {
 
     it('should throw error if category not found', async () => {
       await expect(controller.deleteCategory(12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -148,13 +148,13 @@ describe('CategoriesController', () => {
       const { id } = mockCategoriesRepository.save(createData);
       const products = await controller.getCategoryProducts(id);
       expect(products).toEqual(
-        mockCategoriesRepository.entities.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id)?.products,
       );
     });
 
     it('should throw error if category not found', async () => {
       await expect(controller.getCategoryProducts(12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -175,13 +175,13 @@ describe('CategoriesController', () => {
         updated: expect.any(Date),
       });
       expect(
-        mockCategoriesRepository.entities.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id)?.products,
       ).toEqual([product]);
     });
 
     it('should throw error if category not found', async () => {
       await expect(controller.addCategoryProduct(12345, 12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -195,14 +195,14 @@ describe('CategoriesController', () => {
       await controller.addCategoryProduct(id, productId);
       await controller.deleteCategoryProduct(id, productId);
       expect(
-        mockCategoriesRepository.entities.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id)?.products,
       ).toEqual([]);
     });
 
     it('should throw error if category not found', async () => {
       await expect(
         controller.deleteCategoryProduct(12345, 12345),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(NotFoundError);
     });
   });
 });

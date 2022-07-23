@@ -139,7 +139,7 @@ describe('UsersController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['user not found'],
+        message: ['user with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -200,7 +200,7 @@ describe('UsersController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['user not found'],
+        message: ['user with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -244,7 +244,7 @@ describe('UsersController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['user not found'],
+        message: ['user with id=12345 not found'],
         error: 'Not Found',
       });
     });

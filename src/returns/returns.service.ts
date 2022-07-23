@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { ReturnCreateDto } from './dto/return-create.dto';
 import { Order } from '../orders/entities/order.entity';
 import { ReturnUpdateDto } from './dto/return-update.dto';
+import { NotFoundError } from '../errors/not-found.error';
+import { ConflictError } from '../errors/conflict.error';
 
 @Injectable()
 export class ReturnsService {
@@ -19,7 +21,7 @@ export class ReturnsService {
     return this.returnsRepository.find();
   }
 
-  async getReturn(id: number): Promise<Return | null> {
+  async getReturn(id: number): Promise<Return> {
     const foundReturn = await this.returnsRepository.findOne({
       where: { id },
       relations: [
@@ -32,17 +34,17 @@ export class ReturnsService {
       ],
     });
     if (!foundReturn) {
-      return null;
+      throw new NotFoundError('return', 'id', id.toString());
     }
     return foundReturn;
   }
 
   async checkReturnUser(userId: number, id: number): Promise<boolean> {
-    const order = await this.returnsRepository.findOne({
+    const foundReturn = await this.returnsRepository.findOne({
       where: { id, order: { user: { id: userId } } },
       relations: ['order', 'order.user'],
     });
-    return !!order;
+    return !!foundReturn;
   }
 
   async checkOrderUser(userId: number, orderId: number): Promise<boolean> {
@@ -52,30 +54,27 @@ export class ReturnsService {
     return !!order;
   }
 
-  async createReturn(returnDto: ReturnCreateDto): Promise<Return | null> {
+  async createReturn(returnDto: ReturnCreateDto): Promise<Return> {
     const newReturn = new Return();
     const order = await this.ordersRepository.findOne({
       where: { id: returnDto.orderId },
     });
     if (!order) {
-      return null;
+      throw new NotFoundError('order', 'id', returnDto.orderId.toString());
     }
     try {
       newReturn.order = order;
       newReturn.message = returnDto.message;
       return await this.returnsRepository.save(newReturn);
     } catch (e) {
-      return null;
+      throw new ConflictError('return');
     }
   }
 
-  async updateReturn(
-    id: number,
-    returnDto: ReturnUpdateDto,
-  ): Promise<Return | null> {
+  async updateReturn(id: number, returnDto: ReturnUpdateDto): Promise<Return> {
     const foundReturn = await this.returnsRepository.findOne({ where: { id } });
     if (!foundReturn) {
-      return null;
+      throw new NotFoundError('return', 'id', id.toString());
     }
     Object.assign(foundReturn, returnDto);
     return this.returnsRepository.save(foundReturn);

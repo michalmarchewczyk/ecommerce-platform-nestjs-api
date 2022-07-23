@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
 import { CategoryCreateDto } from '../dto/category-create.dto';
 import { CategoryUpdateDto } from '../dto/category-update.dto';
+import { NotFoundError } from '../../errors/not-found.error';
+import { NotRelatedError } from '../../errors/not-related.error';
 
 @Injectable()
 export class CategoriesService {
@@ -20,25 +22,21 @@ export class CategoriesService {
   }
 
   async getCategory(id: number): Promise<Category> {
-    return this.categoriesRepository.findOne({
+    const category = await this.categoriesRepository.findOne({
       where: { id },
       relations: ['childCategories'],
     });
+    if (!category) {
+      throw new NotFoundError('category', 'id', id.toString());
+    }
+    return category;
   }
 
-  async createCategory(
-    categoryData: CategoryCreateDto,
-  ): Promise<Category | null> {
+  async createCategory(categoryData: CategoryCreateDto): Promise<Category> {
     const category = new Category();
     Object.assign(category, categoryData);
     if (categoryData.parentCategoryId) {
-      const updated = await this.updateParentCategory(
-        category,
-        categoryData.parentCategoryId,
-      );
-      if (!updated) {
-        return null;
-      }
+      await this.updateParentCategory(category, categoryData.parentCategoryId);
     }
     return this.categoriesRepository.save(category);
   }
@@ -46,20 +44,14 @@ export class CategoriesService {
   async updateCategory(
     id: number,
     categoryData: CategoryUpdateDto,
-  ): Promise<Category | null> {
+  ): Promise<Category> {
     const category = await this.categoriesRepository.findOne({ where: { id } });
     if (!category) {
-      return null;
+      throw new NotFoundError('category', 'id', id.toString());
     }
     Object.assign(category, categoryData);
     if (categoryData.parentCategoryId) {
-      const updated = await this.updateParentCategory(
-        category,
-        categoryData.parentCategoryId,
-      );
-      if (!updated) {
-        return null;
-      }
+      await this.updateParentCategory(category, categoryData.parentCategoryId);
     }
     return this.categoriesRepository.save(category);
   }
@@ -72,7 +64,7 @@ export class CategoriesService {
       where: { id: parentCategoryId },
     });
     if (!parentCategory) {
-      return false;
+      throw new NotFoundError('category', 'id', parentCategoryId.toString());
     }
     category.parentCategory = parentCategory;
     return true;
@@ -81,39 +73,36 @@ export class CategoriesService {
   async deleteCategory(id: number): Promise<boolean> {
     const category = await this.categoriesRepository.findOne({ where: { id } });
     if (!category) {
-      return false;
+      throw new NotFoundError('category', 'id', id.toString());
     }
     await this.categoriesRepository.delete({ id });
     return true;
   }
 
-  async getCategoryProducts(id: number): Promise<Product[] | null> {
+  async getCategoryProducts(id: number): Promise<Product[]> {
     const category = await this.categoriesRepository.findOne({
       where: { id },
       relations: ['products'],
     });
     if (!category) {
-      return null;
+      throw new NotFoundError('category', 'id', id.toString());
     }
     return category.products;
   }
 
-  async addCategoryProduct(
-    id: number,
-    productId: number,
-  ): Promise<Product | null> {
+  async addCategoryProduct(id: number, productId: number): Promise<Product> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
     });
     if (!productId || !product) {
-      return null;
+      throw new NotFoundError('product');
     }
     const category = await this.categoriesRepository.findOne({
       where: { id },
       relations: ['products'],
     });
     if (!category) {
-      return null;
+      throw new NotFoundError('category', 'id', id.toString());
     }
     category.products.push(product);
     await this.categoriesRepository.save(category);
@@ -125,17 +114,17 @@ export class CategoriesService {
       where: { id: productId },
     });
     if (!productId || !product) {
-      return false;
+      throw new NotFoundError('product');
     }
     const category = await this.categoriesRepository.findOne({
       where: { id },
       relations: ['products'],
     });
     if (!category) {
-      return false;
+      throw new NotFoundError('category', 'id', id.toString());
     }
     if (!category.products.some((p) => p.id === product.id)) {
-      return false;
+      throw new NotRelatedError('category', 'product');
     }
     category.products = category.products.filter((p) => p.id !== product.id);
     await this.categoriesRepository.save(category);

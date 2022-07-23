@@ -12,7 +12,7 @@ import { Attribute } from '../products/entities/attribute.entity';
 import { OrderCreateDto } from './dto/order-create.dto';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
 import { OrderUpdateDto } from './dto/order-update.dto';
 import { OrderItemDto } from './dto/order-item.dto';
 import { ProductCreateDto } from '../products/dto/product-create.dto';
@@ -24,6 +24,8 @@ import { OrderPaymentDto } from './dto/order-payment.dto';
 import { PaymentMethodDto } from './dto/payment-method.dto';
 import { PaymentMethod } from './entities/payment-method.entity';
 import { PaymentsService } from './payments/payments.service';
+import { NotFoundError } from '../errors/not-found.error';
+import { AttributeType } from '../products/entities/attribute-type.entity';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
@@ -49,6 +51,7 @@ describe('OrdersController', () => {
         RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(DeliveryMethod),
         RepositoryMockService.getProvider(PaymentMethod),
+        RepositoryMockService.getProvider(AttributeType),
         DtoGeneratorService,
       ],
     }).compile();
@@ -116,7 +119,7 @@ describe('OrdersController', () => {
     it('should throw error if order with given id does not exist', async () => {
       await expect(
         controller.getOrder({ id: 12345 } as User, 12345),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(NotFoundError);
     });
 
     it('should throw error if order has different user id', async () => {
@@ -185,10 +188,10 @@ describe('OrdersController', () => {
       expect(order).toMatchObject(expected);
     });
 
-    it('should th if order with given id does not exist', async () => {
+    it('should throw error if order with given id does not exist', async () => {
       const updateData = generate(OrderUpdateDto, true);
       await expect(controller.updateOrder(12345, updateData)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });

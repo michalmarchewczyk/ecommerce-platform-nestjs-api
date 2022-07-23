@@ -93,7 +93,9 @@ describe('AuthController (e2e)', () => {
       expect(response2.status).toBe(409);
       expect(response2.body).toEqual({
         statusCode: 409,
-        message: ['user already exists'],
+        message: [
+          `user could not be saved because of a conflict on email=${registerData.email}`,
+        ],
         error: 'Conflict',
       });
     });

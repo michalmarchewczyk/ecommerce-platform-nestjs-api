@@ -91,8 +91,8 @@ describe('UsersService', () => {
       await service.addUser(email, password);
       const user = await service.findUserToLogin(email);
       expect(user).toBeDefined();
-      expect(user.email).toEqual(email);
-      expect(user.password).toBeDefined();
+      expect(user?.email).toEqual(email);
+      expect(user?.password).toBeDefined();
     });
 
     it('should return null when user with given email does not exist', async () => {
@@ -108,8 +108,8 @@ describe('UsersService', () => {
       const { id } = await service.addUser(email, password);
       const user = await service.findUserToSession(id);
       expect(user).toBeDefined();
-      expect(user.email).toEqual(email);
-      expect(user.password).toBeUndefined();
+      expect(user?.email).toEqual(email);
+      expect(user?.password).toBeUndefined();
     });
 
     it('should return null when user with given id does not exist', async () => {

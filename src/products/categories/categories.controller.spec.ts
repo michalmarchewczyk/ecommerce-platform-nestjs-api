@@ -148,7 +148,7 @@ describe('CategoriesController', () => {
       const { id } = mockCategoriesRepository.save(createData);
       const products = await controller.getCategoryProducts(id);
       expect(products).toEqual(
-        mockCategoriesRepository.entities.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id)?.products,
       );
     });
 
@@ -175,7 +175,7 @@ describe('CategoriesController', () => {
         updated: expect.any(Date),
       });
       expect(
-        mockCategoriesRepository.entities.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id)?.products,
       ).toEqual([product]);
     });
 
@@ -195,7 +195,7 @@ describe('CategoriesController', () => {
       await controller.addCategoryProduct(id, productId);
       await controller.deleteCategoryProduct(id, productId);
       expect(
-        mockCategoriesRepository.entities.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id)?.products,
       ).toEqual([]);
     });
 

@@ -21,7 +21,7 @@ export class ReturnsService {
     return this.returnsRepository.find();
   }
 
-  async getReturn(id: number): Promise<Return | null> {
+  async getReturn(id: number): Promise<Return> {
     const foundReturn = await this.returnsRepository.findOne({
       where: { id },
       relations: [
@@ -54,7 +54,7 @@ export class ReturnsService {
     return !!order;
   }
 
-  async createReturn(returnDto: ReturnCreateDto): Promise<Return | null> {
+  async createReturn(returnDto: ReturnCreateDto): Promise<Return> {
     const newReturn = new Return();
     const order = await this.ordersRepository.findOne({
       where: { id: returnDto.orderId },
@@ -71,10 +71,7 @@ export class ReturnsService {
     }
   }
 
-  async updateReturn(
-    id: number,
-    returnDto: ReturnUpdateDto,
-  ): Promise<Return | null> {
+  async updateReturn(id: number, returnDto: ReturnUpdateDto): Promise<Return> {
     const foundReturn = await this.returnsRepository.findOne({ where: { id } });
     if (!foundReturn) {
       throw new NotFoundError('return', 'id', id.toString());

@@ -47,7 +47,10 @@ export class OrdersService {
     return !!order;
   }
 
-  async createOrder(userId: number, orderData: OrderCreateDto): Promise<Order> {
+  async createOrder(
+    userId: number | null,
+    orderData: OrderCreateDto,
+  ): Promise<Order> {
     const order = new Order();
     if (userId) {
       order.user = await this.usersService.getUser(userId);

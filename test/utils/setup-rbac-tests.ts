@@ -12,7 +12,7 @@ export const setupRbacTests =
     endpoints: [string, Role[]][],
   ) =>
   () => {
-    const cookieHeaders = {};
+    const cookieHeaders: Record<string, any> = {};
     const availableRoles = Object.values(Role);
 
     let app: INestApplication;

@@ -193,9 +193,10 @@ describe('ProductsController', () => {
     });
 
     it('should throw error when product not found', async () => {
-      await expect(controller.addProductPhoto(12345, null)).rejects.toThrow(
-        NotFoundError,
-      );
+      const fileMetadata = generateFileMetadata();
+      await expect(
+        controller.addProductPhoto(12345, fileMetadata),
+      ).rejects.toThrow(NotFoundError);
     });
   });
 

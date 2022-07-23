@@ -7,6 +7,7 @@ import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/entities/user.entity';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 import { Role } from '../users/entities/role.enum';
+import { Request } from 'express';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -76,7 +77,9 @@ describe('AuthController', () => {
   describe('login', () => {
     it('should return req.user', async () => {
       const { email, password } = generate(RegisterDto);
-      const user = await controller.login({ user: { email, password } });
+      const user = await controller.login({
+        user: { email, password },
+      } as unknown as Request);
       expect(user).toBeDefined();
       expect(user).toEqual({ email, password });
     });
@@ -85,7 +88,7 @@ describe('AuthController', () => {
   describe('logout', () => {
     it('should call logout method', async () => {
       const logout = jest.fn();
-      await controller.logout({ logOut: logout });
+      await controller.logout({ logOut: logout } as unknown as Request);
       expect(logout).toHaveBeenCalled();
     });
   });

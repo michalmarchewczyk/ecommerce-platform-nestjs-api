@@ -21,8 +21,11 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  async createOrder(@ReqUser() user: User, @Body() body: OrderCreateDto) {
-    return await this.ordersService.createOrder(user?.id, body);
+  async createOrder(
+    @ReqUser() user: User | null,
+    @Body() body: OrderCreateDto,
+  ) {
+    return await this.ordersService.createOrder(user?.id ?? null, body);
   }
 
   @Get()

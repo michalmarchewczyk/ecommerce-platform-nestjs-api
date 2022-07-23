@@ -31,7 +31,7 @@ export class AuthService {
     if (!passwordMatches) {
       return null;
     }
-    user.password = undefined;
-    return user;
+    const { password, ...toReturn } = user;
+    return toReturn as User;
   }
 }

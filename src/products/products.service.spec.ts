@@ -192,9 +192,10 @@ describe('ProductsService', () => {
     });
 
     it('should throw error if product not found', async () => {
-      await expect(service.addProductPhoto(12345, null)).rejects.toThrow(
-        NotFoundError,
-      );
+      const fileMetadata = generateFileMetadata();
+      await expect(
+        service.addProductPhoto(12345, fileMetadata),
+      ).rejects.toThrow(NotFoundError);
     });
   });
 

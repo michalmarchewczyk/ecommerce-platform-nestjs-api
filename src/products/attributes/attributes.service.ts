@@ -28,7 +28,7 @@ export class AttributesService {
   async updateAttributeType(
     attributeTypeId: number,
     attributeTypeData: AttributeTypeDto,
-  ): Promise<AttributeType | null> {
+  ): Promise<AttributeType> {
     const attributeType = await this.attributeTypesRepository.findOne({
       where: { id: attributeTypeId },
     });

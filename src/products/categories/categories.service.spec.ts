@@ -145,7 +145,7 @@ describe('CategoriesService', () => {
       const { id } = mockCategoriesRepository.save(createData);
       const products = await service.getCategoryProducts(id);
       expect(products).toEqual(
-        mockCategoriesRepository.entities.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id)?.products,
       );
     });
 
@@ -172,7 +172,7 @@ describe('CategoriesService', () => {
         updated: expect.any(Date),
       });
       expect(
-        mockCategoriesRepository.entities.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id)?.products,
       ).toEqual([product]);
     });
 
@@ -193,7 +193,7 @@ describe('CategoriesService', () => {
       const deleted = await service.deleteCategoryProduct(id, productId);
       expect(deleted).toBe(true);
       expect(
-        mockCategoriesRepository.entities.find((c) => c.id === id).products,
+        mockCategoriesRepository.entities.find((c) => c.id === id)?.products,
       ).toEqual([]);
     });
 

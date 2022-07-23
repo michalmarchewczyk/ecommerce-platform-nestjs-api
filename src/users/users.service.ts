@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { NotFoundError } from '../errors/not-found.error';
@@ -25,11 +25,10 @@ export class UsersService {
       user.firstName = firstName;
       user.lastName = lastName;
       const savedUser = await this.usersRepository.save(user);
-      return { ...savedUser, password: undefined };
+      const { password, ...toReturn } = savedUser;
+      return toReturn as User;
     } catch (error) {
-      if (error instanceof QueryFailedError) {
-        throw new ConflictError('user', 'email', email);
-      }
+      throw new ConflictError('user', 'email', email);
     }
   }
 

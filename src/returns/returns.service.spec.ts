@@ -65,13 +65,13 @@ describe('ReturnsService', () => {
   describe('checkReturnUser', () => {
     it('should return true if user is order owner', async () => {
       const orderData = generate(OrderCreateDto);
-      const order = await mockOrdersRepository.save({
+      const order = mockOrdersRepository.save({
         ...orderData,
         user: { id: 123 },
       });
       const createData = generate(ReturnCreateDto);
-      const { id } = await mockReturnsRepository.save({ ...createData, order });
-      const returnFound = await service.checkReturnUser(order.user.id, id);
+      const { id } = mockReturnsRepository.save({ ...createData, order });
+      const returnFound = await service.checkReturnUser(123, id);
       expect(returnFound).toBeTruthy();
     });
 

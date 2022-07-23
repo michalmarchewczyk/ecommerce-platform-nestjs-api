@@ -14,17 +14,17 @@ export class DtoGeneratorService {
     const validationMetadatas =
       this.validatorMetadata.getTargetValidationMetadatas(
         dto,
-        undefined,
+        '',
         false,
         false,
       );
     const groupedValidationMetadatas =
       this.validatorMetadata.groupByPropertyName(validationMetadatas);
-    const properties = {};
+    const properties: Record<string, any> = {};
     for (const [propertyName, validationMetadatas] of Object.entries(
       groupedValidationMetadatas,
     )) {
-      const property = {
+      const property: Record<string, any> = {
         validators: [],
         isOptional: false,
         ignore: false,
@@ -91,7 +91,7 @@ export class DtoGeneratorService {
       return entities as T[];
     }
     const properties = this.getPropertiesFromDto(dto);
-    const entity = new dto();
+    const entity: { [key: string]: any } = new dto();
     for (const [propertyName, property] of Object.entries(properties)) {
       if ((!property.isOptional || full) && !property.ignore) {
         entity[propertyName] = DtoGeneratorService.generateValue(

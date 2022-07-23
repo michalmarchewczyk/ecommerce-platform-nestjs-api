@@ -12,6 +12,7 @@ import { RegisterDto } from './dto/register.dto';
 import { User } from '../users/entities/user.entity';
 import { LocalAuthGuard } from './local-auth.guard';
 import { SessionAuthGuard } from './session-auth.guard';
+import { Request } from 'express';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -25,13 +26,13 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Req() req): Promise<any> {
+  async login(@Req() req: Request): Promise<any> {
     return req.user;
   }
 
   @UseGuards(SessionAuthGuard)
   @Post('logout')
-  async logout(@Req() req): Promise<void> {
+  async logout(@Req() req: Request): Promise<void> {
     req.logOut(() => {
       req.session.cookie.maxAge = 0;
     });

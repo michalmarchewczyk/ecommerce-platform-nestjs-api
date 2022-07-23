@@ -315,7 +315,7 @@ describe.only('OrdersController (e2e)', () => {
   });
 
   describe('/orders/:id (PATCH)', () => {
-    let testOrderId;
+    let testOrderId: number;
 
     beforeEach(async () => {
       const createData = generate(OrderCreateDto);

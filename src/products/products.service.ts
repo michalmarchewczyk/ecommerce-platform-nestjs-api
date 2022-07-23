@@ -46,7 +46,7 @@ export class ProductsService {
   async updateProduct(
     id: number,
     productData: ProductUpdateDto,
-  ): Promise<Product | null> {
+  ): Promise<Product> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundError('product', 'id', id.toString());
@@ -67,7 +67,7 @@ export class ProductsService {
   async updateProductAttributes(
     id: number,
     attributes: AttributeDto[],
-  ): Promise<Product | null> {
+  ): Promise<Product> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundError('product', 'id', id.toString());
@@ -106,7 +106,7 @@ export class ProductsService {
   async addProductPhoto(
     id: number,
     file: Express.Multer.File,
-  ): Promise<Product | null> {
+  ): Promise<Product> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundError('product', 'id', id.toString());
@@ -118,10 +118,7 @@ export class ProductsService {
     return this.productsRepository.save(product);
   }
 
-  async deleteProductPhoto(
-    id: number,
-    photoId: number,
-  ): Promise<Product | null> {
+  async deleteProductPhoto(id: number, photoId: number): Promise<Product> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundError('product', 'id', id.toString());

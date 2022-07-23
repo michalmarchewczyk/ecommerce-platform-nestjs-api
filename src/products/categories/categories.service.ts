@@ -32,9 +32,7 @@ export class CategoriesService {
     return category;
   }
 
-  async createCategory(
-    categoryData: CategoryCreateDto,
-  ): Promise<Category | null> {
+  async createCategory(categoryData: CategoryCreateDto): Promise<Category> {
     const category = new Category();
     Object.assign(category, categoryData);
     if (categoryData.parentCategoryId) {
@@ -46,7 +44,7 @@ export class CategoriesService {
   async updateCategory(
     id: number,
     categoryData: CategoryUpdateDto,
-  ): Promise<Category | null> {
+  ): Promise<Category> {
     const category = await this.categoriesRepository.findOne({ where: { id } });
     if (!category) {
       throw new NotFoundError('category', 'id', id.toString());
@@ -81,7 +79,7 @@ export class CategoriesService {
     return true;
   }
 
-  async getCategoryProducts(id: number): Promise<Product[] | null> {
+  async getCategoryProducts(id: number): Promise<Product[]> {
     const category = await this.categoriesRepository.findOne({
       where: { id },
       relations: ['products'],
@@ -92,10 +90,7 @@ export class CategoriesService {
     return category.products;
   }
 
-  async addCategoryProduct(
-    id: number,
-    productId: number,
-  ): Promise<Product | null> {
+  async addCategoryProduct(id: number, productId: number): Promise<Product> {
     const product = await this.productsRepository.findOne({
       where: { id: productId },
     });

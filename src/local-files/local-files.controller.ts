@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Response,
@@ -22,9 +21,6 @@ export class LocalFilesController {
     @Response({ passthrough: true }) res,
   ) {
     const productPhoto = await this.localFilesService.getProductPhoto(id);
-    if (!productPhoto) {
-      throw new NotFoundException(['product photo not found']);
-    }
 
     try {
       const stream = createReadStream(

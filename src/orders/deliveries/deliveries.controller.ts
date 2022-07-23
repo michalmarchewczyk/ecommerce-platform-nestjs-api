@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -35,20 +34,12 @@ export class DeliveriesController {
     @Param('id') id: number,
     @Body() body: DeliveryMethodDto,
   ): Promise<DeliveryMethod> {
-    const updated = await this.deliveriesService.updateMethod(id, body);
-    if (!updated) {
-      throw new NotFoundException(['delivery method not found']);
-    }
-    return updated;
+    return await this.deliveriesService.updateMethod(id, body);
   }
 
   @Delete(':id')
   @Roles(Role.Admin)
   async deleteMethod(@Param('id') id: number): Promise<void> {
-    const deleted = await this.deliveriesService.deleteMethod(id);
-    if (!deleted) {
-      throw new NotFoundException(['delivery method not found']);
-    }
-    return;
+    await this.deliveriesService.deleteMethod(id);
   }
 }

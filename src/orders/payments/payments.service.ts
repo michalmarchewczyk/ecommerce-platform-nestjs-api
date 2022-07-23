@@ -3,6 +3,7 @@ import { PaymentMethod } from '../entities/payment-method.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
+import { NotFoundError } from '../../errors/not-found.error';
 
 @Injectable()
 export class PaymentsService {
@@ -18,7 +19,7 @@ export class PaymentsService {
   async getMethod(id: number): Promise<PaymentMethod | null> {
     const method = await this.paymentsRepository.findOne({ where: { id } });
     if (!method) {
-      return null;
+      throw new NotFoundError('payment method', 'id', id.toString());
     }
     return method;
   }
@@ -37,7 +38,7 @@ export class PaymentsService {
   ): Promise<PaymentMethod | null> {
     const method = await this.paymentsRepository.findOne({ where: { id } });
     if (!method) {
-      return null;
+      throw new NotFoundError('payment method', 'id', id.toString());
     }
     Object.assign(method, methodData);
     return this.paymentsRepository.save(method);
@@ -46,7 +47,7 @@ export class PaymentsService {
   async deleteMethod(id: number): Promise<boolean> {
     const method = await this.paymentsRepository.findOne({ where: { id } });
     if (!method) {
-      return false;
+      throw new NotFoundError('payment method', 'id', id.toString());
     }
     await this.paymentsRepository.delete({ id });
     return true;

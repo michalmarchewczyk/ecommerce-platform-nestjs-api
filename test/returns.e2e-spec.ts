@@ -158,7 +158,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         error: 'Not Found',
-        message: ['return not found'],
+        message: ['return with id=12345 not found'],
         statusCode: 404,
       });
     });
@@ -223,7 +223,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         error: 'Not Found',
-        message: ['order not found'],
+        message: ['order with id=12345 not found'],
         statusCode: 404,
       });
     });
@@ -239,11 +239,11 @@ describe.only('OrdersController (e2e)', () => {
         .post('/returns')
         .set('Cookie', cookieHeader)
         .send(createData);
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(409);
       expect(response.body).toEqual({
-        error: 'Not Found',
-        message: ['order not found'],
-        statusCode: 404,
+        error: 'Conflict',
+        message: ['return could not be saved because of a data conflict'],
+        statusCode: 409,
       });
     });
   });
@@ -292,7 +292,7 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         error: 'Not Found',
-        message: ['return not found'],
+        message: ['return with id=12345 not found'],
         statusCode: 404,
       });
     });

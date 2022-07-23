@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { DeliveryMethod } from '../entities/delivery-method.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryMethodDto } from '../dto/delivery-method.dto';
+import { NotFoundError } from '../../errors/not-found.error';
 
 @Injectable()
 export class DeliveriesService {
@@ -15,10 +16,10 @@ export class DeliveriesService {
     return this.deliveriesRepository.find();
   }
 
-  async getMethod(id: number): Promise<DeliveryMethod | null> {
+  async getMethod(id: number): Promise<DeliveryMethod> {
     const method = await this.deliveriesRepository.findOne({ where: { id } });
     if (!method) {
-      return null;
+      throw new NotFoundError('delivery method', 'id', id.toString());
     }
     return method;
   }
@@ -34,10 +35,10 @@ export class DeliveriesService {
   async updateMethod(
     id: number,
     methodData: DeliveryMethodDto,
-  ): Promise<DeliveryMethod | null> {
+  ): Promise<DeliveryMethod> {
     const method = await this.deliveriesRepository.findOne({ where: { id } });
     if (!method) {
-      return null;
+      throw new NotFoundError('delivery method', 'id', id.toString());
     }
     method.name = methodData.name;
     method.description = methodData.description;
@@ -48,7 +49,7 @@ export class DeliveriesService {
   async deleteMethod(id: number): Promise<boolean> {
     const method = await this.deliveriesRepository.findOne({ where: { id } });
     if (!method) {
-      return false;
+      throw new NotFoundError('delivery method', 'id', id.toString());
     }
     await this.deliveriesRepository.delete({ id });
     return true;

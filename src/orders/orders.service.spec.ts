@@ -22,6 +22,7 @@ import { PaymentMethod } from './entities/payment-method.entity';
 import { OrderPaymentDto } from './dto/order-payment.dto';
 import { PaymentMethodDto } from './dto/payment-method.dto';
 import { PaymentsService } from './payments/payments.service';
+import { NotFoundError } from '../errors/not-found.error';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -84,9 +85,8 @@ describe('OrdersService', () => {
       );
     });
 
-    it('should return null if order with given id does not exist', async () => {
-      const order = await service.getOrder(12345);
-      expect(order).toBeNull();
+    it('should throw error if order with given id does not exist', async () => {
+      await expect(service.getOrder(12345)).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -182,10 +182,11 @@ describe('OrdersService', () => {
       expect(order).toMatchObject(expected);
     });
 
-    it('should return null if order with given id does not exist', async () => {
+    it('should throw error if order with given id does not exist', async () => {
       const updateData = generate(OrderUpdateDto, true);
-      const order = await service.updateOrder(12345, updateData);
-      expect(order).toBeNull();
+      await expect(service.updateOrder(12345, updateData)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 });

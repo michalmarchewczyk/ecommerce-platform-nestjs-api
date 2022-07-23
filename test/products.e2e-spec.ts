@@ -389,7 +389,7 @@ describe('ProductsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['product photo not found'],
+        message: ['product photo with id=12345 not found'],
         error: 'Not Found',
       });
     });

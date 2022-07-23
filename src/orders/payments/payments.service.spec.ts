@@ -5,6 +5,7 @@ import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-gener
 import { PaymentMethod } from '../entities/payment-method.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
+import { NotFoundError } from '../../errors/not-found.error';
 
 describe('PaymentsService', () => {
   let service: PaymentsService;
@@ -55,10 +56,11 @@ describe('PaymentsService', () => {
       expect(updated).toMatchObject(updateData);
     });
 
-    it('should return null if no payment method found', async () => {
+    it('should throw error if no payment method found', async () => {
       const updateData = generate(PaymentMethodDto);
-      const updated = await service.updateMethod(12345, updateData);
-      expect(updated).toBeNull();
+      await expect(service.updateMethod(12345, updateData)).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 
@@ -73,9 +75,8 @@ describe('PaymentsService', () => {
       ).toBeUndefined();
     });
 
-    it('should return false if no payment method found', async () => {
-      const deleted = await service.deleteMethod(12345);
-      expect(deleted).toBe(false);
+    it('should throw error if no payment method found', async () => {
+      await expect(service.deleteMethod(12345)).rejects.toThrow(NotFoundError);
     });
   });
 });

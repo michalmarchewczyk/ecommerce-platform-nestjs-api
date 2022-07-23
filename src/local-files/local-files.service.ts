@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductPhoto } from '../products/entities/product-photo.entity';
 import { Repository } from 'typeorm';
+import { NotFoundError } from '../errors/not-found.error';
 
 @Injectable()
 export class LocalFilesService {
@@ -15,7 +16,7 @@ export class LocalFilesService {
       where: { id },
     });
     if (!productPhoto) {
-      return null;
+      throw new NotFoundError('product photo', 'id', id.toString());
     }
     return productPhoto;
   }

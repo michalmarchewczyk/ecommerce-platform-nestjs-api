@@ -8,6 +8,7 @@ import { ReturnCreateDto } from './dto/return-create.dto';
 import { Order } from '../orders/entities/order.entity';
 import { OrderCreateDto } from '../orders/dto/order-create.dto';
 import { User } from '../users/entities/user.entity';
+import { NotFoundError } from '../errors/not-found.error';
 
 describe('ReturnsService', () => {
   let service: ReturnsService;
@@ -56,9 +57,8 @@ describe('ReturnsService', () => {
       });
     });
 
-    it('should return null if return not found', async () => {
-      const returnFound = await service.getReturn(12345);
-      expect(returnFound).toBeNull();
+    it('should throw error if return not found', async () => {
+      await expect(service.getReturn(12345)).rejects.toThrow(NotFoundError);
     });
   });
 
@@ -131,9 +131,10 @@ describe('ReturnsService', () => {
       });
     });
 
-    it('should return null if return not found', async () => {
-      const updated = await service.updateReturn(12345, {});
-      expect(updated).toBeNull();
+    it('should throw error if return not found', async () => {
+      await expect(service.updateReturn(12345, {})).rejects.toThrow(
+        NotFoundError,
+      );
     });
   });
 });

@@ -10,7 +10,7 @@ import { ReturnCreateDto } from './dto/return-create.dto';
 import { OrderCreateDto } from '../orders/dto/order-create.dto';
 import { User } from '../users/entities/user.entity';
 import { Role } from '../users/entities/role.enum';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundError } from '../errors/not-found.error';
 
 describe('ReturnsController', () => {
   let controller: ReturnsController;
@@ -62,7 +62,7 @@ describe('ReturnsController', () => {
 
     it('should throw error if return not found', async () => {
       await expect(controller.getReturn({} as User, 12345)).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });
@@ -106,7 +106,7 @@ describe('ReturnsController', () => {
 
     it('should throw error if return not found', async () => {
       await expect(controller.updateReturn(12345, {})).rejects.toThrow(
-        NotFoundException,
+        NotFoundError,
       );
     });
   });

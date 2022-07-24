@@ -15,7 +15,16 @@ import { Roles } from '../auth/roles.decorator';
 import { ReqUser } from '../auth/user.decorator';
 import { User } from '../users/entities/user.entity';
 import { OrderUpdateDto } from './dto/order-update.dto';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { Order } from './entities/order.entity';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -23,22 +32,35 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
+  @ApiCreatedResponse({ type: Order, description: 'Order created' })
+  @ApiBadRequestResponse({ description: 'Invalid order data' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
   async createOrder(
     @ReqUser() user: User | null,
     @Body() body: OrderCreateDto,
-  ) {
+  ): Promise<Order> {
     return await this.ordersService.createOrder(user?.id ?? null, body);
   }
 
   @Get()
   @Roles(Role.Admin, Role.Manager, Role.Sales)
-  async getOrders() {
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiOkResponse({ type: [Order], description: 'List of all orders' })
+  async getOrders(): Promise<Order[]> {
     return this.ordersService.getOrders();
   }
 
   @Get('/:id')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
-  async getOrder(@ReqUser() user: User, @Param('id', ParseIntPipe) id: number) {
+  @ApiNotFoundResponse({ description: 'Order not found' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiOkResponse({ type: Order, description: 'Order with given id' })
+  async getOrder(
+    @ReqUser() user: User,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Order> {
     const checkUser = await this.ordersService.checkOrderUser(user.id, id);
     if (!checkUser && user.role === Role.Customer) {
       throw new ForbiddenException();
@@ -48,10 +70,15 @@ export class OrdersController {
 
   @Patch('/:id')
   @Roles(Role.Admin, Role.Manager, Role.Sales)
+  @ApiBadRequestResponse({ description: 'Invalid order data' })
+  @ApiNotFoundResponse({ description: 'Order not found' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiOkResponse({ type: Order, description: 'Order updated' })
   async updateOrder(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: OrderUpdateDto,
-  ) {
+  ): Promise<Order> {
     return await this.ordersService.updateOrder(id, body);
   }
 }

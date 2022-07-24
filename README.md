@@ -7,7 +7,7 @@ REST API for the E-commerce Platform project.
 [![Codecov](https://img.shields.io/codecov/c/github/michalmarchewczyk/ecommerce-platform-nestjs-api)](https://app.codecov.io/github/michalmarchewczyk/ecommerce-platform-nestjs-api)
 [![GitHub last commit](https://img.shields.io/github/last-commit/michalmarchewczyk/ecommerce-platform-nestjs-api)](https://github.com/michalmarchewczyk/ecommerce-platform-nestjs-api/commits/master)
 [![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/michalmarchewczyk/ecommerce-platform-nestjs-api)](https://github.com/michalmarchewczyk/ecommerce-platform-nestjs-api)
-[![GitHub milestone](https://img.shields.io/github/milestones/progress/michalmarchewczyk/ecommerce-platform-nestjs-api/2?label=1.1%20milestone)](https://github.com/michalmarchewczyk/ecommerce-platform-nestjs-api/milestone/2)
+[![GitHub milestone](https://img.shields.io/github/milestones/progress/michalmarchewczyk/ecommerce-platform-nestjs-api/3?label=1.2%20milestone)](https://github.com/michalmarchewczyk/ecommerce-platform-nestjs-api/milestone/3)
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/michalmarchewczyk/ecommerce-platform-nestjs-api)](package.json)
 
 

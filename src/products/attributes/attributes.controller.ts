@@ -13,7 +13,9 @@ import { AttributesService } from './attributes.service';
 import { Roles } from '../../auth/roles.decorator';
 import { Role } from '../../users/entities/role.enum';
 import { AttributeTypeDto } from '../dto/attribute-type.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('attributes')
 @Controller('attributes')
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}

@@ -13,7 +13,9 @@ import { User } from '../users/entities/user.entity';
 import { LocalAuthGuard } from './local-auth.guard';
 import { SessionAuthGuard } from './session-auth.guard';
 import { Request } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {

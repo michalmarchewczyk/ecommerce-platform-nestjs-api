@@ -15,7 +15,9 @@ import { Roles } from '../auth/roles.decorator';
 import { ReqUser } from '../auth/user.decorator';
 import { User } from '../users/entities/user.entity';
 import { OrderUpdateDto } from './dto/order-update.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('orders')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}

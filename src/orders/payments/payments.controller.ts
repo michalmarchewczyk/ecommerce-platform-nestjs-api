@@ -13,7 +13,9 @@ import { PaymentMethod } from '../entities/payment-method.entity';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
 import { Role } from '../../users/entities/role.enum';
 import { Roles } from '../../auth/roles.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('payments')
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}

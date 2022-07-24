@@ -14,7 +14,9 @@ import { User } from './entities/user.entity';
 import { SessionAuthGuard } from '../auth/session-auth.guard';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { ReqUser } from '../auth/user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

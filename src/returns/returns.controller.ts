@@ -16,7 +16,9 @@ import { ReqUser } from '../auth/user.decorator';
 import { ReturnCreateDto } from './dto/return-create.dto';
 import { ReturnUpdateDto } from './dto/return-update.dto';
 import { Role } from '../users/entities/role.enum';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('returns')
 @Controller('returns')
 export class ReturnsController {
   constructor(private readonly returnsService: ReturnsService) {}

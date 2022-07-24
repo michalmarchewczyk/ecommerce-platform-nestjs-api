@@ -12,7 +12,9 @@ import { DeliveryMethod } from '../entities/delivery-method.entity';
 import { DeliveryMethodDto } from '../dto/delivery-method.dto';
 import { Roles } from '../../auth/roles.decorator';
 import { Role } from '../../users/entities/role.enum';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('deliveries')
 @Controller('deliveries')
 export class DeliveriesController {
   constructor(private readonly deliveriesService: DeliveriesService) {}

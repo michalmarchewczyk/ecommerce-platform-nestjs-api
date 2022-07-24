@@ -10,11 +10,13 @@ import { LocalFilesService } from './local-files.service';
 import { createReadStream } from 'fs';
 import * as path from 'path';
 import { Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('files')
 export class LocalFilesController {
   constructor(private readonly localFilesService: LocalFilesService) {}
 
+  @ApiTags('products')
   @Get('/:id')
   async getProductPhoto(
     @Param('id', ParseIntPipe) id: number,

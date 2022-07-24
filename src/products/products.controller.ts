@@ -21,29 +21,51 @@ import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/product-update.dto';
 import { AttributeDto } from './dto/attribute.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
+@ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
+  @ApiOkResponse({ type: [Product], description: 'List of all products' })
   getProducts(): Promise<Product[]> {
     return this.productsService.getProducts();
   }
 
   @Get('/:id')
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiOkResponse({ type: Product, description: 'Product with given id' })
   async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
     return await this.productsService.getProduct(id);
   }
 
   @Post()
   @Roles(Role.Admin, Role.Manager)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiCreatedResponse({ type: Product, description: 'Product created' })
+  @ApiBadRequestResponse({ description: 'Invalid product data' })
   createProduct(@Body() product: ProductCreateDto): Promise<Product> {
     return this.productsService.createProduct(product);
   }
 
   @Patch('/:id')
   @Roles(Role.Admin, Role.Manager)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiOkResponse({ type: Product, description: 'Product updated' })
+  @ApiBadRequestResponse({ description: 'Invalid product data' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
   async updateProduct(
     @Param('id', ParseIntPipe) id: number,
     @Body() product: ProductUpdateDto,
@@ -53,12 +75,20 @@ export class ProductsController {
 
   @Delete('/:id')
   @Roles(Role.Admin, Role.Manager)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiOkResponse({ description: 'Product deleted' })
   async deleteProduct(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.productsService.deleteProduct(id);
   }
 
   @Patch('/:id/attributes')
   @Roles(Role.Admin, Role.Manager)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiOkResponse({ type: Product, description: 'Product attributes updated' })
   async updateProductAttributes(
     @Param('id', ParseIntPipe) id: number,
     @Body() attributes: AttributeDto[],
@@ -69,6 +99,10 @@ export class ProductsController {
   @Post('/:id/photos')
   @Roles(Role.Admin, Role.Manager)
   @UseInterceptors(FileInterceptor('file'))
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiCreatedResponse({ type: Product, description: 'Product photo added' })
   async addProductPhoto(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile(
@@ -86,6 +120,10 @@ export class ProductsController {
 
   @Delete('/:id/photos/:photoId')
   @Roles(Role.Admin, Role.Manager)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  @ApiOkResponse({ type: Product, description: 'Product photo deleted' })
   async deleteProductPhoto(
     @Param('id', ParseIntPipe) id: number,
     @Param('photoId', ParseIntPipe) photoId: number,

@@ -4,7 +4,6 @@ import {
   Module,
   ValidationPipe,
 } from '@nestjs/common';
-import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -56,7 +55,7 @@ import { ServiceErrorInterceptor } from './errors/service-error.interceptor';
     OrdersModule,
     ReturnsModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
     {
       provide: APP_PIPE,

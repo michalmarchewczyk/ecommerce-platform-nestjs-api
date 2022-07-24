@@ -35,7 +35,7 @@ export class PaymentsService {
   async updateMethod(
     id: number,
     methodData: PaymentMethodDto,
-  ): Promise<PaymentMethod | null> {
+  ): Promise<PaymentMethod> {
     const method = await this.paymentsRepository.findOne({ where: { id } });
     if (!method) {
       throw new NotFoundError('payment method', 'id', id.toString());

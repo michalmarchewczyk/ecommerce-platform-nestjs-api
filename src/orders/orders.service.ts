@@ -28,7 +28,7 @@ export class OrdersService {
     return this.ordersRepository.find();
   }
 
-  async getOrder(id: number): Promise<Order | null> {
+  async getOrder(id: number): Promise<Order> {
     const order = await this.ordersRepository.findOne({
       where: { id },
       relations: ['user', 'items', 'items.product', 'delivery', 'payment'],
@@ -85,10 +85,7 @@ export class OrdersService {
     return this.ordersRepository.save(order);
   }
 
-  async updateOrder(
-    id: number,
-    orderData: OrderUpdateDto,
-  ): Promise<Order | null> {
+  async updateOrder(id: number, orderData: OrderUpdateDto): Promise<Order> {
     const order = await this.ordersRepository.findOne({
       where: { id },
       relations: ['user', 'items', 'items.product', 'delivery', 'payment'],

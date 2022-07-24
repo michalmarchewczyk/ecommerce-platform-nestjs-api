@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Role } from './role.enum';
 import { Exclude } from 'class-transformer';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 @Entity('users')
 export class User {
@@ -26,6 +27,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
+  @ApiHideProperty()
   @Exclude()
   @Column({ select: false })
   password: string;

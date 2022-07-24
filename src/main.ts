@@ -11,7 +11,9 @@ async function bootstrap() {
     .setTitle('E-commerce platform API')
     .setVersion(process.env.npm_package_version ?? '0.0.2')
     .build();
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  const document = SwaggerModule.createDocument(app, swaggerConfig, {
+    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+  });
   await RedocModule.setup('docs', app, document, {});
 
   const configService = app.get(ConfigService);

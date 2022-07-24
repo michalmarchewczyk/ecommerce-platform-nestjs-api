@@ -10,7 +10,12 @@ import { LocalFilesService } from './local-files.service';
 import { createReadStream } from 'fs';
 import * as path from 'path';
 import { Response } from 'express';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller('files')
 export class LocalFilesController {
@@ -18,6 +23,9 @@ export class LocalFilesController {
 
   @ApiTags('products')
   @Get('/:id')
+  @ApiOkResponse({ description: 'Product photo with given id' })
+  @ApiProduces('image/*')
+  @ApiNotFoundResponse({ description: 'Product photo not found' })
   async getProductPhoto(
     @Param('id', ParseIntPipe) id: number,
     @Res({ passthrough: true }) res: Response,

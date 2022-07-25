@@ -6,6 +6,11 @@ import { RedocModule } from 'nestjs-redoc';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  if (configService.get('nodeEnv') === 'development') {
+    app.enableCors();
+  }
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('E-commerce platform API')
@@ -16,7 +21,6 @@ async function bootstrap() {
   });
   await RedocModule.setup('docs', app, document, {});
 
-  const configService = app.get(ConfigService);
   const port = configService.get('port');
   await app.listen(port);
 }

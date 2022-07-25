@@ -33,7 +33,7 @@ export class PaymentsController {
     type: [PaymentMethod],
     description: 'List all payment methods',
   })
-  async getMethods(): Promise<PaymentMethod[]> {
+  async getPaymentMethods(): Promise<PaymentMethod[]> {
     return this.paymentsService.getMethods();
   }
 
@@ -46,7 +46,7 @@ export class PaymentsController {
     type: PaymentMethod,
     description: 'Payment method created',
   })
-  async createMethod(
+  async createPaymentMethod(
     @Body() methodData: PaymentMethodDto,
   ): Promise<PaymentMethod> {
     return this.paymentsService.createMethod(methodData);
@@ -59,7 +59,7 @@ export class PaymentsController {
   @ApiNotFoundResponse({ description: 'Payment method not found' })
   @ApiBadRequestResponse({ description: 'Invalid payment method data' })
   @ApiOkResponse({ type: PaymentMethod, description: 'Payment method updated' })
-  async updateMethod(
+  async updatePaymentMethod(
     @Param('id', ParseIntPipe) id: number,
     @Body() methodData: PaymentMethodDto,
   ): Promise<PaymentMethod> {
@@ -72,7 +72,9 @@ export class PaymentsController {
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Payment method not found' })
   @ApiOkResponse({ description: 'Payment method deleted' })
-  async deleteMethod(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async deletePaymentMethod(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
     await this.paymentsService.deleteMethod(id);
   }
 }

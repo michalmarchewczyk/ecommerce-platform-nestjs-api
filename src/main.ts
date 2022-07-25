@@ -9,7 +9,7 @@ async function bootstrap() {
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('E-commerce platform API')
-    .setVersion(process.env.npm_package_version ?? '0.0.2')
+    .setVersion(process.env.npm_package_version ?? '1.0.0')
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig, {
     operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,

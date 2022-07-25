@@ -32,7 +32,7 @@ export class DeliveriesController {
     type: [DeliveryMethod],
     description: 'List all delivery methods',
   })
-  async getMethods(): Promise<DeliveryMethod[]> {
+  async getDeliveryMethods(): Promise<DeliveryMethod[]> {
     return this.deliveriesService.getMethods();
   }
 
@@ -45,7 +45,9 @@ export class DeliveriesController {
     type: DeliveryMethod,
     description: 'Delivery method created',
   })
-  async createMethod(@Body() body: DeliveryMethodDto): Promise<DeliveryMethod> {
+  async createDeliveryMethod(
+    @Body() body: DeliveryMethodDto,
+  ): Promise<DeliveryMethod> {
     return this.deliveriesService.createMethod(body);
   }
 
@@ -59,7 +61,7 @@ export class DeliveriesController {
     type: DeliveryMethod,
     description: 'Delivery method updated',
   })
-  async updateMethod(
+  async updateDeliveryMethod(
     @Param('id') id: number,
     @Body() body: DeliveryMethodDto,
   ): Promise<DeliveryMethod> {
@@ -72,7 +74,7 @@ export class DeliveriesController {
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Delivery method not found' })
   @ApiOkResponse({ description: 'Delivery method deleted' })
-  async deleteMethod(@Param('id') id: number): Promise<void> {
+  async deleteDeliveryMethod(@Param('id') id: number): Promise<void> {
     await this.deliveriesService.deleteMethod(id);
   }
 }

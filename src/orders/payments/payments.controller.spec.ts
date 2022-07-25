@@ -36,7 +36,7 @@ describe('PaymentsController', () => {
 
   describe('getMethods', () => {
     it('should return all payment methods', async () => {
-      const methods = await controller.getMethods();
+      const methods = await controller.getPaymentMethods();
       expect(methods).toEqual(mockPaymentsRepository.find());
     });
   });
@@ -44,7 +44,7 @@ describe('PaymentsController', () => {
   describe('createMethod', () => {
     it('should create a new payment method', async () => {
       const createData = generate(PaymentMethodDto);
-      const created = await controller.createMethod(createData);
+      const created = await controller.createPaymentMethod(createData);
       expect(created).toMatchObject(createData);
     });
   });
@@ -52,32 +52,32 @@ describe('PaymentsController', () => {
   describe('updateMethod', () => {
     it('should update a payment method', async () => {
       const createData = generate(PaymentMethodDto);
-      const { id } = await controller.createMethod(createData);
+      const { id } = await controller.createPaymentMethod(createData);
       const updateData = generate(PaymentMethodDto);
-      const updated = await controller.updateMethod(id, updateData);
+      const updated = await controller.updatePaymentMethod(id, updateData);
       expect(updated).toMatchObject(updateData);
     });
 
     it('should throw error if no payment method found', async () => {
       const updateData = generate(PaymentMethodDto);
-      await expect(controller.updateMethod(12345, updateData)).rejects.toThrow(
-        NotFoundError,
-      );
+      await expect(
+        controller.updatePaymentMethod(12345, updateData),
+      ).rejects.toThrow(NotFoundError);
     });
   });
 
   describe('deleteMethod', () => {
     it('should delete a payment method', async () => {
       const createData = generate(PaymentMethodDto);
-      const { id } = await controller.createMethod(createData);
-      await controller.deleteMethod(id);
+      const { id } = await controller.createPaymentMethod(createData);
+      await controller.deletePaymentMethod(id);
       expect(
         mockPaymentsRepository.entities.find((m) => m.id === id),
       ).toBeUndefined();
     });
 
     it('should throw error if no payment method found', async () => {
-      await expect(controller.deleteMethod(12345)).rejects.toThrow(
+      await expect(controller.deletePaymentMethod(12345)).rejects.toThrow(
         NotFoundError,
       );
     });

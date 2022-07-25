@@ -36,7 +36,7 @@ describe('DeliveriesController', () => {
 
   describe('getMethods', () => {
     it('should return all delivery methods', async () => {
-      const methods = await controller.getMethods();
+      const methods = await controller.getDeliveryMethods();
       expect(methods).toEqual(mockDeliveriesRepository.find());
     });
   });
@@ -44,7 +44,7 @@ describe('DeliveriesController', () => {
   describe('createMethod', () => {
     it('should create a new delivery method', async () => {
       const createData = generate(DeliveryMethodDto);
-      const created = await controller.createMethod(createData);
+      const created = await controller.createDeliveryMethod(createData);
       expect(created).toMatchObject(createData);
     });
   });
@@ -52,32 +52,32 @@ describe('DeliveriesController', () => {
   describe('updateMethod', () => {
     it('should update a delivery method', async () => {
       const createData = generate(DeliveryMethodDto);
-      const { id } = await controller.createMethod(createData);
+      const { id } = await controller.createDeliveryMethod(createData);
       const updateData = generate(DeliveryMethodDto);
-      const updated = await controller.updateMethod(id, updateData);
+      const updated = await controller.updateDeliveryMethod(id, updateData);
       expect(updated).toMatchObject(updateData);
     });
 
     it('should throw error if no delivery method found', async () => {
       const updateData = generate(DeliveryMethodDto);
-      await expect(controller.updateMethod(12345, updateData)).rejects.toThrow(
-        NotFoundError,
-      );
+      await expect(
+        controller.updateDeliveryMethod(12345, updateData),
+      ).rejects.toThrow(NotFoundError);
     });
   });
 
   describe('deleteMethod', () => {
     it('should delete a delivery method', async () => {
       const createData = generate(DeliveryMethodDto);
-      const { id } = await controller.createMethod(createData);
-      await controller.deleteMethod(id);
+      const { id } = await controller.createDeliveryMethod(createData);
+      await controller.deleteDeliveryMethod(id);
       expect(
         mockDeliveriesRepository.entities.find((m) => m.id === id),
       ).toBeUndefined();
     });
 
     it('should throw error if no delivery method found', async () => {
-      await expect(controller.deleteMethod(12345)).rejects.toThrow(
+      await expect(controller.deleteDeliveryMethod(12345)).rejects.toThrow(
         NotFoundError,
       );
     });

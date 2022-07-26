@@ -10,7 +10,6 @@ import { ProductCreateDto } from '../dto/product-create.dto';
 import { ProductRatingDto } from '../dto/product-rating.dto';
 import { User } from '../../users/entities/user.entity';
 import { NotFoundError } from '../../errors/not-found.error';
-import { ForbiddenException } from '@nestjs/common';
 
 describe('ProductRatingsController', () => {
   let controller: ProductRatingsController;
@@ -146,7 +145,7 @@ describe('ProductRatingsController', () => {
     it('should throw error if product or rating does not exist', async () => {
       await expect(
         controller.deleteProductRating({ id: 123 } as User, 12345, 12345),
-      ).rejects.toThrow(ForbiddenException);
+      ).rejects.toThrow(NotFoundError);
     });
   });
 });

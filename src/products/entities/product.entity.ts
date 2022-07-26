@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Attribute } from './attribute.entity';
 import { ProductPhoto } from './product-photo.entity';
+import { ProductRating } from './product-rating.entity';
 
 @Entity('products')
 export class Product {
@@ -48,4 +49,10 @@ export class Product {
     cascade: true,
   })
   photos: ProductPhoto[];
+
+  @OneToMany(() => ProductRating, (rating) => rating.product, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  ratings: ProductRating[];
 }

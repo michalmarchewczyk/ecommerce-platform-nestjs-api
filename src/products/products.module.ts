@@ -10,6 +10,7 @@ import { AttributesModule } from './attributes/attributes.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductRatingsModule } from './product-ratings/product-ratings.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CategoriesModule } from './categories/categories.module';
       inject: [ConfigService],
     }),
     CategoriesModule,
+    ProductRatingsModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

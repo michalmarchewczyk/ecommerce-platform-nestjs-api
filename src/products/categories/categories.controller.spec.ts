@@ -171,6 +171,7 @@ describe('CategoriesController', () => {
         ...productData,
         attributes: [],
         photos: [],
+        ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
       });

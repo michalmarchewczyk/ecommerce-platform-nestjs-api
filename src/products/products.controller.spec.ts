@@ -70,6 +70,7 @@ describe('ProductsController', () => {
         photos: [],
         created: expect.any(Date),
         updated: expect.any(Date),
+        ratings: [],
       });
     });
 
@@ -87,6 +88,7 @@ describe('ProductsController', () => {
         id: expect.any(Number),
         attributes: [],
         photos: [],
+        ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
       });
@@ -104,6 +106,7 @@ describe('ProductsController', () => {
         id: expect.any(Number),
         attributes: [],
         photos: [],
+        ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
       });
@@ -162,6 +165,7 @@ describe('ProductsController', () => {
         ...createData,
         id: expect.any(Number),
         photos: [],
+        ratings: [],
         attributes: expectedAttributes,
         created: expect.any(Date),
         updated: expect.any(Date),

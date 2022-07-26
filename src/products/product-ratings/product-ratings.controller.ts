@@ -75,7 +75,7 @@ export class ProductRatingsController {
       id,
       user.id,
     );
-    if (!checkUser) {
+    if (!checkUser && user.role === Role.Customer) {
       throw new ForbiddenException(['forbidden']);
     }
     await this.productRatingsService.deleteProductRating(productId, id);

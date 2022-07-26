@@ -126,4 +126,8 @@ export class ProductsService {
     product.photos = product.photos.filter((p) => p.id !== photoId);
     return this.productsRepository.save(product);
   }
+
+  async exportProducts(): Promise<Product[]> {
+    return await this.productsRepository.find();
+  }
 }

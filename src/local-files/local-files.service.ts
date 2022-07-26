@@ -20,4 +20,8 @@ export class LocalFilesService {
     }
     return productPhoto;
   }
+
+  async exportProductPhotos(): Promise<ProductPhoto[]> {
+    return this.productPhotosRepository.find();
+  }
 }

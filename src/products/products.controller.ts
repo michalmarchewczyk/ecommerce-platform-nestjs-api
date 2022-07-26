@@ -4,6 +4,7 @@ import {
   Delete,
   FileTypeValidator,
   Get,
+  Header,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -30,6 +31,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { parse } from 'json2csv';
 
 @ApiTags('products')
 @Controller('products')
@@ -40,6 +42,17 @@ export class ProductsController {
   @ApiOkResponse({ type: [Product], description: 'List of all products' })
   getProducts(): Promise<Product[]> {
     return this.productsService.getProducts();
+  }
+
+  @Get('/export')
+  @Roles(Role.Admin, Role.Manager)
+  @ApiOkResponse({ type: [Product], description: 'Products export' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @Header('Content-Type', 'text/csv')
+  async exportProducts(): Promise<string> {
+    const products = await this.productsService.exportProducts();
+    return parse(products);
   }
 
   @Get('/:id')

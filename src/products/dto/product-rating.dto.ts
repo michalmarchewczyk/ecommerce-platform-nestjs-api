@@ -9,10 +9,6 @@ import {
 export class ProductRatingDto {
   @IsNumber()
   @IsPositive()
-  productId: number;
-
-  @IsNumber()
-  @IsPositive()
   @Max(5)
   rating: number;
 

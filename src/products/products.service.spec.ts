@@ -65,6 +65,7 @@ describe('ProductsService', () => {
         visible: true,
         attributes: [],
         photos: [],
+        ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
       });
@@ -81,6 +82,7 @@ describe('ProductsService', () => {
         visible: true,
         attributes: [],
         photos: [],
+        ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
       });
@@ -101,6 +103,7 @@ describe('ProductsService', () => {
         id,
         attributes: [],
         photos: [],
+        ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
       });
@@ -159,6 +162,7 @@ describe('ProductsService', () => {
         id,
         attributes: expectedAttributes,
         photos: [],
+        ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
       });

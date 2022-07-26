@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductRatingDto } from '../dto/product-rating.dto';
 import { Product } from '../entities/product.entity';
 import { NotFoundError } from '../../errors/not-found.error';
+import { User } from '../../users/entities/user.entity';
 
 @Injectable()
 export class ProductRatingsService {
@@ -22,6 +23,7 @@ export class ProductRatingsService {
   }
 
   async createProductRating(
+    user: User,
     productId: number,
     createData: ProductRatingDto,
   ): Promise<ProductRating> {
@@ -32,10 +34,18 @@ export class ProductRatingsService {
       throw new NotFoundError('product', 'id', productId.toString());
     }
     const newProductRating = new ProductRating();
+    newProductRating.user = user;
     newProductRating.product = product;
     newProductRating.rating = createData.rating;
     newProductRating.comment = createData.comment;
     return this.productRatingsRepository.save(newProductRating);
+  }
+
+  async checkProductRatingUser(id: number, userId: number): Promise<boolean> {
+    const productRating = await this.productRatingsRepository.findOne({
+      where: { id, user: { id: userId } },
+    });
+    return !!productRating;
   }
 
   async updateProductRating(

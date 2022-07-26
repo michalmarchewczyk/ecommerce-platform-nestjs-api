@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Product } from './product.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('product-ratings')
 export class ProductRating {
@@ -18,6 +19,9 @@ export class ProductRating {
 
   @UpdateDateColumn()
   updated: Date;
+
+  @ManyToOne(() => User)
+  user: User;
 
   @ManyToOne(() => Product, (product) => product.ratings, {
     orphanedRowAction: 'delete',

@@ -1,25 +1,88 @@
 import {
   Controller,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   ParseIntPipe,
+  Post,
   Res,
   StreamableFile,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { LocalFilesService } from './local-files.service';
 import { createReadStream } from 'fs';
 import * as path from 'path';
 import { Response } from 'express';
 import {
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiProduces,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Product } from '../products/entities/product.entity';
+import * as tar from 'tar';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../users/entities/role.enum';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as multer from 'multer';
+import { Readable } from 'stream';
 
 @Controller('files')
 export class LocalFilesController {
   constructor(private readonly localFilesService: LocalFilesService) {}
+
+  @ApiTags('products')
+  @Get('/export')
+  @Roles(Role.Admin, Role.Manager)
+  @ApiOkResponse({ type: [Product], description: 'Products photos exported' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  async exportProductPhotos() {
+    const productPhotos = await this.localFilesService.exportProductPhotos();
+    const paths: string[] = productPhotos.map(
+      (productPhoto) => productPhoto.path,
+    );
+    const stream = tar.create({ gzip: true }, paths);
+    return new StreamableFile(stream, {
+      type: 'application/gzip',
+      disposition: 'attachment; filename="product-photos.tar.gz"',
+    });
+  }
+
+  @ApiTags('products')
+  @Post('/import')
+  @Roles(Role.Admin, Role.Manager)
+  @ApiCreatedResponse({
+    type: [Product],
+    description: 'Products photos imported',
+  })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @UseInterceptors(
+    FileInterceptor('data', {
+      storage: multer.memoryStorage(),
+    }),
+  )
+  async importProductPhotos(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
+          new FileTypeValidator({ fileType: 'application/gzip' }),
+        ],
+      }),
+    )
+    data: Express.Multer.File,
+  ) {
+    const stream = Readable.from(data.buffer);
+    stream.pipe(tar.extract({}));
+  }
 
   @ApiTags('products')
   @Get('/:id')

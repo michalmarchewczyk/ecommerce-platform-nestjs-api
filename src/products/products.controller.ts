@@ -4,12 +4,14 @@ import {
   Delete,
   FileTypeValidator,
   Get,
+  Header,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -30,6 +32,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import * as multer from 'multer';
 
 @ApiTags('products')
 @Controller('products')
@@ -40,6 +43,43 @@ export class ProductsController {
   @ApiOkResponse({ type: [Product], description: 'List of all products' })
   getProducts(): Promise<Product[]> {
     return this.productsService.getProducts();
+  }
+
+  @Get('/export')
+  @Roles(Role.Admin, Role.Manager)
+  @ApiOkResponse({ type: [Product], description: 'Products exported' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @Header('Content-Type', 'text/csv')
+  @Header('Content-Disposition', 'attachment; filename=products.csv')
+  async exportProducts(): Promise<string> {
+    return await this.productsService.exportProducts();
+  }
+
+  @Post('/import')
+  @Roles(Role.Admin, Role.Manager)
+  @ApiCreatedResponse({ type: [Product], description: 'Products imported' })
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @UseInterceptors(
+    FileInterceptor('data', {
+      storage: multer.memoryStorage(),
+    }),
+  )
+  async importProducts(
+    @Query('replace') replace = false,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
+          new FileTypeValidator({ fileType: 'text/csv' }),
+        ],
+      }),
+    )
+    data: Express.Multer.File,
+  ): Promise<Product[]> {
+    const csv = data.buffer.toString('utf-8');
+    return await this.productsService.importProducts(csv, replace);
   }
 
   @Get('/:id')

@@ -131,8 +131,25 @@ export class RepositoryMockService<T extends { [key: string]: any }> {
     return this.currentId++;
   }
 
-  find(): T[] {
-    return this.entities;
+  find(options?: {
+    select?: Record<string, boolean>;
+    relations?: Record<string, boolean>;
+    where?: Record<string, any>;
+  }): T[] {
+    const foundEntities = this.findWhere(options?.where ?? {});
+    if (!foundEntities) {
+      return [];
+    }
+    const selectedColumns = this.getSelectedColumns(options?.select);
+    const results = [];
+    for (const foundEntity of foundEntities) {
+      const selectedEntity: { [key: string]: any } = {};
+      for (const column of selectedColumns) {
+        selectedEntity[column] = foundEntity[column];
+      }
+      results.push(selectedEntity as T);
+    }
+    return results;
   }
 
   private findWhere(where?: Record<string, any>): T[] {
@@ -159,16 +176,7 @@ export class RepositoryMockService<T extends { [key: string]: any }> {
     relations?: Record<string, boolean>;
     where?: Record<string, any>;
   }): T | null {
-    const foundEntity = this.findWhere(options.where)[0];
-    if (!foundEntity) {
-      return null;
-    }
-    const selectedColumns = this.getSelectedColumns(options.select);
-    const selectedEntity: { [key: string]: any } = {};
-    for (const column of selectedColumns) {
-      selectedEntity[column] = foundEntity[column];
-    }
-    return selectedEntity as T;
+    return this.find(options)[0] ?? null;
   }
 
   private getSelectedColumns(select?: Record<string, boolean>) {

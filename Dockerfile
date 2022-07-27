@@ -16,7 +16,7 @@ COPY . .
 
 FROM base as prod
 
-RUN npm ci --production
+RUN npm ci
 
 COPY . .
 

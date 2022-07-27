@@ -501,6 +501,62 @@ describe('ProductsController (e2e)', () => {
     });
   });
 
+  describe('/products/export', () => {
+    it('should export products', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/products/export')
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(200);
+      expect(response.headers['content-type']).toBe('text/csv; charset=utf-8');
+    });
+  });
+
+  describe('/products/import', () => {
+    it('should import products', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/products/export')
+        .set('Cookie', cookieHeader);
+      const data = Buffer.from(response.text, 'utf8');
+      const response2 = await request(app.getHttpServer())
+        .post('/products/import')
+        .set('Cookie', cookieHeader)
+        .attach('data', data, 'products.csv');
+      expect(response2.status).toBe(201);
+      expect(response2.body).toContainEqual({
+        ...testProduct,
+        id: expect.any(Number),
+        attributes: expect.any(Array),
+        photos: expect.any(Array),
+        created: expect.any(String),
+        updated: expect.any(String),
+      });
+    });
+  });
+
+  describe('/files/export', () => {
+    it('should export product photos', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/files/export')
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(200);
+      expect(response.headers['content-type']).toBe('application/gzip');
+    });
+  });
+
+  describe('/files/import', () => {
+    it('should import product photos', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/files/export')
+        .set('Cookie', cookieHeader);
+      const data = Buffer.from(response.body, 'utf8');
+      const response2 = await request(app.getHttpServer())
+        .post('/files/import')
+        .set('Cookie', cookieHeader)
+        .attach('data', data, 'files.gz');
+      expect(response2.status).toBe(201);
+    });
+  });
+
   describe(
     'RBAC for /products',
     setupRbacTests(
@@ -521,6 +577,14 @@ describe('ProductsController (e2e)', () => {
         ['/products/:id/attributes (PATCH)', [Role.Admin, Role.Manager]],
         ['/products/:id/photos (POST)', [Role.Admin, Role.Manager]],
         ['/products/:id/photos/:photoId (DELETE)', [Role.Admin, Role.Manager]],
+        ['/products/export (GET)', [Role.Admin, Role.Manager]],
+        ['/products/import (POST)', [Role.Admin, Role.Manager]],
+        [
+          '/files/:id (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        ],
+        ['/files/export (GET)', [Role.Admin, Role.Manager]],
+        ['/files/import (POST)', [Role.Admin, Role.Manager]],
       ],
     ),
   );

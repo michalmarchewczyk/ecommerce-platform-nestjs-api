@@ -15,19 +15,34 @@ import { Role } from '../users/entities/role.enum';
 import { Roles } from '../auth/roles.decorator';
 import { WishlistCreateDto } from './dto/wishlist-create.dto';
 import { WishlistUpdateDto } from './dto/wishlist-update.dto';
+import {
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
+@ApiTags('wishlists')
 @Controller('wishlists')
 export class WishlistsController {
   constructor(private readonly wishlistsService: WishlistsService) {}
 
   @Get()
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiOkResponse({ type: [Wishlist], description: 'User wishlists' })
   async getUserWishlists(@ReqUser() user: User): Promise<Wishlist[]> {
     return this.wishlistsService.getUserWishlists(user);
   }
 
   @Post()
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiCreatedResponse({ type: Wishlist, description: 'Wishlist created' })
   async createWishlist(
     @ReqUser() user: User,
     @Body() body: WishlistCreateDto,
@@ -37,6 +52,10 @@ export class WishlistsController {
 
   @Patch('/:id')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiNotFoundResponse({ description: 'Wishlist not found' })
+  @ApiOkResponse({ type: Wishlist, description: 'Wishlist updated' })
   async updateWishlist(
     @ReqUser() user: User,
     @Param('id') id: number,
@@ -47,6 +66,10 @@ export class WishlistsController {
 
   @Delete('/:id')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
+  @ApiUnauthorizedResponse({ description: 'User not logged in' })
+  @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiNotFoundResponse({ description: 'Wishlist not found' })
+  @ApiOkResponse({ description: 'Wishlist deleted' })
   async deleteWishlist(
     @ReqUser() user: User,
     @Param('id') id: number,

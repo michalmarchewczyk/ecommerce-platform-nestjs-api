@@ -14,6 +14,8 @@ import {
 } from './entities/attribute-type.entity';
 import { isBoolean, isHexColor, isNumber, isString } from 'class-validator';
 import { TypeCheckError } from '../errors/type-check.error';
+import { parse } from 'json2csv';
+import * as csv from 'csvtojson';
 
 @Injectable()
 export class ProductsService {
@@ -127,7 +129,32 @@ export class ProductsService {
     return this.productsRepository.save(product);
   }
 
-  async exportProducts(): Promise<Product[]> {
-    return await this.productsRepository.find();
+  async exportProducts(): Promise<string> {
+    const products = await this.productsRepository.find();
+    return parse(products);
+  }
+
+  async importProducts(data: string, replace: boolean): Promise<Product[]> {
+    const products = await csv({
+      checkType: true,
+    }).fromString(data);
+    if (!replace) {
+      products.forEach((product) => {
+        product.id = undefined;
+        product.created = undefined;
+        product.updated = undefined;
+      });
+    }
+    for (const product of products) {
+      product.attributes = product.attributes.map((attribute: Attribute) => ({
+        ...attribute,
+        id: undefined,
+      }));
+      product.photos = product.photos.map((photo: ProductPhoto) => ({
+        ...photo,
+        id: undefined,
+      }));
+    }
+    return await this.productsRepository.save(products);
   }
 }

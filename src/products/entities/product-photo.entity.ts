@@ -7,6 +7,7 @@ export class ProductPhoto {
   id: number;
 
   @ManyToOne(() => Product, (product) => product.photos, {
+    onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
   })
   product: Product;

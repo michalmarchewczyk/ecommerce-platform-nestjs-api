@@ -57,7 +57,7 @@ export class WishlistsService {
     }
     wishlist.name = updateData.name ?? wishlist.name;
     wishlist.products = [];
-    for (const productId of updateData?.productIds ?? []) {
+    for (const productId of updateData.productIds ?? []) {
       const product = await this.productsRepository.findOne({
         where: { id: productId },
       });

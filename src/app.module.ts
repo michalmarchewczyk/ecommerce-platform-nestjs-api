@@ -21,6 +21,7 @@ import { LocalFilesModule } from './local-files/local-files.module';
 import { OrdersModule } from './orders/orders.module';
 import { ReturnsModule } from './returns/returns.module';
 import { ServiceErrorInterceptor } from './errors/service-error.interceptor';
+import { WishlistsModule } from './wishlists/wishlists.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { ServiceErrorInterceptor } from './errors/service-error.interceptor';
     LocalFilesModule,
     OrdersModule,
     ReturnsModule,
+    WishlistsModule,
   ],
   controllers: [],
   providers: [

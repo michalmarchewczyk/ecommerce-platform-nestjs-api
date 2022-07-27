@@ -28,7 +28,11 @@ export class Wishlist {
   @ManyToOne(() => User)
   user: User;
 
-  @ManyToMany(() => Product)
+  @ManyToMany(() => Product, {
+    eager: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   @JoinTable()
   products: Product[];
 }

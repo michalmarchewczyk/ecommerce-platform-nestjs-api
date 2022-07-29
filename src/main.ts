@@ -9,7 +9,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   if (configService.get('nodeEnv') === 'development') {
-    app.enableCors();
+    app.enableCors({ origin: true, credentials: true });
   }
 
   const swaggerConfig = new DocumentBuilder()

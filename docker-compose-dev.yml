@@ -16,6 +16,8 @@ services:
       POSTGRES_DB: ecommerce-platform
       PORT: 80
       SESSION_SECRET: secret
+      ADMIN_EMAIL: admin@test.local
+      ADMIN_PASSWORD: test1234
     command: npm run start:dev
     ports:
       - "80:80"

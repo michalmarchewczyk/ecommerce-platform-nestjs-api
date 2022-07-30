@@ -8,6 +8,7 @@ import { User } from '../users/entities/user.entity';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 import { Role } from '../users/entities/role.enum';
 import { Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -18,6 +19,7 @@ describe('AuthController', () => {
       controllers: [AuthController],
       providers: [
         AuthService,
+        ConfigService,
         DtoGeneratorService,
         UsersService,
         RepositoryMockService.getProvider(User),

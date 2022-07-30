@@ -7,6 +7,7 @@ import { RepositoryMockService } from '../../test/utils/repository-mock/reposito
 import { User } from '../users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Role } from '../users/entities/role.enum';
+import { ConfigService } from '@nestjs/config';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -17,6 +18,7 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
+        ConfigService,
         DtoGeneratorService,
         UsersService,
         RepositoryMockService.getProvider(User),

@@ -61,6 +61,8 @@ jobs:
           POSTGRES_DB: ecommerce-platform-test
           REDIS_HOST: localhost
           NODE_ENV: test
+          ADMIN_EMAIL: test@test.local
+          ADMIN_PASSWORD: test1234
       - name: Archive e2e tests coverage
         uses: actions/upload-artifact@v3
         with:

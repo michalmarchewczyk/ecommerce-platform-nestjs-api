@@ -91,7 +91,11 @@ describe('AuthService', () => {
       await service.register({ email, password });
       const user = await service.validateUser({ email, password });
       expect(user).toBeDefined();
-      expect(user).toEqual({ email, id: expect.any(Number) });
+      expect(user).toEqual({
+        email,
+        id: expect.any(Number),
+        role: Role.Customer,
+      });
     });
 
     it("should return null if user exists and password doesn't match", async () => {

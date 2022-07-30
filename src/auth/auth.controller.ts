@@ -20,6 +20,7 @@ import {
   ApiCreatedResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  PickType,
 } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 
@@ -40,9 +41,14 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @ApiBody({ type: LoginDto })
-  @ApiCreatedResponse({ type: User, description: 'Logged in user' })
+  @ApiCreatedResponse({
+    type: PickType(User, ['id', 'email', 'role']),
+    description: 'Logged in user',
+  })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-  async login(@Req() req: Request): Promise<User> {
+  async login(
+    @Req() req: Request,
+  ): Promise<Pick<User, 'id' | 'email' | 'role'>> {
     return req.user as User;
   }
 

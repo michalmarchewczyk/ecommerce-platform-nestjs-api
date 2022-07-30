@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
 import { RegisterDto } from '../src/auth/dto/register.dto';
 import { LoginDto } from '../src/auth/dto/login.dto';
+import { Role } from '../src/users/entities/role.enum';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -119,6 +120,7 @@ describe('AuthController (e2e)', () => {
       expect(response.body).toEqual({
         email: registerData.email,
         id: expect.any(Number),
+        role: Role.Customer,
       });
       expect(response.headers['set-cookie']).toBeDefined();
     });

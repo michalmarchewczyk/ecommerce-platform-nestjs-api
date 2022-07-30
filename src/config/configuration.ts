@@ -14,6 +14,8 @@ export const schema = Joi.object({
   NODE_ENV: Joi.string()
     .valid('development', 'production', 'test')
     .default('development'),
+  ADMIN_EMAIL: Joi.string().required(),
+  ADMIN_PASSWORD: Joi.string().required(),
 });
 
 export default () => ({
@@ -35,4 +37,8 @@ export default () => ({
   },
   uploadPath: process.env.UPLOAD_PATH,
   nodeEnv: process.env.NODE_ENV,
+  admin: {
+    email: process.env.ADMIN_EMAIL,
+    password: process.env.ADMIN_PASSWORD,
+  },
 });

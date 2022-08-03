@@ -17,6 +17,7 @@ import { Product } from '../entities/product.entity';
 import { Category } from '../entities/category.entity';
 import {
   ApiBadRequestResponse,
+  ApiBody,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
@@ -94,6 +95,15 @@ export class CategoriesController {
   @ApiCreatedResponse({
     type: Product,
     description: 'Product added to category',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        productId: { type: 'number' },
+      },
+      required: ['productId'],
+    },
   })
   async addCategoryProduct(
     @Param('id', ParseIntPipe) id: number,

@@ -48,7 +48,10 @@ export class ProductRatingsController {
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
-  @ApiCreatedResponse({ description: 'Product rating created' })
+  @ApiCreatedResponse({
+    type: ProductRating,
+    description: 'Product rating created',
+  })
   @ApiBadRequestResponse({ description: 'Invalid rating data' })
   async createProductRating(
     @ReqUser() user: User,
@@ -67,7 +70,7 @@ export class ProductRatingsController {
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product rating not found' })
-  @ApiOkResponse({ description: 'Product rating updated' })
+  @ApiOkResponse({ type: ProductRating, description: 'Product rating updated' })
   @ApiBadRequestResponse({ description: 'Invalid rating data' })
   async updateProductRating(
     @ReqUser() user: User,

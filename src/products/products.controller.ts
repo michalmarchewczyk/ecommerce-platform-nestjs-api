@@ -25,6 +25,8 @@ import { AttributeDto } from './dto/attribute.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBadRequestResponse,
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
@@ -61,6 +63,18 @@ export class ProductsController {
   @ApiCreatedResponse({ type: [Product], description: 'Products imported' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('data', {
       storage: multer.memoryStorage(),
@@ -129,6 +143,7 @@ export class ProductsController {
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiOkResponse({ type: Product, description: 'Product attributes updated' })
+  @ApiBody({ type: [AttributeDto] })
   async updateProductAttributes(
     @Param('id', ParseIntPipe) id: number,
     @Body() attributes: AttributeDto[],
@@ -143,6 +158,17 @@ export class ProductsController {
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiCreatedResponse({ type: Product, description: 'Product photo added' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async addProductPhoto(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile(

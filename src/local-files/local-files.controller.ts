@@ -17,6 +17,8 @@ import { createReadStream } from 'fs';
 import * as path from 'path';
 import { Response } from 'express';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
@@ -25,7 +27,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Product } from '../products/entities/product.entity';
 import * as tar from 'tar';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../users/entities/role.enum';
@@ -40,7 +41,14 @@ export class LocalFilesController {
   @ApiTags('products')
   @Get('/export')
   @Roles(Role.Admin, Role.Manager)
-  @ApiOkResponse({ type: [Product], description: 'Products photos exported' })
+  @ApiOkResponse({
+    schema: {
+      type: 'object',
+      properties: {},
+    },
+    description: 'Products photos exported',
+  })
+  @ApiProduces('application/gzip')
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
   async exportProductPhotos() {
@@ -59,11 +67,23 @@ export class LocalFilesController {
   @Post('/import')
   @Roles(Role.Admin, Role.Manager)
   @ApiCreatedResponse({
-    type: [Product],
+    type: undefined,
     description: 'Products photos imported',
   })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('data', {
       storage: multer.memoryStorage(),
@@ -79,7 +99,7 @@ export class LocalFilesController {
       }),
     )
     data: Express.Multer.File,
-  ) {
+  ): Promise<void> {
     const stream = Readable.from(data.buffer);
     stream.pipe(tar.extract({}));
   }

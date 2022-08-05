@@ -43,8 +43,8 @@ export class LocalFilesController {
   @Roles(Role.Admin, Role.Manager)
   @ApiOkResponse({
     schema: {
-      type: 'object',
-      properties: {},
+      type: 'string',
+      format: 'binary',
     },
     description: 'Products photos exported',
   })
@@ -106,7 +106,13 @@ export class LocalFilesController {
 
   @ApiTags('products')
   @Get('/:id')
-  @ApiOkResponse({ description: 'Product photo with given id' })
+  @ApiOkResponse({
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
+    description: 'Product photo with given id',
+  })
   @ApiProduces('image/*')
   @ApiNotFoundResponse({ description: 'Product photo not found' })
   async getProductPhoto(

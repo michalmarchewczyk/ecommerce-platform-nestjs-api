@@ -169,6 +169,7 @@ export class ProductsController {
       },
     },
   })
+  @ApiConsumes('multipart/form-data')
   async addProductPhoto(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile(

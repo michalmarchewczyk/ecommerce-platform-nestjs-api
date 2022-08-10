@@ -12,7 +12,12 @@ import {
   AttributeType,
   AttributeValueType,
 } from './entities/attribute-type.entity';
-import { isBoolean, isHexColor, isNumber, isString } from 'class-validator';
+import {
+  isBooleanString,
+  isHexColor,
+  isNumberString,
+  isString,
+} from 'class-validator';
 import { TypeCheckError } from '../errors/type-check.error';
 import { parse } from 'json2csv';
 import * as csv from 'csvtojson';
@@ -95,8 +100,8 @@ export class ProductsService {
   private async checkAttributeType(type: AttributeValueType, value: any) {
     (<[AttributeValueType, (value: any) => boolean][]>[
       [AttributeValueType.String, isString],
-      [AttributeValueType.Number, isNumber],
-      [AttributeValueType.Boolean, isBoolean],
+      [AttributeValueType.Number, isNumberString],
+      [AttributeValueType.Boolean, isBooleanString],
       [AttributeValueType.Color, isHexColor],
     ]).forEach((check) => {
       if (type === check[0] && !check[1](value)) {

@@ -77,7 +77,10 @@ describe('CategoriesController (e2e)', () => {
         .get('/categories')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      expect(response.body).toContainEqual(testCategory);
+      expect(response.body).toContainEqual({
+        ...testCategory,
+        parentCategory: null,
+      });
     });
   });
 
@@ -87,7 +90,11 @@ describe('CategoriesController (e2e)', () => {
         .get(`/categories/${testCategory.id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
-      expect(response.body).toEqual({ ...testCategory, childCategories: [] });
+      expect(response.body).toEqual({
+        ...testCategory,
+        childCategories: [],
+        parentCategory: null,
+      });
     });
 
     it('should return error if category with given id does not exist', async () => {

@@ -105,6 +105,9 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toContainEqual({
         ...expected,
         status: 'pending',
+        delivery: expect.any(Object),
+        payment: expect.any(Object),
+        items: expect.any(Array),
       });
     });
   });

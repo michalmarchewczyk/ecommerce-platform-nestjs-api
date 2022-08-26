@@ -25,7 +25,9 @@ export class OrdersService {
   ) {}
 
   async getOrders(): Promise<Order[]> {
-    return this.ordersRepository.find();
+    return this.ordersRepository.find({
+      relations: ['items', 'delivery', 'payment'],
+    });
   }
 
   async getOrder(id: number): Promise<Order> {

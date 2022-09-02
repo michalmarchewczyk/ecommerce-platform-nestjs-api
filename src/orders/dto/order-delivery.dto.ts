@@ -26,7 +26,7 @@ export class OrderDeliveryDto {
   @IsOptional()
   @IsString()
   @IsPostalCode('any')
-  postalCode: string;
+  postalCode?: string;
 
   @IsString()
   @IsNotEmpty()

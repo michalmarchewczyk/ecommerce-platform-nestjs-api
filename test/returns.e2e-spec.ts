@@ -117,8 +117,10 @@ describe.only('OrdersController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .get('/returns')
         .set('Cookie', cookieHeader);
-      const { order, ...expected } = testReturn;
-      expect(response.body).toContainEqual(expected);
+      expect(response.body).toContainEqual({
+        ...testReturn,
+        order: expect.anything(),
+      });
     });
   });
 

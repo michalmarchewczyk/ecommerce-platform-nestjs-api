@@ -18,7 +18,9 @@ export class ReturnsService {
   ) {}
 
   async getReturns(): Promise<Return[]> {
-    return this.returnsRepository.find();
+    return this.returnsRepository.find({
+      relations: ['order', 'order.items'],
+    });
   }
 
   async getReturn(id: number): Promise<Return> {

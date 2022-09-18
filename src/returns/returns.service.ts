@@ -60,6 +60,7 @@ export class ReturnsService {
     const newReturn = new Return();
     const order = await this.ordersRepository.findOne({
       where: { id: returnDto.orderId },
+      relations: ['items'],
     });
     if (!order) {
       throw new NotFoundError('order', 'id', returnDto.orderId.toString());

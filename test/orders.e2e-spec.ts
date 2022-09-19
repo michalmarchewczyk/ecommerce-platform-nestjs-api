@@ -108,6 +108,7 @@ describe.only('OrdersController (e2e)', () => {
         delivery: expect.any(Object),
         payment: expect.any(Object),
         items: expect.any(Array),
+        return: null,
       });
     });
   });
@@ -126,6 +127,7 @@ describe.only('OrdersController (e2e)', () => {
         user: expect.any(Object),
         delivery: expect.any(Object),
         payment: expect.any(Object),
+        return: null,
       });
     });
 
@@ -357,6 +359,7 @@ describe.only('OrdersController (e2e)', () => {
         user: expect.any(Object),
         delivery: expect.any(Object),
         payment: expect.any(Object),
+        return: null,
       });
     });
 

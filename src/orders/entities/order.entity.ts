@@ -14,6 +14,7 @@ import { OrderStatus } from './order-status.enum';
 import { OrderItem } from './order-item.entity';
 import { OrderDelivery } from './order-delivery.entity';
 import { OrderPayment } from './order-payment.entity';
+import { Return } from '../../returns/entities/return.entity';
 
 @Entity('orders')
 export class Order {
@@ -72,4 +73,9 @@ export class Order {
 
   @Column({ nullable: true })
   message?: string;
+
+  @OneToOne(() => Return, (r) => r.order, {
+    nullable: true,
+  })
+  return?: Return;
 }

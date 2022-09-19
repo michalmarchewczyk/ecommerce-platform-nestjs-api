@@ -26,14 +26,21 @@ export class OrdersService {
 
   async getOrders(): Promise<Order[]> {
     return this.ordersRepository.find({
-      relations: ['items', 'delivery', 'payment'],
+      relations: ['items', 'delivery', 'payment', 'return'],
     });
   }
 
   async getOrder(id: number): Promise<Order> {
     const order = await this.ordersRepository.findOne({
       where: { id },
-      relations: ['user', 'items', 'items.product', 'delivery', 'payment'],
+      relations: [
+        'user',
+        'items',
+        'items.product',
+        'delivery',
+        'payment',
+        'return',
+      ],
     });
     if (!order) {
       throw new NotFoundError('order', 'id', id.toString());
@@ -90,7 +97,14 @@ export class OrdersService {
   async updateOrder(id: number, orderData: OrderUpdateDto): Promise<Order> {
     const order = await this.ordersRepository.findOne({
       where: { id },
-      relations: ['user', 'items', 'items.product', 'delivery', 'payment'],
+      relations: [
+        'user',
+        'items',
+        'items.product',
+        'delivery',
+        'payment',
+        'return',
+      ],
     });
     if (!order) {
       throw new NotFoundError('order', 'id', id.toString());

@@ -120,9 +120,15 @@ export class LocalFilesController {
       path.join(process.cwd(), productPhoto.path),
     );
 
-    return new StreamableFile(stream, {
+    const res = new StreamableFile(stream, {
       type: productPhoto.mimeType,
       disposition: 'inline',
     });
+
+    res.setErrorHandler((err, response) => {
+      response.send('ERROR');
+    });
+
+    return res;
   }
 }

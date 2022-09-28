@@ -37,7 +37,7 @@ npm run start:prod
 
 ## Building the app
 ```bash
-npm run buld
+npm run build
 ```
 Built app is available in the `dist` folder.
 

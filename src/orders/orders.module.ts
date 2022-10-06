@@ -10,6 +10,7 @@ import { DeliveriesModule } from './deliveries/deliveries.module';
 import { OrderDelivery } from './entities/order-delivery.entity';
 import { PaymentsModule } from './payments/payments.module';
 import { OrderPayment } from './entities/order-payment.entity';
+import { OrdersSubscriber } from './orders.subscriber';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { OrderPayment } from './entities/order-payment.entity';
     DeliveriesModule,
     PaymentsModule,
   ],
-  providers: [OrdersService],
+  providers: [OrdersService, OrdersSubscriber],
   controllers: [OrdersController],
   exports: [OrdersService],
 })

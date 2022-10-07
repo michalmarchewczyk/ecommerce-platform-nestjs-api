@@ -25,6 +25,7 @@ export class OrdersSubscriber implements EntitySubscriberInterface<Order> {
 
   @BeforeInsert()
   async beforeInsert(event: InsertEvent<Order>) {
+    // TODO: mark order as failed if stock is too low
     await this.productsService.updateProductsStocks(
       'subtract',
       event.entity.items,
@@ -33,6 +34,7 @@ export class OrdersSubscriber implements EntitySubscriberInterface<Order> {
 
   @AfterUpdate()
   async afterUpdate(event: UpdateEvent<Order>) {
+    // TODO: mark order as failed if stock is too low
     if (event.updatedColumns.some((c) => c.propertyName === 'items')) {
       await this.productsService.updateProductsStocks(
         'add',

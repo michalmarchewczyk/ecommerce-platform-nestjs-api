@@ -75,7 +75,10 @@ export class ReturnsService {
   }
 
   async updateReturn(id: number, returnDto: ReturnUpdateDto): Promise<Return> {
-    const foundReturn = await this.returnsRepository.findOne({ where: { id } });
+    const foundReturn = await this.returnsRepository.findOne({
+      where: { id },
+      relations: ['order'],
+    });
     if (!foundReturn) {
       throw new NotFoundError('return', 'id', id.toString());
     }

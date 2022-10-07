@@ -20,6 +20,7 @@ import { OrderPaymentDto } from '../src/orders/dto/order-payment.dto';
 import { ReturnCreateDto } from '../src/returns/dto/return-create.dto';
 import { Return } from '../src/returns/entities/return.entity';
 import { ReturnUpdateDto } from '../src/returns/dto/return-update.dto';
+import { ReturnStatus } from '../src/returns/entities/return-status.enum';
 
 describe.only('OrdersController (e2e)', () => {
   let app: INestApplication;
@@ -278,11 +279,20 @@ describe.only('OrdersController (e2e)', () => {
           .send(createData)
       ).body;
       const updateData = generate(ReturnUpdateDto);
+      updateData.status = ReturnStatus.Cancelled;
       const response = await request(app.getHttpServer())
         .patch(`/returns/${id}`)
         .set('Cookie', cookieHeader)
         .send(updateData);
+      expect(response.status).toBe(200);
       expect(response.body).toMatchObject(updateData);
+      updateData.status = ReturnStatus.Completed;
+      const response2 = await request(app.getHttpServer())
+        .patch(`/returns/${id}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response2.status).toBe(200);
+      expect(response2.body).toMatchObject(updateData);
     });
 
     it('should return error if the return does not exist', async () => {

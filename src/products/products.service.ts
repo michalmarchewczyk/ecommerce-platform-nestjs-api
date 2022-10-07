@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/product-update.dto';
 import { Attribute } from './entities/attribute.entity';
@@ -21,6 +21,7 @@ import {
 import { TypeCheckError } from '../errors/type-check.error';
 import { parse } from 'json2csv';
 import * as csv from 'csvtojson';
+import { OrderItem } from '../orders/entities/order-item.entity';
 
 @Injectable()
 export class ProductsService {
@@ -69,6 +70,37 @@ export class ProductsService {
     }
     await this.productsRepository.delete({ id });
     return true;
+  }
+
+  async checkProductsStocks(items: OrderItem[]) {
+    const products = await this.productsRepository.find({
+      where: { id: In(items.map((i) => i.product.id)) },
+    });
+    for (const p of products) {
+      const item = items.find((i) => i.product.id === p.id);
+      if (item && p.stock < item.quantity) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  async updateProductsStocks(type: 'add' | 'subtract', items: OrderItem[]) {
+    const products = await this.productsRepository.find({
+      where: { id: In(items.map((i) => i.product.id)) },
+    });
+    for (const p of products) {
+      const item = items.find((i) => i.product.id === p.id);
+      if (!item) {
+        continue;
+      }
+      if (type === 'add') {
+        p.stock += item.quantity;
+      } else {
+        p.stock -= item.quantity;
+      }
+      await this.productsRepository.save(p);
+    }
   }
 
   async updateProductAttributes(

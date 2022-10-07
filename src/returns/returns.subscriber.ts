@@ -30,12 +30,15 @@ export class ReturnsSubscriber implements EntitySubscriberInterface<Return> {
 
   @BeforeUpdate()
   async beforeUpdate(event: UpdateEvent<Return>) {
-    if (['rejected', 'cancelled'].includes(event.entity?.status)) {
+    if (!event.entity) {
+      return;
+    }
+    if (['rejected', 'cancelled'].includes(event.entity.status)) {
       await this.ordersService.updateOrder(event.databaseEntity.order.id, {
         status: OrderStatus.Delivered,
       });
     }
-    if (['open', 'accepted', 'completed'].includes(event.entity?.status)) {
+    if (['open', 'accepted', 'completed'].includes(event.entity.status)) {
       await this.ordersService.updateOrder(event.databaseEntity.order.id, {
         status: OrderStatus.Refunded,
       });

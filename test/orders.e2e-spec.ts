@@ -18,6 +18,7 @@ import { OrderDeliveryDto } from '../src/orders/dto/order-delivery.dto';
 import { PaymentMethod } from '../src/orders/entities/payment-method.entity';
 import { PaymentMethodDto } from '../src/orders/dto/payment-method.dto';
 import { OrderPaymentDto } from '../src/orders/dto/order-payment.dto';
+import { OrderStatus } from '../src/orders/entities/order-status.enum';
 
 describe.only('OrdersController (e2e)', () => {
   let app: INestApplication;
@@ -339,6 +340,7 @@ describe.only('OrdersController (e2e)', () => {
 
     it('should update order', async () => {
       const updateData = generate(OrderUpdateDto, true);
+      updateData.status = OrderStatus.Cancelled;
       updateData.items = [{ productId: testProduct.id, quantity: 10 }];
       updateData.delivery = generate(OrderDeliveryDto);
       updateData.delivery.methodId = testDeliveryMethod.id;
@@ -361,6 +363,13 @@ describe.only('OrdersController (e2e)', () => {
         payment: expect.any(Object),
         return: null,
       });
+      updateData.status = OrderStatus.Open;
+      const response2 = await request(app.getHttpServer())
+        .patch(`/orders/${testOrderId}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response2.status).toBe(200);
+      expect(response2.body.status).toBe(OrderStatus.Open);
     });
 
     it('should return error if order does not exist', async () => {

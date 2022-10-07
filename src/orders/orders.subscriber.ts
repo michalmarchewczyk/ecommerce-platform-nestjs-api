@@ -10,6 +10,7 @@ import {
 import { Order } from './entities/order.entity';
 import { ProductsService } from '../products/products.service';
 import { OrderItem } from './entities/order-item.entity';
+import { OrderStatus } from './entities/order-status.enum';
 
 @EventSubscriber()
 export class OrdersSubscriber implements EntitySubscriberInterface<Order> {
@@ -26,7 +27,10 @@ export class OrdersSubscriber implements EntitySubscriberInterface<Order> {
 
   @BeforeInsert()
   async beforeInsert(event: InsertEvent<Order>) {
-    // TODO: mark order as failed if stock is too low
+    if (!(await this.productsService.checkProductsStocks(event.entity.items))) {
+      event.entity.status = OrderStatus.Failed;
+      return;
+    }
     await this.productsService.updateProductsStocks(
       'subtract',
       event.entity.items,
@@ -35,7 +39,6 @@ export class OrdersSubscriber implements EntitySubscriberInterface<Order> {
 
   @AfterUpdate()
   async afterUpdate(event: UpdateEvent<Order>) {
-    // TODO: mark order as failed if stock is too low
     if (!event.entity) {
       return;
     }
@@ -43,6 +46,12 @@ export class OrdersSubscriber implements EntitySubscriberInterface<Order> {
       event.databaseEntity.items.map((i) => i.id).join(',') !==
       event.entity.items.map((i: OrderItem) => i.id).join(',')
     ) {
+      if (
+        !(await this.productsService.checkProductsStocks(event.entity.items))
+      ) {
+        event.entity.status = OrderStatus.Failed;
+        return;
+      }
       await this.productsService.updateProductsStocks(
         'subtract',
         event.entity.items,
@@ -67,6 +76,12 @@ export class OrdersSubscriber implements EntitySubscriberInterface<Order> {
         event.entity.status,
       )
     ) {
+      if (
+        !(await this.productsService.checkProductsStocks(event.entity.items))
+      ) {
+        event.entity.status = OrderStatus.Failed;
+        return;
+      }
       await this.productsService.updateProductsStocks(
         'subtract',
         event.entity.items,

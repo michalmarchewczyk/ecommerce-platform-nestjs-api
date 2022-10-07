@@ -72,6 +72,19 @@ export class ProductsService {
     return true;
   }
 
+  async checkProductsStocks(items: OrderItem[]) {
+    const products = await this.productsRepository.find({
+      where: { id: In(items.map((i) => i.product.id)) },
+    });
+    for (const p of products) {
+      const item = items.find((i) => i.product.id === p.id);
+      if (item && p.stock < item.quantity) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   async updateProductsStocks(type: 'add' | 'subtract', items: OrderItem[]) {
     const products = await this.productsRepository.find({
       where: { id: In(items.map((i) => i.product.id)) },

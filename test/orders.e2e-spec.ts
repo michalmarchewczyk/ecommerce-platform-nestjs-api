@@ -236,6 +236,25 @@ describe.only('OrdersController (e2e)', () => {
       });
     });
 
+    it('should create failed order', async () => {
+      const createData = generate(OrderCreateDto);
+      createData.items = [{ productId: testProduct.id, quantity: 2147483647 }];
+      createData.delivery = generate(OrderDeliveryDto);
+      createData.delivery.methodId = testDeliveryMethod.id;
+      createData.payment = generate(OrderPaymentDto);
+      createData.payment.methodId = testPaymentMethod.id;
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(createData);
+      expect(response.status).toBe(201);
+      const { products, user, ...expected } = response.body;
+      expect(response.body).toEqual({
+        ...expected,
+        status: 'failed',
+        items: [expect.any(Object)],
+      });
+    });
+
     it('should return error if product does not exist', async () => {
       const createData = generate(OrderCreateDto);
       createData.items = [{ productId: 12345, quantity: 1 }];
@@ -370,6 +389,30 @@ describe.only('OrdersController (e2e)', () => {
         .send(updateData);
       expect(response2.status).toBe(200);
       expect(response2.body.status).toBe(OrderStatus.Open);
+    });
+
+    it('should set status to failed', async () => {
+      const updateData = generate(OrderUpdateDto, true);
+      updateData.status = OrderStatus.Cancelled;
+      updateData.items = [{ productId: testProduct.id, quantity: 2147483647 }];
+      updateData.delivery = generate(OrderDeliveryDto);
+      updateData.delivery.methodId = testDeliveryMethod.id;
+      updateData.payment = generate(OrderPaymentDto);
+      updateData.payment.methodId = testPaymentMethod.id;
+      const response = await request(app.getHttpServer())
+        .patch(`/orders/${testOrderId}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe(OrderStatus.Failed);
+      updateData.items = undefined;
+      updateData.status = OrderStatus.Delivered;
+      const response2 = await request(app.getHttpServer())
+        .patch(`/orders/${testOrderId}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response2.status).toBe(200);
+      expect(response2.body.status).toBe(OrderStatus.Failed);
     });
 
     it('should return error if order does not exist', async () => {

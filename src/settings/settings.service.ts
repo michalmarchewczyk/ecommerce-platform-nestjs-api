@@ -53,7 +53,7 @@ export class SettingsService implements OnModuleInit {
       throw new NotFoundError('setting', 'id', id.toString());
     }
     // TODO: type checking
-    setting.value = data.value ?? setting.defaultValue;
+    setting.value = data.value;
     return this.settingsRepository.save(setting);
   }
 

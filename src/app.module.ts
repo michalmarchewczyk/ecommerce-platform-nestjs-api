@@ -22,6 +22,7 @@ import { OrdersModule } from './orders/orders.module';
 import { ReturnsModule } from './returns/returns.module';
 import { ServiceErrorInterceptor } from './errors/service-error.interceptor';
 import { WishlistsModule } from './wishlists/wishlists.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { WishlistsModule } from './wishlists/wishlists.module';
     OrdersModule,
     ReturnsModule,
     WishlistsModule,
+    SettingsModule,
   ],
   controllers: [],
   providers: [

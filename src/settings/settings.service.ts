@@ -1,11 +1,18 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { Setting } from './entities/setting.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SettingCreateDto } from './dto/setting-create.dto';
 import { NotFoundError } from '../errors/not-found.error';
 import { SettingUpdateDto } from './dto/setting-update.dto';
 import { BUILTIN_SETTINGS } from '../users/builtin-settings.data';
+import { SettingType } from './entities/setting-type.enum';
+import { TypeCheckError } from '../errors/type-check.error';
+import validator from 'validator';
+import isISO4217 = validator.isISO4217;
+import isISO31661Alpha2 = validator.isISO31661Alpha2;
+import { isBooleanString, isNumberString, isString } from 'class-validator';
+import { ConflictError } from '../errors/conflict.error';
 
 @Injectable()
 export class SettingsService implements OnModuleInit {
@@ -36,15 +43,25 @@ export class SettingsService implements OnModuleInit {
   }
 
   async createSetting(data: SettingCreateDto): Promise<Setting> {
-    const setting = new Setting();
-    setting.builtin = data.builtin;
-    setting.name = data.name;
-    setting.description = data.description;
-    setting.type = data.type;
-    // TODO: type checking
-    setting.defaultValue = data.defaultValue;
-    setting.value = data.value ?? data.defaultValue;
-    return this.settingsRepository.save(setting);
+    try {
+      const setting = new Setting();
+      setting.builtin = data.builtin;
+      setting.name = data.name;
+      setting.description = data.description;
+      setting.type = data.type;
+      await this.checkSettingType(
+        setting.type,
+        data.value ?? data.defaultValue,
+      );
+      setting.defaultValue = data.defaultValue;
+      setting.value = data.value ?? data.defaultValue;
+      return await this.settingsRepository.save(setting);
+    } catch (e) {
+      if (e instanceof QueryFailedError) {
+        throw new ConflictError('setting', 'name', data.name);
+      }
+      throw e;
+    }
   }
 
   async updateSetting(id: number, data: SettingUpdateDto): Promise<Setting> {
@@ -52,9 +69,38 @@ export class SettingsService implements OnModuleInit {
     if (!setting) {
       throw new NotFoundError('setting', 'id', id.toString());
     }
-    // TODO: type checking
+    await this.checkSettingType(setting.type, data.value);
     setting.value = data.value;
     return this.settingsRepository.save(setting);
+  }
+
+  private async checkSettingType(type: SettingType, value: string) {
+    if (type === SettingType.CountriesList) {
+      const countries = value.split(',');
+      if (!countries.every((c) => isISO31661Alpha2(c))) {
+        throw new TypeCheckError(
+          'setting value',
+          'array of alpha2 country codes',
+        );
+      }
+    }
+    if (type === SettingType.CurrenciesList) {
+      const currencies = value.split(',');
+      if (!currencies.every((c) => isISO4217(c))) {
+        throw new TypeCheckError('setting value', 'array of currency codes');
+      }
+    }
+    (<[SettingType, (value: string) => boolean][]>[
+      [SettingType.String, isString],
+      [SettingType.Boolean, isBooleanString],
+      [SettingType.Number, isNumberString],
+      [SettingType.Currency, isISO4217],
+      [SettingType.Country, isISO31661Alpha2],
+    ]).forEach((check) => {
+      if (type === check[0] && !check[1](value)) {
+        throw new TypeCheckError('setting value', check[0]);
+      }
+    });
   }
 
   async deleteSetting(id: number): Promise<boolean> {

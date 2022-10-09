@@ -10,6 +10,7 @@ import { setupRbacTests } from './utils/setup-rbac-tests';
 import { Setting } from '../src/settings/entities/setting.entity';
 import { SettingCreateDto } from '../src/settings/dto/setting-create.dto';
 import { SettingUpdateDto } from '../src/settings/dto/setting-update.dto';
+import { SettingType } from '../src/settings/entities/setting-type.enum';
 
 describe('SettingsController (e2e)', () => {
   let app: INestApplication;
@@ -48,6 +49,7 @@ describe('SettingsController (e2e)', () => {
         .set('Cookie', cookieHeader)
         .send({
           ...generate(SettingCreateDto, true),
+          type: 'string',
         })
     ).body;
   });
@@ -91,6 +93,7 @@ describe('SettingsController (e2e)', () => {
   describe('/settings (POST)', () => {
     it('should create setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const response = await request(app.getHttpServer())
         .post('/settings')
         .set('Cookie', cookieHeader)
@@ -117,11 +120,44 @@ describe('SettingsController (e2e)', () => {
         error: 'Bad Request',
       });
     });
+
+    it('should return error if value does not match type', async () => {
+      const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.Boolean;
+      createData.value = 'test';
+      const response = await request(app.getHttpServer())
+        .post('/settings')
+        .set('Cookie', cookieHeader)
+        .send(createData);
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        statusCode: 400,
+        message: ['setting value is not of type boolean'],
+        error: 'Bad Request',
+      });
+    });
+
+    it('should return error if value does not match array type', async () => {
+      const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.CurrenciesList;
+      createData.value = 'test';
+      const response = await request(app.getHttpServer())
+        .post('/settings')
+        .set('Cookie', cookieHeader)
+        .send(createData);
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        statusCode: 400,
+        message: ['setting value is not of type array of currency codes'],
+        error: 'Bad Request',
+      });
+    });
   });
 
   describe('/settings/:id (PATCH)', () => {
     it('should update setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const id = (
         await request(app.getHttpServer())
           .post('/settings')
@@ -157,6 +193,7 @@ describe('SettingsController (e2e)', () => {
 
     it('should return error if data is invalid', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const id = (
         await request(app.getHttpServer())
           .post('/settings')
@@ -176,11 +213,36 @@ describe('SettingsController (e2e)', () => {
         error: 'Bad Request',
       });
     });
+
+    it('should return error if value does not match type', async () => {
+      const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.CountriesList;
+      createData.value = 'US,PL';
+      const id = (
+        await request(app.getHttpServer())
+          .post('/settings')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const updateData = generate(SettingUpdateDto, true);
+      updateData.value = 'test';
+      const response = await request(app.getHttpServer())
+        .patch(`/settings/${id}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        statusCode: 400,
+        message: ['setting value is not of type array of alpha2 country codes'],
+        error: 'Bad Request',
+      });
+    });
   });
 
   describe('/settings/:id (DELETE)', () => {
     it('should delete setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const id = (
         await request(app.getHttpServer())
           .post('/settings')

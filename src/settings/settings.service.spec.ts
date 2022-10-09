@@ -7,6 +7,7 @@ import { SettingCreateDto } from './dto/setting-create.dto';
 import { NotFoundError } from '../errors/not-found.error';
 import { SettingUpdateDto } from './dto/setting-update.dto';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { SettingType } from './entities/setting-type.enum';
 
 describe('SettingsService', () => {
   let service: SettingsService;
@@ -56,6 +57,7 @@ describe('SettingsService', () => {
   describe('createSetting', () => {
     it('should create setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const created = await service.createSetting(createData);
       expect(created).toMatchObject({ ...createData, id: expect.any(Number) });
     });
@@ -64,6 +66,7 @@ describe('SettingsService', () => {
   describe('updateSetting', () => {
     it('should update setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const { id } = await service.createSetting(createData);
       const updateData = generate(SettingUpdateDto, true);
       const updated = await service.updateSetting(id, updateData);
@@ -80,6 +83,7 @@ describe('SettingsService', () => {
   describe('deleteSetting', () => {
     it('should delete setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const { id } = await service.createSetting(createData);
       await service.deleteSetting(id);
       expect(

@@ -8,6 +8,7 @@ import { SettingCreateDto } from './dto/setting-create.dto';
 import { NotFoundError } from '../errors/not-found.error';
 import { SettingUpdateDto } from './dto/setting-update.dto';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { SettingType } from './entities/setting-type.enum';
 
 describe('SettingsController', () => {
   let controller: SettingsController;
@@ -58,6 +59,7 @@ describe('SettingsController', () => {
   describe('createSetting', () => {
     it('should create setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const created = await controller.createSetting(createData);
       expect(created).toMatchObject({ ...createData, id: expect.any(Number) });
     });
@@ -66,6 +68,7 @@ describe('SettingsController', () => {
   describe('updateSetting', () => {
     it('should update setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const { id } = await controller.createSetting(createData);
       const updateData = generate(SettingUpdateDto, true);
       const updated = await controller.updateSetting(id, updateData);
@@ -82,6 +85,7 @@ describe('SettingsController', () => {
   describe('deleteSetting', () => {
     it('should delete setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.type = SettingType.String;
       const { id } = await controller.createSetting(createData);
       await controller.deleteSetting(id);
       expect(

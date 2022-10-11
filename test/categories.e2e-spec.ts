@@ -80,6 +80,7 @@ describe('CategoriesController (e2e)', () => {
       expect(response.body).toContainEqual({
         ...testCategory,
         parentCategory: null,
+        groups: [],
       });
     });
   });
@@ -94,6 +95,7 @@ describe('CategoriesController (e2e)', () => {
         ...testCategory,
         childCategories: [],
         parentCategory: null,
+        groups: [],
       });
     });
 
@@ -137,7 +139,7 @@ describe('CategoriesController (e2e)', () => {
         id: expect.any(Number),
         ...createData,
         slug: null,
-        parentCategory: testCategory,
+        parentCategory: { ...testCategory, groups: [] },
       });
     });
 
@@ -184,6 +186,11 @@ describe('CategoriesController (e2e)', () => {
           .send(createData)
       ).body.id;
       const updateData = generate(CategoryUpdateDto, true);
+      updateData.groups = [
+        {
+          name: 'test group',
+        },
+      ];
       const response = await request(app.getHttpServer())
         .patch('/categories/' + id)
         .set('Cookie', cookieHeader)
@@ -192,6 +199,7 @@ describe('CategoriesController (e2e)', () => {
       expect(response.body).toEqual({
         id,
         ...updateData,
+        groups: [{ name: 'test group', id: expect.any(Number) }],
       });
     });
 
@@ -213,7 +221,8 @@ describe('CategoriesController (e2e)', () => {
       expect(response.body).toEqual({
         id,
         ...updateData,
-        parentCategory: testCategory,
+        groups: [],
+        parentCategory: { ...testCategory, groups: [] },
       });
     });
 

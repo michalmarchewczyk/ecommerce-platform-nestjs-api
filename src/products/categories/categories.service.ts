@@ -7,6 +7,7 @@ import { CategoryCreateDto } from '../dto/category-create.dto';
 import { CategoryUpdateDto } from '../dto/category-update.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 import { NotRelatedError } from '../../errors/not-related.error';
+import { CategoryGroup } from '../entities/category-group.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -15,6 +16,8 @@ export class CategoriesService {
     private categoriesRepository: Repository<Category>,
     @InjectRepository(Product)
     private productsRepository: Repository<Product>,
+    @InjectRepository(CategoryGroup)
+    private categoryGroupsRepository: Repository<CategoryGroup>,
   ) {}
 
   async getCategories(): Promise<Category[]> {
@@ -54,6 +57,20 @@ export class CategoriesService {
     Object.assign(category, categoryData);
     if (categoryData.parentCategoryId) {
       await this.updateParentCategory(category, categoryData.parentCategoryId);
+    }
+    if (categoryData.groups) {
+      category.groups = [];
+      for (const groupData of categoryData.groups) {
+        let group = await this.categoryGroupsRepository.findOne({
+          where: { name: groupData.name },
+        });
+        if (!group) {
+          group = new CategoryGroup();
+          group.name = groupData.name;
+          group = await this.categoryGroupsRepository.save(group);
+        }
+        category.groups.push(group);
+      }
     }
     return this.categoriesRepository.save(category);
   }

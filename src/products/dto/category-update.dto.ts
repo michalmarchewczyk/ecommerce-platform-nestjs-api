@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNotEmptyObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { CategoryGroupDto } from './category-group.dto';
+import { Type } from 'class-transformer';
 
 export class CategoryUpdateDto {
   @IsString()
@@ -16,4 +24,11 @@ export class CategoryUpdateDto {
 
   @IsOptional()
   parentCategoryId?: number;
+
+  @IsOptional()
+  @IsNotEmpty({ each: true })
+  @ValidateNested({ each: true })
+  @IsNotEmptyObject({ nullable: false }, { each: true })
+  @Type(() => CategoryGroupDto)
+  groups?: CategoryGroupDto[];
 }

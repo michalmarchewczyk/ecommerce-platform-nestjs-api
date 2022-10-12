@@ -10,6 +10,7 @@ import { CategoryUpdateDto } from '../dto/category-update.dto';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { NotFoundError } from '../../errors/not-found.error';
+import { CategoryGroup } from '../entities/category-group.entity';
 
 describe('CategoriesController', () => {
   let controller: CategoriesController;
@@ -24,6 +25,7 @@ describe('CategoriesController', () => {
         CategoriesService,
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(Category),
+        RepositoryMockService.getProvider(CategoryGroup),
         DtoGeneratorService,
       ],
     }).compile();
@@ -59,6 +61,7 @@ describe('CategoriesController', () => {
         products: [],
         parentCategory: null,
         slug: null,
+        groups: [],
       });
     });
 
@@ -80,6 +83,7 @@ describe('CategoriesController', () => {
         products: [],
         parentCategory: null,
         slug: null,
+        groups: [],
       });
       expect(
         mockCategoriesRepository.entities.find((c) => c.id === created.id),
@@ -90,6 +94,7 @@ describe('CategoriesController', () => {
         products: [],
         parentCategory: null,
         slug: null,
+        groups: [],
       });
     });
   });
@@ -99,6 +104,7 @@ describe('CategoriesController', () => {
       const createData = generate(CategoryCreateDto);
       const { id } = mockCategoriesRepository.save(createData);
       const updateData = generate(CategoryUpdateDto, true);
+      updateData.groups = [{ name: 'test group' }];
       const updated = await controller.updateCategory(id, updateData);
       expect(updated).toEqual({
         id,
@@ -106,6 +112,9 @@ describe('CategoriesController', () => {
         childCategories: [],
         products: [],
         parentCategory: null,
+        groups: [
+          { id: expect.any(Number), name: 'test group', categories: [] },
+        ],
       });
       expect(
         mockCategoriesRepository.entities.find((c) => c.id === updated.id),
@@ -115,6 +124,9 @@ describe('CategoriesController', () => {
         childCategories: [],
         products: [],
         parentCategory: null,
+        groups: [
+          { id: expect.any(Number), name: 'test group', categories: [] },
+        ],
       });
     });
 

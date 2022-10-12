@@ -9,6 +9,7 @@ import { CategoryUpdateDto } from '../dto/category-update.dto';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { NotFoundError } from '../../errors/not-found.error';
+import { CategoryGroup } from '../entities/category-group.entity';
 
 describe('CategoriesService', () => {
   let service: CategoriesService;
@@ -22,6 +23,7 @@ describe('CategoriesService', () => {
         CategoriesService,
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(Category),
+        RepositoryMockService.getProvider(CategoryGroup),
         DtoGeneratorService,
       ],
     }).compile();
@@ -71,6 +73,7 @@ describe('CategoriesService', () => {
         products: [],
         parentCategory: null,
         slug: null,
+        groups: [],
       });
       expect(
         mockCategoriesRepository.entities.find((c) => c.id === created.id),
@@ -81,6 +84,7 @@ describe('CategoriesService', () => {
         products: [],
         parentCategory: null,
         slug: null,
+        groups: [],
       });
     });
   });
@@ -90,6 +94,7 @@ describe('CategoriesService', () => {
       const createData = generate(CategoryCreateDto);
       const { id } = mockCategoriesRepository.save(createData);
       const updateData = generate(CategoryUpdateDto, true);
+      updateData.groups = [{ name: 'test group' }];
       const updated = await service.updateCategory(id, updateData);
       expect(updated).toEqual({
         ...updateData,
@@ -99,6 +104,9 @@ describe('CategoriesService', () => {
         parentCategory: null,
         parentCategoryId: undefined,
         slug: expect.any(String),
+        groups: [
+          { id: expect.any(Number), name: 'test group', categories: [] },
+        ],
       });
       expect(
         mockCategoriesRepository.entities.find((c) => c.id === updated.id),
@@ -110,6 +118,9 @@ describe('CategoriesService', () => {
         parentCategory: null,
         parentCategoryId: undefined,
         slug: expect.any(String),
+        groups: [
+          { id: expect.any(Number), name: 'test group', categories: [] },
+        ],
       });
     });
 

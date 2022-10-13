@@ -37,6 +37,12 @@ export class CategoriesService {
     return category;
   }
 
+  async getCategoryGroups(): Promise<CategoryGroup[]> {
+    return await this.categoryGroupsRepository.find({
+      relations: ['categories'],
+    });
+  }
+
   async createCategory(categoryData: CategoryCreateDto): Promise<Category> {
     const category = new Category();
     Object.assign(category, categoryData);

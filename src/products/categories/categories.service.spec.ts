@@ -16,6 +16,7 @@ describe('CategoriesService', () => {
   let generate: DtoGeneratorService['generate'];
   let mockProductsRepository: RepositoryMockService<Product>;
   let mockCategoriesRepository: RepositoryMockService<Category>;
+  let mockCategoryGroupsRepository: RepositoryMockService<CategoryGroup>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,6 +35,9 @@ describe('CategoriesService', () => {
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
     mockProductsRepository = module.get(getRepositoryToken(Product));
     mockCategoriesRepository = module.get(getRepositoryToken(Category));
+    mockCategoryGroupsRepository = module.get(
+      getRepositoryToken(CategoryGroup),
+    );
   });
 
   it('should be defined', () => {
@@ -44,6 +48,13 @@ describe('CategoriesService', () => {
     it('should return all categories', async () => {
       const categories = await service.getCategories();
       expect(categories).toEqual(mockCategoriesRepository.entities);
+    });
+  });
+
+  describe('getCategoryGroups', () => {
+    it('should return all category groups', async () => {
+      const categoryGroups = await service.getCategoryGroups();
+      expect(categoryGroups).toEqual(mockCategoryGroupsRepository.entities);
     });
   });
 

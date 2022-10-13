@@ -85,6 +85,16 @@ describe('CategoriesController (e2e)', () => {
     });
   });
 
+  describe('/categories/groups (GET)', () => {
+    it('should return all category groups', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/categories/groups')
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([]);
+    });
+  });
+
   describe('/categories/:id (GET)', () => {
     it('should return category with given id', async () => {
       const response = await request(app.getHttpServer())
@@ -455,6 +465,10 @@ describe('CategoriesController (e2e)', () => {
       [
         [
           '/categories (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        ],
+        [
+          '/categories/groups (GET)',
           [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
         ],
         ['/categories (POST)', [Role.Admin, Role.Manager]],

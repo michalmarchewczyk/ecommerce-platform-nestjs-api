@@ -1,7 +1,9 @@
 import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { SettingType } from '../entities/setting-type.enum';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class SettingCreateDto {
+  @ApiProperty({ type: 'boolean', required: false })
   @IsBoolean()
   builtin = false;
 

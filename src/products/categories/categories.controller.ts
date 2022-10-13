@@ -25,6 +25,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { CategoryGroup } from '../entities/category-group.entity';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -35,6 +36,15 @@ export class CategoriesController {
   @ApiOkResponse({ type: [Category], description: 'List of all categories' })
   async getCategories(): Promise<Category[]> {
     return this.categoriesService.getCategories();
+  }
+
+  @Get('/groups')
+  @ApiOkResponse({
+    type: [CategoryGroup],
+    description: 'List of all category groups',
+  })
+  async getCategoryGroups(): Promise<CategoryGroup[]> {
+    return await this.categoriesService.getCategoryGroups();
   }
 
   @Get('/:id')

@@ -242,6 +242,7 @@ describe('SettingsController (e2e)', () => {
   describe('/settings/:id (DELETE)', () => {
     it('should delete setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.builtin = false;
       createData.type = SettingType.String;
       const id = (
         await request(app.getHttpServer())

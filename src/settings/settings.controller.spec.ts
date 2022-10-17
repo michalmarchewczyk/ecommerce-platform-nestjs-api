@@ -85,6 +85,7 @@ describe('SettingsController', () => {
   describe('deleteSetting', () => {
     it('should delete setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.builtin = false;
       createData.type = SettingType.String;
       const { id } = await controller.createSetting(createData);
       await controller.deleteSetting(id);

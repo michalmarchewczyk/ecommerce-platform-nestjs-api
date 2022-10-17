@@ -83,6 +83,7 @@ describe('SettingsService', () => {
   describe('deleteSetting', () => {
     it('should delete setting', async () => {
       const createData = generate(SettingCreateDto, true);
+      createData.builtin = false;
       createData.type = SettingType.String;
       const { id } = await service.createSetting(createData);
       await service.deleteSetting(id);

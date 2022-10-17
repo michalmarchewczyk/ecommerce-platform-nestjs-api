@@ -105,7 +105,7 @@ export class SettingsService implements OnModuleInit {
 
   async deleteSetting(id: number): Promise<boolean> {
     const setting = await this.settingsRepository.findOne({ where: { id } });
-    if (!setting) {
+    if (!setting || setting.builtin) {
       throw new NotFoundError('setting', 'id', id.toString());
     }
     await this.settingsRepository.delete({ id });

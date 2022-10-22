@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SettingCreateDto } from './dto/setting-create.dto';
 import { NotFoundError } from '../errors/not-found.error';
 import { SettingUpdateDto } from './dto/setting-update.dto';
-import { BUILTIN_SETTINGS } from '../users/builtin-settings.data';
+import { BUILTIN_SETTINGS } from './builtin-settings.data';
 import { SettingType } from './entities/setting-type.enum';
 import { TypeCheckError } from '../errors/type-check.error';
 import validator from 'validator';

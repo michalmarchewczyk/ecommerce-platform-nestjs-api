@@ -1,5 +1,5 @@
-import { SettingCreateDto } from '../settings/dto/setting-create.dto';
-import { SettingType } from '../settings/entities/setting-type.enum';
+import { SettingCreateDto } from './dto/setting-create.dto';
+import { SettingType } from './entities/setting-type.enum';
 
 export const BUILTIN_SETTINGS: SettingCreateDto[] = [
   {
@@ -12,8 +12,8 @@ export const BUILTIN_SETTINGS: SettingCreateDto[] = [
   {
     builtin: true,
     name: 'Countries',
-    description: 'Available countries',
+    description: 'Possible countries for delivery',
     type: SettingType.CountriesList,
-    defaultValue: 'US,CA,GB,FR,DE,IT,ES,JP,PL',
+    defaultValue: 'US,CA',
   },
 ];

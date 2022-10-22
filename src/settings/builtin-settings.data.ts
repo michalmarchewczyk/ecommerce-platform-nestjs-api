@@ -12,8 +12,8 @@ export const BUILTIN_SETTINGS: SettingCreateDto[] = [
   {
     builtin: true,
     name: 'Countries',
-    description: 'Available countries',
+    description: 'Possible countries for delivery',
     type: SettingType.CountriesList,
-    defaultValue: 'US,CA,GB,FR,DE,IT,ES,JP,PL',
+    defaultValue: 'US,CA',
   },
 ];

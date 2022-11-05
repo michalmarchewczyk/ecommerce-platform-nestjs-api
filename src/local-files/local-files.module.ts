@@ -8,5 +8,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [TypeOrmModule.forFeature([ProductPhoto])],
   controllers: [LocalFilesController],
   providers: [LocalFilesService],
+  exports: [LocalFilesService],
 })
 export class LocalFilesModule {}

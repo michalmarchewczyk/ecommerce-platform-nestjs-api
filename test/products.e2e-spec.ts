@@ -390,6 +390,7 @@ describe('ProductsController (e2e)', () => {
             id: expect.any(Number),
             mimeType: 'image/jpeg',
             path: expect.any(String),
+            thumbnailPath: expect.any(String),
           },
         ],
       });
@@ -397,6 +398,7 @@ describe('ProductsController (e2e)', () => {
         id: expect.any(Number),
         mimeType: 'image/jpeg',
         path: expect.any(String),
+        thumbnailPath: expect.any(String),
       });
     });
 

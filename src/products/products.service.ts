@@ -22,7 +22,7 @@ import { TypeCheckError } from '../errors/type-check.error';
 import { parse } from 'json2csv';
 import * as csv from 'csvtojson';
 import { OrderItem } from '../orders/entities/order-item.entity';
-import * as sharp from 'sharp';
+import { LocalFilesService } from '../local-files/local-files.service';
 
 @Injectable()
 export class ProductsService {
@@ -32,6 +32,7 @@ export class ProductsService {
     private attributesRepository: Repository<Attribute>,
     @InjectRepository(AttributeType)
     private attributeTypesRepository: Repository<AttributeType>,
+    private localFilesService: LocalFilesService,
   ) {}
 
   async getProducts(): Promise<Product[]> {
@@ -154,18 +155,11 @@ export class ProductsService {
     const photo = new ProductPhoto();
     photo.path = file.path;
     photo.mimeType = file.mimetype;
-    photo.thumbnailPath = await this.createProductPhotoThumbnail(file.path);
+    photo.thumbnailPath = await this.localFilesService.createPhotoThumbnail(
+      file.path,
+    );
     product.photos.push(photo);
     return this.productsRepository.save(product);
-  }
-
-  async createProductPhotoThumbnail(path: string): Promise<string> {
-    const outputPath = `${path}-thumbnail`;
-    await sharp(path)
-      .resize(200, 200, { fit: 'contain', background: '#ffffff' })
-      .jpeg({ quality: 80 })
-      .toFile(outputPath);
-    return outputPath;
   }
 
   async deleteProductPhoto(id: number, photoId: number): Promise<Product> {

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductPhoto } from '../products/entities/product-photo.entity';
 import { Repository } from 'typeorm';
 import { NotFoundError } from '../errors/not-found.error';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class LocalFilesService {
@@ -19,6 +20,15 @@ export class LocalFilesService {
       throw new NotFoundError('product photo', 'id', id.toString());
     }
     return productPhoto;
+  }
+
+  async createPhotoThumbnail(path: string): Promise<string> {
+    const outputPath = `${path}-thumbnail`;
+    await sharp(path)
+      .resize(200, 200, { fit: 'contain', background: '#ffffff' })
+      .jpeg({ quality: 80 })
+      .toFile(outputPath);
+    return outputPath;
   }
 
   async exportProductPhotos(): Promise<ProductPhoto[]> {

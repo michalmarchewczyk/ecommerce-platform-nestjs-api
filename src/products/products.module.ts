@@ -11,6 +11,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductRatingsModule } from './product-ratings/product-ratings.module';
+import { LocalFilesModule } from '../local-files/local-files.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ProductRatingsModule } from './product-ratings/product-ratings.module';
     }),
     CategoriesModule,
     ProductRatingsModule,
+    LocalFilesModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

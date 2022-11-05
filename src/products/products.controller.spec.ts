@@ -16,6 +16,7 @@ import {
   AttributeValueType,
 } from './entities/attribute-type.entity';
 import { AttributeTypeDto } from './dto/attribute-type.dto';
+import { LocalFilesService } from '../local-files/local-files.service';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -32,6 +33,12 @@ describe('ProductsController', () => {
         RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(AttributeType),
         DtoGeneratorService,
+        {
+          provide: LocalFilesService,
+          useValue: {
+            createPhotoThumbnail: jest.fn((v: string) => v + '-thumbnail'),
+          },
+        },
       ],
     }).compile();
 
@@ -192,6 +199,7 @@ describe('ProductsController', () => {
         {
           path: fileMetadata.path,
           mimeType: 'image/jpeg',
+          thumbnailPath: fileMetadata.path + '-thumbnail',
         },
       ]);
     });

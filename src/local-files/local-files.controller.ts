@@ -131,4 +131,34 @@ export class LocalFilesController {
 
     return res;
   }
+
+  @ApiTags('products')
+  @Get('/:id/thumb')
+  @ApiOkResponse({
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
+    description: 'Product photo thumbnail with given id',
+  })
+  @ApiProduces('image/jpeg')
+  @ApiNotFoundResponse({ description: 'Product photo not found' })
+  async getProductPhotoThumbnail(@Param('id', ParseIntPipe) id: number) {
+    const productPhoto = await this.localFilesService.getProductPhoto(id);
+
+    const stream = createReadStream(
+      path.join(process.cwd(), productPhoto.thumbnailPath),
+    );
+
+    const res = new StreamableFile(stream, {
+      type: productPhoto.mimeType,
+      disposition: 'inline',
+    });
+
+    res.setErrorHandler((err, response) => {
+      response.send('ERROR');
+    });
+
+    return res;
+  }
 }

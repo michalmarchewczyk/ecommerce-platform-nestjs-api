@@ -415,7 +415,28 @@ describe('ProductsController (e2e)', () => {
         .set('Cookie', cookieHeader)
         .attach('file', './test/assets/test.jpg');
       const response2 = await request(app.getHttpServer())
-        .get('/files/' + response.body.photos[0].id)
+        .get(`/products/${id}/photos/${response.body.photos[0].id}`)
+        .set('Cookie', cookieHeader);
+      expect(response2.status).toBe(200);
+      expect(response2.headers['content-type']).toBe('image/jpeg');
+    });
+
+    it('should be able to get product photos thumbnails', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const response2 = await request(app.getHttpServer())
+        .get(
+          `/products/${id}/photos/${response.body.photos[0].id}/?thumbnail=true`,
+        )
         .set('Cookie', cookieHeader);
       expect(response2.status).toBe(200);
       expect(response2.headers['content-type']).toBe('image/jpeg');
@@ -423,7 +444,7 @@ describe('ProductsController (e2e)', () => {
 
     it('should return error if photo not found', async () => {
       const response = await request(app.getHttpServer())
-        .get('/files/' + 12345)
+        .get('/products/' + 123 + '/photos/' + 12345)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
@@ -577,14 +598,14 @@ describe('ProductsController (e2e)', () => {
         ['/products/:id (PATCH)', [Role.Admin, Role.Manager]],
         ['/products/:id (DELETE)', [Role.Admin, Role.Manager]],
         ['/products/:id/attributes (PATCH)', [Role.Admin, Role.Manager]],
+        [
+          '/products/:id/photos/:photoId (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        ],
         ['/products/:id/photos (POST)', [Role.Admin, Role.Manager]],
         ['/products/:id/photos/:photoId (DELETE)', [Role.Admin, Role.Manager]],
         ['/products/export (GET)', [Role.Admin, Role.Manager]],
         ['/products/import (POST)', [Role.Admin, Role.Manager]],
-        [
-          '/files/:id (GET)',
-          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
-        ],
         ['/files/export (GET)', [Role.Admin, Role.Manager]],
         ['/files/import (POST)', [Role.Admin, Role.Manager]],
       ],

@@ -17,6 +17,7 @@ import {
 } from './entities/attribute-type.entity';
 import { AttributeTypeDto } from './dto/attribute-type.dto';
 import { LocalFilesService } from '../local-files/local-files.service';
+import { ProductPhoto } from './entities/product-photo.entity';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -32,6 +33,7 @@ describe('ProductsController', () => {
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(AttributeType),
+        RepositoryMockService.getProvider(ProductPhoto),
         DtoGeneratorService,
         {
           provide: LocalFilesService,

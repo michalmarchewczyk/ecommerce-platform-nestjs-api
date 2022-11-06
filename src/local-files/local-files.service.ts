@@ -13,7 +13,7 @@ export class LocalFilesService {
     private productPhotosRepository: Repository<ProductPhoto>,
   ) {}
 
-  async getPhoto(filepath: string, mimeType = 'image/jpeg') {
+  async getPhoto(filepath: string, mimeType: string) {
     const stream = createReadStream(path.join(process.cwd(), filepath));
 
     const res = new StreamableFile(stream, {

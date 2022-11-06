@@ -24,4 +24,12 @@ export const BUILTIN_SETTINGS: SettingCreateDto[] = [
     type: SettingType.Boolean,
     defaultValue: 'true',
   },
+  {
+    builtin: true,
+    name: 'Thumbnail size',
+    description:
+      'Size of automatically generated thumbnails (in pixels, [SIZE]x[SIZE])',
+    type: SettingType.Number,
+    defaultValue: '400',
+  },
 ];

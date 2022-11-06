@@ -49,8 +49,13 @@ export class LocalFilesService {
 
   async createPhotoThumbnail(path: string): Promise<string> {
     const outputPath = `${path}-thumbnail`;
+    const size = Math.abs(
+      parseInt(
+        await this.settingsService.getSettingValueByName('Thumbnail size'),
+      ),
+    );
     await sharp(path)
-      .resize(200, 200, { fit: 'contain', background: '#ffffff' })
+      .resize(size, size, { fit: 'contain', background: '#ffffff' })
       .jpeg({ quality: 80, mozjpeg: true })
       .toFile(outputPath);
     return outputPath;

@@ -42,6 +42,14 @@ export class SettingsService implements OnModuleInit {
     return setting;
   }
 
+  async getSettingValueByName(name: string): Promise<string> {
+    const setting = await this.settingsRepository.findOne({ where: { name } });
+    if (!setting) {
+      throw new NotFoundError('setting', 'name', name);
+    }
+    return setting.value;
+  }
+
   async createSetting(data: SettingCreateDto): Promise<Setting> {
     try {
       const setting = new Setting();

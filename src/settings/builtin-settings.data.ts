@@ -16,4 +16,12 @@ export const BUILTIN_SETTINGS: SettingCreateDto[] = [
     type: SettingType.CountriesList,
     defaultValue: 'US,CA',
   },
+  {
+    builtin: true,
+    name: 'Convert images to JPEG',
+    description:
+      'Automatically convert uploaded images to JPEG format (recommended)',
+    type: SettingType.Boolean,
+    defaultValue: 'true',
+  },
 ];

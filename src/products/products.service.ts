@@ -174,8 +174,9 @@ export class ProductsService {
       throw new NotFoundError('product', 'id', id.toString());
     }
     const photo = new ProductPhoto();
-    photo.path = file.path;
-    photo.mimeType = file.mimetype;
+    const { path, mimeType } = await this.localFilesService.savePhoto(file);
+    photo.path = path;
+    photo.mimeType = mimeType;
     photo.thumbnailPath = await this.localFilesService.createPhotoThumbnail(
       file.path,
     );

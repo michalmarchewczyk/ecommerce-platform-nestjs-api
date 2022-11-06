@@ -36,6 +36,10 @@ describe('ProductsService', () => {
         {
           provide: LocalFilesService,
           useValue: {
+            savePhoto: jest.fn((v) => ({
+              path: v.path,
+              mimeType: v.mimetype,
+            })),
             createPhotoThumbnail: jest.fn((v: string) => v + '-thumbnail'),
           },
         },

@@ -13,6 +13,7 @@ import { AttributeDto } from '../src/products/dto/attribute.dto';
 import { AttributeTypeDto } from '../src/products/dto/attribute-type.dto';
 import { setupRbacTests } from './utils/setup-rbac-tests';
 import { AttributeValueType } from '../src/products/entities/attribute-type.entity';
+import { SettingsService } from '../src/settings/settings.service';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;
@@ -376,7 +377,7 @@ describe('ProductsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/products/' + id + '/photos')
         .set('Cookie', cookieHeader)
-        .attach('file', './test/assets/test.jpg');
+        .attach('file', './test/assets/test.png');
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
         id: expect.any(Number),
@@ -402,6 +403,84 @@ describe('ProductsController (e2e)', () => {
       });
     });
 
+    it('should add photo to product without conversion', async () => {
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Convert images to JPEG',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.png');
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        id: expect.any(Number),
+        ...createData,
+        visible: true,
+        created: expect.any(String),
+        updated: expect.any(String),
+        attributes: [],
+        photos: [
+          {
+            id: expect.any(Number),
+            mimeType: 'image/png',
+            path: expect.any(String),
+            thumbnailPath: expect.any(String),
+          },
+        ],
+      });
+      expect(response.body.photos[0]).toEqual({
+        id: expect.any(Number),
+        mimeType: 'image/png',
+        path: expect.any(String),
+        thumbnailPath: expect.any(String),
+      });
+    });
+
+    it('should return error if wrong file type', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.txt');
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        statusCode: 400,
+        message:
+          'Validation failed (expected type is /^image\\/(png|jpe?g|gif|webp)/)',
+        error: 'Bad Request',
+      });
+    });
+
+    it('should return error if product not found', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/products/12345/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        message: ['product with id=12345 not found'],
+        error: 'Not Found',
+      });
+    });
+  });
+
+  describe('/products/:id/photos/:photoId (GET)', () => {
     it('should be able to get product photos', async () => {
       const createData = generate(ProductCreateDto);
       const id = (
@@ -450,40 +529,6 @@ describe('ProductsController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         message: ['product photo with id=12345 not found'],
-        error: 'Not Found',
-      });
-    });
-
-    it('should return error if wrong file type', async () => {
-      const createData = generate(ProductCreateDto);
-      const id = (
-        await request(app.getHttpServer())
-          .post('/products')
-          .set('Cookie', cookieHeader)
-          .send(createData)
-      ).body.id;
-      const response = await request(app.getHttpServer())
-        .post('/products/' + id + '/photos')
-        .set('Cookie', cookieHeader)
-        .attach('file', './test/assets/test.txt');
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual({
-        statusCode: 400,
-        message:
-          'Validation failed (expected type is /^image\\/(png|jpe?g|gif|webp)/)',
-        error: 'Bad Request',
-      });
-    });
-
-    it('should return error if product not found', async () => {
-      const response = await request(app.getHttpServer())
-        .post('/products/12345/photos')
-        .set('Cookie', cookieHeader)
-        .attach('file', './test/assets/test.jpg');
-      expect(response.status).toBe(404);
-      expect(response.body).toEqual({
-        statusCode: 404,
-        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });

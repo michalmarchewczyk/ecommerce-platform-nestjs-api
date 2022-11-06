@@ -178,7 +178,6 @@ export class ProductsController {
 
   @Post('/:id/photos')
   @Roles(Role.Admin, Role.Manager)
-  @UseInterceptors(FileInterceptor('file'))
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product not found' })
@@ -195,6 +194,7 @@ export class ProductsController {
     },
   })
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
   async addProductPhoto(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile(

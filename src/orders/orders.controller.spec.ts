@@ -26,6 +26,8 @@ import { PaymentMethod } from './entities/payment-method.entity';
 import { PaymentsService } from './payments/payments.service';
 import { NotFoundError } from '../errors/not-found.error';
 import { AttributeType } from '../products/entities/attribute-type.entity';
+import { LocalFilesService } from '../local-files/local-files.service';
+import { ProductPhoto } from '../products/entities/product-photo.entity';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
@@ -52,7 +54,14 @@ describe('OrdersController', () => {
         RepositoryMockService.getProvider(DeliveryMethod),
         RepositoryMockService.getProvider(PaymentMethod),
         RepositoryMockService.getProvider(AttributeType),
+        RepositoryMockService.getProvider(ProductPhoto),
         DtoGeneratorService,
+        {
+          provide: LocalFilesService,
+          useValue: {
+            createPhotoThumbnail: jest.fn((v: string) => v + '-thumbnail'),
+          },
+        },
       ],
     }).compile();
 

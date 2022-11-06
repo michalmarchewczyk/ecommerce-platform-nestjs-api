@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { In, Repository } from 'typeorm';
@@ -22,6 +22,7 @@ import { TypeCheckError } from '../errors/type-check.error';
 import { parse } from 'json2csv';
 import * as csv from 'csvtojson';
 import { OrderItem } from '../orders/entities/order-item.entity';
+import { LocalFilesService } from '../local-files/local-files.service';
 
 @Injectable()
 export class ProductsService {
@@ -31,6 +32,9 @@ export class ProductsService {
     private attributesRepository: Repository<Attribute>,
     @InjectRepository(AttributeType)
     private attributeTypesRepository: Repository<AttributeType>,
+    @InjectRepository(ProductPhoto)
+    private productPhotosRepository: Repository<ProductPhoto>,
+    private localFilesService: LocalFilesService,
   ) {}
 
   async getProducts(): Promise<Product[]> {
@@ -142,6 +146,25 @@ export class ProductsService {
     });
   }
 
+  async getProductPhoto(
+    productId: number,
+    photoId: number,
+    thumbnail: boolean,
+  ): Promise<StreamableFile> {
+    const productPhoto = await this.productPhotosRepository.findOne({
+      where: { id: photoId, product: { id: productId } },
+    });
+    if (!productPhoto) {
+      throw new NotFoundError('product photo', 'id', photoId.toString());
+    }
+
+    const filepath = thumbnail ? productPhoto.thumbnailPath : productPhoto.path;
+
+    const mimeType = thumbnail ? 'image/jpeg' : productPhoto.mimeType;
+
+    return await this.localFilesService.getPhoto(filepath, mimeType);
+  }
+
   async addProductPhoto(
     id: number,
     file: Express.Multer.File,
@@ -151,8 +174,12 @@ export class ProductsService {
       throw new NotFoundError('product', 'id', id.toString());
     }
     const photo = new ProductPhoto();
-    photo.path = file.path;
-    photo.mimeType = file.mimetype;
+    const { path, mimeType } = await this.localFilesService.savePhoto(file);
+    photo.path = path;
+    photo.mimeType = mimeType;
+    photo.thumbnailPath = await this.localFilesService.createPhotoThumbnail(
+      file.path,
+    );
     product.photos.push(photo);
     return this.productsRepository.save(product);
   }

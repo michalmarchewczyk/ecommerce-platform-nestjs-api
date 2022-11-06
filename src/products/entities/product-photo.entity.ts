@@ -17,4 +17,7 @@ export class ProductPhoto {
 
   @Column()
   mimeType: string;
+
+  @Column()
+  thumbnailPath: string;
 }

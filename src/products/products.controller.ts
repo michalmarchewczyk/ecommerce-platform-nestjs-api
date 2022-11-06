@@ -7,11 +7,13 @@ import {
   Header,
   MaxFileSizeValidator,
   Param,
+  ParseBoolPipe,
   ParseFilePipe,
   ParseIntPipe,
   Patch,
   Post,
   Query,
+  StreamableFile,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -31,6 +33,7 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiProduces,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -151,9 +154,30 @@ export class ProductsController {
     return await this.productsService.updateProductAttributes(id, attributes);
   }
 
+  @Get('/:id/photos/:photoId')
+  @ApiOkResponse({
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
+    description: 'Product photo with given id',
+  })
+  @ApiProduces('image/*')
+  @ApiNotFoundResponse({ description: 'Product photo not found' })
+  async getProductPhoto(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('photoId', ParseIntPipe) photoId: number,
+    @Query('thumbnail', ParseBoolPipe) thumbnail?: boolean,
+  ): Promise<StreamableFile> {
+    return await this.productsService.getProductPhoto(
+      id,
+      photoId,
+      thumbnail ?? false,
+    );
+  }
+
   @Post('/:id/photos')
   @Roles(Role.Admin, Role.Manager)
-  @UseInterceptors(FileInterceptor('file'))
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product not found' })
@@ -170,6 +194,7 @@ export class ProductsController {
     },
   })
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
   async addProductPhoto(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile(

@@ -15,6 +15,8 @@ import {
   AttributeValueType,
 } from './entities/attribute-type.entity';
 import { AttributeTypeDto } from './dto/attribute-type.dto';
+import { LocalFilesService } from '../local-files/local-files.service';
+import { ProductPhoto } from './entities/product-photo.entity';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -29,7 +31,18 @@ describe('ProductsService', () => {
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(AttributeType),
+        RepositoryMockService.getProvider(ProductPhoto),
         DtoGeneratorService,
+        {
+          provide: LocalFilesService,
+          useValue: {
+            savePhoto: jest.fn((v) => ({
+              path: v.path,
+              mimeType: v.mimetype,
+            })),
+            createPhotoThumbnail: jest.fn((v: string) => v + '-thumbnail'),
+          },
+        },
       ],
     }).compile();
 
@@ -191,6 +204,7 @@ describe('ProductsService', () => {
         {
           path: fileMetadata.path,
           mimeType: 'image/jpeg',
+          thumbnailPath: fileMetadata.path + '-thumbnail',
         },
       ]);
     });

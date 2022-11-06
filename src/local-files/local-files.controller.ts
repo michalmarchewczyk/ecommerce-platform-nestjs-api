@@ -3,23 +3,18 @@ import {
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
-  Param,
   ParseFilePipe,
-  ParseIntPipe,
   Post,
   StreamableFile,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { LocalFilesService } from './local-files.service';
-import { createReadStream } from 'fs';
-import * as path from 'path';
 import {
   ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiProduces,
   ApiTags,
@@ -100,35 +95,5 @@ export class LocalFilesController {
   ): Promise<void> {
     const stream = Readable.from(data.buffer);
     stream.pipe(tar.extract({}));
-  }
-
-  @ApiTags('products')
-  @Get('/:id')
-  @ApiOkResponse({
-    schema: {
-      type: 'string',
-      format: 'binary',
-    },
-    description: 'Product photo with given id',
-  })
-  @ApiProduces('image/*')
-  @ApiNotFoundResponse({ description: 'Product photo not found' })
-  async getProductPhoto(@Param('id', ParseIntPipe) id: number) {
-    const productPhoto = await this.localFilesService.getProductPhoto(id);
-
-    const stream = createReadStream(
-      path.join(process.cwd(), productPhoto.path),
-    );
-
-    const res = new StreamableFile(stream, {
-      type: productPhoto.mimeType,
-      disposition: 'inline',
-    });
-
-    res.setErrorHandler((err, response) => {
-      response.send('ERROR');
-    });
-
-    return res;
   }
 }

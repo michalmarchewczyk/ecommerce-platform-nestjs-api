@@ -13,6 +13,7 @@ import { AttributeDto } from '../src/products/dto/attribute.dto';
 import { AttributeTypeDto } from '../src/products/dto/attribute-type.dto';
 import { setupRbacTests } from './utils/setup-rbac-tests';
 import { AttributeValueType } from '../src/products/entities/attribute-type.entity';
+import { SettingsService } from '../src/settings/settings.service';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;
@@ -376,7 +377,7 @@ describe('ProductsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/products/' + id + '/photos')
         .set('Cookie', cookieHeader)
-        .attach('file', './test/assets/test.jpg');
+        .attach('file', './test/assets/test.png');
       expect(response.status).toBe(201);
       expect(response.body).toEqual({
         id: expect.any(Number),
@@ -390,6 +391,7 @@ describe('ProductsController (e2e)', () => {
             id: expect.any(Number),
             mimeType: 'image/jpeg',
             path: expect.any(String),
+            thumbnailPath: expect.any(String),
           },
         ],
       });
@@ -397,10 +399,16 @@ describe('ProductsController (e2e)', () => {
         id: expect.any(Number),
         mimeType: 'image/jpeg',
         path: expect.any(String),
+        thumbnailPath: expect.any(String),
       });
     });
 
-    it('should be able to get product photos', async () => {
+    it('should add photo to product without conversion', async () => {
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Convert images to JPEG',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
       const createData = generate(ProductCreateDto);
       const id = (
         await request(app.getHttpServer())
@@ -411,23 +419,29 @@ describe('ProductsController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/products/' + id + '/photos')
         .set('Cookie', cookieHeader)
-        .attach('file', './test/assets/test.jpg');
-      const response2 = await request(app.getHttpServer())
-        .get('/files/' + response.body.photos[0].id)
-        .set('Cookie', cookieHeader);
-      expect(response2.status).toBe(200);
-      expect(response2.headers['content-type']).toBe('image/jpeg');
-    });
-
-    it('should return error if photo not found', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/files/' + 12345)
-        .set('Cookie', cookieHeader);
-      expect(response.status).toBe(404);
+        .attach('file', './test/assets/test.png');
+      expect(response.status).toBe(201);
       expect(response.body).toEqual({
-        statusCode: 404,
-        message: ['product photo with id=12345 not found'],
-        error: 'Not Found',
+        id: expect.any(Number),
+        ...createData,
+        visible: true,
+        created: expect.any(String),
+        updated: expect.any(String),
+        attributes: [],
+        photos: [
+          {
+            id: expect.any(Number),
+            mimeType: 'image/png',
+            path: expect.any(String),
+            thumbnailPath: expect.any(String),
+          },
+        ],
+      });
+      expect(response.body.photos[0]).toEqual({
+        id: expect.any(Number),
+        mimeType: 'image/png',
+        path: expect.any(String),
+        thumbnailPath: expect.any(String),
       });
     });
 
@@ -461,6 +475,60 @@ describe('ProductsController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 404,
         message: ['product with id=12345 not found'],
+        error: 'Not Found',
+      });
+    });
+  });
+
+  describe('/products/:id/photos/:photoId (GET)', () => {
+    it('should be able to get product photos', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const response2 = await request(app.getHttpServer())
+        .get(`/products/${id}/photos/${response.body.photos[0].id}`)
+        .set('Cookie', cookieHeader);
+      expect(response2.status).toBe(200);
+      expect(response2.headers['content-type']).toBe('image/jpeg');
+    });
+
+    it('should be able to get product photos thumbnails', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const response2 = await request(app.getHttpServer())
+        .get(
+          `/products/${id}/photos/${response.body.photos[0].id}/?thumbnail=true`,
+        )
+        .set('Cookie', cookieHeader);
+      expect(response2.status).toBe(200);
+      expect(response2.headers['content-type']).toBe('image/jpeg');
+    });
+
+    it('should return error if photo not found', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/products/' + 123 + '/photos/' + 12345)
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        message: ['product photo with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -575,14 +643,14 @@ describe('ProductsController (e2e)', () => {
         ['/products/:id (PATCH)', [Role.Admin, Role.Manager]],
         ['/products/:id (DELETE)', [Role.Admin, Role.Manager]],
         ['/products/:id/attributes (PATCH)', [Role.Admin, Role.Manager]],
+        [
+          '/products/:id/photos/:photoId (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        ],
         ['/products/:id/photos (POST)', [Role.Admin, Role.Manager]],
         ['/products/:id/photos/:photoId (DELETE)', [Role.Admin, Role.Manager]],
         ['/products/export (GET)', [Role.Admin, Role.Manager]],
         ['/products/import (POST)', [Role.Admin, Role.Manager]],
-        [
-          '/files/:id (GET)',
-          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
-        ],
         ['/files/export (GET)', [Role.Admin, Role.Manager]],
         ['/files/import (POST)', [Role.Admin, Role.Manager]],
       ],

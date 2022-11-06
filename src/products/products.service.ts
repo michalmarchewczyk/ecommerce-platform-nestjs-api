@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { In, Repository } from 'typeorm';
@@ -32,6 +32,8 @@ export class ProductsService {
     private attributesRepository: Repository<Attribute>,
     @InjectRepository(AttributeType)
     private attributeTypesRepository: Repository<AttributeType>,
+    @InjectRepository(ProductPhoto)
+    private productPhotosRepository: Repository<ProductPhoto>,
     private localFilesService: LocalFilesService,
   ) {}
 
@@ -142,6 +144,25 @@ export class ProductsService {
         throw new TypeCheckError('attribute value', check[0]);
       }
     });
+  }
+
+  async getProductPhoto(
+    productId: number,
+    photoId: number,
+    thumbnail: boolean,
+  ): Promise<StreamableFile> {
+    const productPhoto = await this.productPhotosRepository.findOne({
+      where: { id: photoId, product: { id: productId } },
+    });
+    if (!productPhoto) {
+      throw new NotFoundError('product photo', 'id', photoId.toString());
+    }
+
+    const filepath = thumbnail ? productPhoto.thumbnailPath : productPhoto.path;
+
+    const mimeType = thumbnail ? 'image/jpeg' : productPhoto.mimeType;
+
+    return await this.localFilesService.getPhoto(filepath, mimeType);
   }
 
   async addProductPhoto(

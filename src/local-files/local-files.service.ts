@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, StreamableFile } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductPhoto } from '../products/entities/product-photo.entity';
 import { Repository } from 'typeorm';
-import { NotFoundError } from '../errors/not-found.error';
 import * as sharp from 'sharp';
+import { createReadStream } from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class LocalFilesService {
@@ -12,14 +13,19 @@ export class LocalFilesService {
     private productPhotosRepository: Repository<ProductPhoto>,
   ) {}
 
-  async getProductPhoto(id: number): Promise<ProductPhoto> {
-    const productPhoto = await this.productPhotosRepository.findOne({
-      where: { id },
+  async getPhoto(filepath: string, mimeType = 'image/jpeg') {
+    const stream = createReadStream(path.join(process.cwd(), filepath));
+
+    const res = new StreamableFile(stream, {
+      type: mimeType,
+      disposition: 'inline',
     });
-    if (!productPhoto) {
-      throw new NotFoundError('product photo', 'id', id.toString());
-    }
-    return productPhoto;
+
+    res.setErrorHandler((err, response) => {
+      response.send('ERROR');
+    });
+
+    return res;
   }
 
   async createPhotoThumbnail(path: string): Promise<string> {

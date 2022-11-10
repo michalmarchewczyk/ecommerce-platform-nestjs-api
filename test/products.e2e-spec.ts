@@ -113,6 +113,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: null,
       });
     });
 
@@ -152,6 +153,7 @@ describe('ProductsController (e2e)', () => {
           .send(createData)
       ).body.id;
       const updateData = generate(ProductUpdateDto, true);
+      updateData.photosOrder = '';
       const response = await request(app.getHttpServer())
         .patch('/products/' + id)
         .set('Cookie', cookieHeader)
@@ -278,6 +280,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: null,
         attributes: [
           {
             id: expect.any(Number),
@@ -385,6 +388,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: null,
         attributes: [],
         photos: [
           {
@@ -427,6 +431,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: null,
         attributes: [],
         photos: [
           {
@@ -590,6 +595,7 @@ describe('ProductsController (e2e)', () => {
         .set('Cookie', cookieHeader)
         .attach('data', data, 'products.csv');
       expect(response2.status).toBe(201);
+      console.log('BODY', response2.body);
       expect(response2.body).toContainEqual({
         ...testProduct,
         id: expect.any(Number),
@@ -597,6 +603,7 @@ describe('ProductsController (e2e)', () => {
         photos: expect.any(Array),
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: '',
       });
     });
   });

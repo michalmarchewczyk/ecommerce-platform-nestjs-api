@@ -63,8 +63,23 @@ export class ProductsService {
     if (!product) {
       throw new NotFoundError('product', 'id', id.toString());
     }
+    if (productData.photosOrder) {
+      await this.checkProductPhotosOrder(product, productData.photosOrder);
+    }
     Object.assign(product, productData);
     return this.productsRepository.save(product);
+  }
+
+  async checkProductPhotosOrder(product: Product, newOrder: string) {
+    const photos = product.photos;
+    const sortedPhotos = photos.sort((a, b) => a.id - b.id).map((p) => p.id);
+    const sortedNewOrder = newOrder
+      .split(',')
+      .map((p) => parseInt(p))
+      .sort((a, b) => a - b);
+    if (sortedPhotos.join(',') !== sortedNewOrder.join(',')) {
+      throw new NotFoundError('product photo');
+    }
   }
 
   async deleteProduct(id: number): Promise<boolean> {

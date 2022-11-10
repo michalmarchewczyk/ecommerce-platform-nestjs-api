@@ -30,4 +30,8 @@ export class ProductUpdateDto {
   @Min(0)
   @IsOptional()
   stock?: number;
+
+  @IsString()
+  @IsOptional()
+  photosOrder?: string;
 }

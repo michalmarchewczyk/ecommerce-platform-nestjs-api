@@ -84,6 +84,7 @@ describe('ProductsController', () => {
         created: expect.any(Date),
         updated: expect.any(Date),
         ratings: [],
+        photosOrder: null,
       });
     });
 
@@ -104,6 +105,7 @@ describe('ProductsController', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
+        photosOrder: null,
       });
     });
   });
@@ -113,6 +115,7 @@ describe('ProductsController', () => {
       const createData = generate(ProductCreateDto, true);
       const { id } = await controller.createProduct(createData);
       const updateData = generate(ProductUpdateDto, true);
+      updateData.photosOrder = '';
       const updated = await controller.updateProduct(id, updateData);
       expect(updated).toEqual({
         ...updateData,
@@ -122,6 +125,7 @@ describe('ProductsController', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
+        photosOrder: '',
       });
     });
 
@@ -182,6 +186,7 @@ describe('ProductsController', () => {
         attributes: expectedAttributes,
         created: expect.any(Date),
         updated: expect.any(Date),
+        photosOrder: null,
       });
     });
 

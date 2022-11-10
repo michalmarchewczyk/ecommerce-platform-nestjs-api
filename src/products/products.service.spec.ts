@@ -81,6 +81,7 @@ describe('ProductsService', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
+        photosOrder: null,
       });
     });
   });
@@ -98,6 +99,7 @@ describe('ProductsService', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
+        photosOrder: null,
       });
       expect(
         mockProductsRepository.entities.some((p) => p.name === createData.name),
@@ -110,6 +112,7 @@ describe('ProductsService', () => {
       const createData = generate(ProductCreateDto);
       const { id } = mockProductsRepository.save(createData);
       const updateData = generate(ProductUpdateDto, true);
+      updateData.photosOrder = '';
       const updated = await service.updateProduct(id, updateData);
       expect(updated).toEqual({
         ...updateData,
@@ -178,6 +181,7 @@ describe('ProductsService', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
+        photosOrder: null,
       });
       expect(
         mockProductsRepository.entities.find((p) => p.id === id)?.attributes,

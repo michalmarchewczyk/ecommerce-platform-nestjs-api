@@ -170,6 +170,35 @@ describe('ProductsController (e2e)', () => {
       expect(response.body.created).not.toBe(response.body.updated);
     });
 
+    it('should update product photos order', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const response2 = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.png');
+      const response3 = await request(app.getHttpServer())
+        .patch('/products/' + id)
+        .set('Cookie', cookieHeader)
+        .send({
+          photosOrder:
+            response2.body.photos[1].id + ',' + response.body.photos[0].id,
+        });
+      expect(response3.status).toBe(200);
+      expect(response3.body.photosOrder).toBe(
+        response2.body.photos[1].id + ',' + response.body.photos[0].id,
+      );
+    });
+
     it('should return error if product not found', async () => {
       const updateData = generate(ProductUpdateDto, true);
       const response = await request(app.getHttpServer())
@@ -595,7 +624,6 @@ describe('ProductsController (e2e)', () => {
         .set('Cookie', cookieHeader)
         .attach('data', data, 'products.csv');
       expect(response2.status).toBe(201);
-      console.log('BODY', response2.body);
       expect(response2.body).toContainEqual({
         ...testProduct,
         id: expect.any(Number),

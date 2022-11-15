@@ -113,6 +113,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: null,
       });
     });
 
@@ -152,6 +153,7 @@ describe('ProductsController (e2e)', () => {
           .send(createData)
       ).body.id;
       const updateData = generate(ProductUpdateDto, true);
+      updateData.photosOrder = '';
       const response = await request(app.getHttpServer())
         .patch('/products/' + id)
         .set('Cookie', cookieHeader)
@@ -166,6 +168,35 @@ describe('ProductsController (e2e)', () => {
         photos: [],
       });
       expect(response.body.created).not.toBe(response.body.updated);
+    });
+
+    it('should update product photos order', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const response2 = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.png');
+      const response3 = await request(app.getHttpServer())
+        .patch('/products/' + id)
+        .set('Cookie', cookieHeader)
+        .send({
+          photosOrder:
+            response2.body.photos[1].id + ',' + response.body.photos[0].id,
+        });
+      expect(response3.status).toBe(200);
+      expect(response3.body.photosOrder).toBe(
+        response2.body.photos[1].id + ',' + response.body.photos[0].id,
+      );
     });
 
     it('should return error if product not found', async () => {
@@ -278,6 +309,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: null,
         attributes: [
           {
             id: expect.any(Number),
@@ -385,6 +417,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: null,
         attributes: [],
         photos: [
           {
@@ -427,6 +460,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: null,
         attributes: [],
         photos: [
           {
@@ -597,6 +631,7 @@ describe('ProductsController (e2e)', () => {
         photos: expect.any(Array),
         created: expect.any(String),
         updated: expect.any(String),
+        photosOrder: '',
       });
     });
   });

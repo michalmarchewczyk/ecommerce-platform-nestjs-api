@@ -12,6 +12,7 @@ import { User } from '../../users/entities/user.entity';
 import { NotFoundError } from '../../errors/not-found.error';
 import { ProductRatingPhoto } from '../entities/product-rating-photo.entity';
 import { LocalFilesService } from '../../local-files/local-files.service';
+import { SettingsService } from '../../settings/settings.service';
 
 describe('ProductRatingsController', () => {
   let controller: ProductRatingsController;
@@ -37,6 +38,12 @@ describe('ProductRatingsController', () => {
               mimeType: v.mimetype,
             })),
             createPhotoThumbnail: jest.fn((v: string) => v + '-thumbnail'),
+          },
+        },
+        {
+          provide: SettingsService,
+          useValue: {
+            getSettingValueByName: jest.fn(() => 'true'),
           },
         },
       ],

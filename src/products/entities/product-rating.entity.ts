@@ -3,11 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Product } from './product.entity';
 import { User } from '../../users/entities/user.entity';
+import { ProductRatingPhoto } from './product-rating-photo.entity';
 
 @Entity('product-ratings')
 export class ProductRating {
@@ -33,4 +35,11 @@ export class ProductRating {
 
   @Column({ nullable: true })
   comment?: string;
+
+  @OneToMany(() => ProductRatingPhoto, (photo) => photo.productRating, {
+    eager: true,
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  photos: ProductRatingPhoto[];
 }

@@ -72,7 +72,7 @@ describe('ProductRatingsController (e2e)', () => {
         .get(`/product-ratings/${testProduct.id}`)
         .set('Cookie', cookieHeader);
       const { product, user, ...expected } = testRating;
-      expect(response.body).toContainEqual(expected);
+      expect(response.body).toContainEqual({ ...expected, photos: [] });
     });
 
     it('should return empty array if product not found', async () => {

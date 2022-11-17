@@ -11,6 +11,7 @@ import { Product } from '../src/products/entities/product.entity';
 import { setupRbacTests } from './utils/setup-rbac-tests';
 import { ProductRatingDto } from '../src/products/dto/product-rating.dto';
 import { ProductRating } from '../src/products/entities/product-rating.entity';
+import { SettingsService } from '../src/settings/settings.service';
 
 describe('ProductRatingsController (e2e)', () => {
   let app: INestApplication;
@@ -60,6 +61,10 @@ describe('ProductRatingsController (e2e)', () => {
         .set('Cookie', cookieHeader)
         .send(createData)
     ).body;
+    await request(app.getHttpServer())
+      .post(`/product-ratings/${testProduct.id}/${testRating.id}/photos`)
+      .set('Cookie', cookieHeader)
+      .attach('file', './test/assets/test.jpg');
   });
 
   afterAll(async () => {
@@ -72,7 +77,27 @@ describe('ProductRatingsController (e2e)', () => {
         .get(`/product-ratings/${testProduct.id}`)
         .set('Cookie', cookieHeader);
       const { product, user, ...expected } = testRating;
-      expect(response.body).toContainEqual({ ...expected, photos: [] });
+      expect(response.body).toContainEqual({
+        ...expected,
+        photos: [expect.any(Object)],
+      });
+    });
+
+    it('should return product ratings without photos', async () => {
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Product rating photos',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
+      const response = await request(app.getHttpServer())
+        .get(`/product-ratings/${testProduct.id}`)
+        .set('Cookie', cookieHeader);
+      const { product, user, ...expected } = testRating;
+      expect(response.body).toContainEqual({
+        ...expected,
+        photos: [],
+      });
+      await settings.updateSetting(settingId ?? -1, { value: 'true' });
     });
 
     it('should return empty array if product not found', async () => {
@@ -230,6 +255,314 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
+  describe('/product-ratings/:productId/:id/photos/:photoId (GET)', () => {
+    it('should be able to get product rating photos', async () => {
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const response2 = await request(app.getHttpServer()).get(
+        `/product-ratings/${testProduct.id}/${id}/photos/${response.body.photos[0].id}`,
+      );
+      expect(response2.status).toBe(200);
+      expect(response2.header['content-type']).toBe('image/jpeg');
+    });
+
+    it('should be able to get product rating photos thumbnails', async () => {
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const response2 = await request(app.getHttpServer()).get(
+        `/product-ratings/${testProduct.id}/${id}/photos/${response.body.photos[0].id}?thumbnail=true`,
+      );
+      expect(response2.status).toBe(200);
+      expect(response2.header['content-type']).toBe('image/jpeg');
+    });
+
+    it('should return error if disabled by setting', async () => {
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Product rating photos',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
+      const response2 = await request(app.getHttpServer()).get(
+        `/product-ratings/${testProduct.id}/${id}/photos/${response.body.photos[0].id}`,
+      );
+      expect(response2.status).toBe(404);
+      expect(response2.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating photo not found'],
+      });
+      await settings.updateSetting(settingId ?? -1, { value: 'true' });
+    });
+
+    it('should return error if product not found', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/product-ratings/${12345}/${testRating.id}/photos/${12345}`)
+        .set('Cookie', cookieHeader)
+        .send();
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating photo with id=12345 not found'],
+      });
+    });
+
+    it('should return error if product rating not found', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/product-ratings/${testProduct.id}/${12345}/photos/${12345}`)
+        .set('Cookie', cookieHeader)
+        .send();
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating photo with id=12345 not found'],
+      });
+    });
+
+    it('should return error if product rating photo not found', async () => {
+      const response = await request(app.getHttpServer())
+        .get(
+          `/product-ratings/${testProduct.id}/${testRating.id}/photos/${12345}`,
+        )
+        .set('Cookie', cookieHeader)
+        .send();
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating photo with id=12345 not found'],
+      });
+    });
+  });
+
+  describe('/product-ratings/:productId/:id/photos (POST)', () => {
+    it('should add photo to product rating', async () => {
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        id: expect.any(Number),
+        ...createData,
+        created: expect.any(String),
+        updated: expect.any(String),
+        photos: [
+          {
+            id: expect.any(Number),
+            mimeType: 'image/jpeg',
+            path: expect.any(String),
+            thumbnailPath: expect.any(String),
+          },
+        ],
+      });
+      expect(response.body.photos[0]).toEqual({
+        id: expect.any(Number),
+        mimeType: 'image/jpeg',
+        path: expect.any(String),
+        thumbnailPath: expect.any(String),
+      });
+    });
+
+    it('should return error if wrong file type', async () => {
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.txt');
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        statusCode: 400,
+        message:
+          'Validation failed (expected type is /^image\\/(png|jpe?g|gif|webp)/)',
+        error: 'Bad Request',
+      });
+    });
+
+    it('should return error if disabled by setting', async () => {
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Product rating photos',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating not found'],
+      });
+      await settings.updateSetting(settingId ?? -1, { value: 'true' });
+    });
+
+    it('should return error if product not found', async () => {
+      const response = await request(app.getHttpServer())
+        .post(`/product-ratings/${12345}/${testRating.id}/photos`)
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating with id=1 not found'],
+      });
+    });
+
+    it('should return error if product rating not found', async () => {
+      const response = await request(app.getHttpServer())
+        .post(`/product-ratings/${testProduct.id}/${12345}/photos`)
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating with id=12345 not found'],
+      });
+    });
+  });
+
+  describe('/product-ratings/:productId/:id/photos/:photoId (DELETE)', () => {
+    it('should delete photo from product rating', async () => {
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const photoId = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+          .set('Cookie', cookieHeader)
+          .attach('file', './test/assets/test.jpg')
+      ).body.photos[0].id;
+      const response = await request(app.getHttpServer())
+        .delete(`/product-ratings/${testProduct.id}/${id}/photos/${photoId}`)
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(200);
+      expect(response.body.photos).toEqual([]);
+    });
+
+    it('should return error if disabled by setting', async () => {
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const photoId = (
+        await request(app.getHttpServer())
+          .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+          .set('Cookie', cookieHeader)
+          .attach('file', './test/assets/test.jpg')
+      ).body.photos[0].id;
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Product rating photos',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
+      const response2 = await request(app.getHttpServer())
+        .delete(`/product-ratings/${testProduct.id}/${id}/photos/${photoId}`)
+        .set('Cookie', cookieHeader);
+      expect(response2.status).toBe(404);
+      expect(response2.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating photo not found'],
+      });
+      await settings.updateSetting(settingId ?? -1, { value: 'true' });
+    });
+
+    it('should return error if product not found', async () => {
+      const response = await request(app.getHttpServer())
+        .delete(`/product-ratings/${12345}/${testRating.id}/photos/${12345}`)
+        .set('Cookie', cookieHeader)
+        .send();
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating with id=1 not found'],
+      });
+    });
+
+    it('should return error if product rating not found', async () => {
+      const response = await request(app.getHttpServer())
+        .delete(`/product-ratings/${testProduct.id}/${12345}/photos/${12345}`)
+        .set('Cookie', cookieHeader)
+        .send();
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        error: 'Not Found',
+        message: ['product rating with id=12345 not found'],
+      });
+    });
+  });
+
   describe(
     'RBAC for /product-ratings',
     setupRbacTests(
@@ -250,6 +583,18 @@ describe('ProductRatingsController (e2e)', () => {
         ],
         [
           '/product-ratings/:productId/:id (DELETE)',
+          [Role.Admin, Role.Manager, Role.Sales],
+        ],
+        [
+          '/product-ratings/:productId/:id/photos/:photoId (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        ],
+        [
+          '/product-ratings/:productId/:id/photos (POST)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer],
+        ],
+        [
+          '/product-ratings/:productId/:id/photos/:photoId (DELETE)',
           [Role.Admin, Role.Manager, Role.Sales],
         ],
       ],

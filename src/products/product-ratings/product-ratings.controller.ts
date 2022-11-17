@@ -151,7 +151,7 @@ export class ProductRatingsController {
   }
 
   @Post(':productId/:id/photos')
-  @Roles(Role.Admin, Role.Manager)
+  @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product rating not found' })
@@ -201,7 +201,7 @@ export class ProductRatingsController {
   }
 
   @Delete(':productId/:id/photos/:photoId')
-  @Roles(Role.Admin, Role.Manager)
+  @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product rating not found' })

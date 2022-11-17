@@ -9,6 +9,9 @@ import { ProductCreateDto } from '../dto/product-create.dto';
 import { ProductRatingDto } from '../dto/product-rating.dto';
 import { User } from '../../users/entities/user.entity';
 import { NotFoundError } from '../../errors/not-found.error';
+import { ProductRatingPhoto } from '../entities/product-rating-photo.entity';
+import { LocalFilesService } from '../../local-files/local-files.service';
+import { SettingsService } from '../../settings/settings.service';
 
 describe('ProductRatingsService', () => {
   let service: ProductRatingsService;
@@ -23,7 +26,24 @@ describe('ProductRatingsService', () => {
         ProductRatingsService,
         RepositoryMockService.getProvider(ProductRating),
         RepositoryMockService.getProvider(Product),
+        RepositoryMockService.getProvider(ProductRatingPhoto),
         DtoGeneratorService,
+        {
+          provide: LocalFilesService,
+          useValue: {
+            savePhoto: jest.fn((v) => ({
+              path: v.path,
+              mimeType: v.mimetype,
+            })),
+            createPhotoThumbnail: jest.fn((v: string) => v + '-thumbnail'),
+          },
+        },
+        {
+          provide: SettingsService,
+          useValue: {
+            getSettingValueByName: jest.fn(() => 'true'),
+          },
+        },
       ],
     }).compile();
 
@@ -76,6 +96,7 @@ describe('ProductRatingsService', () => {
         created: expect.any(Date),
         updated: expect.any(Date),
         id: expect.any(Number),
+        photos: [],
       });
     });
 

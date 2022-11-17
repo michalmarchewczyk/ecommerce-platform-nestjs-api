@@ -32,4 +32,11 @@ export const BUILTIN_SETTINGS: SettingCreateDto[] = [
     type: SettingType.Number,
     defaultValue: '400',
   },
+  {
+    builtin: true,
+    name: 'Product rating photos',
+    description: 'Allow users to upload photos for product ratings',
+    type: SettingType.Boolean,
+    defaultValue: 'true',
+  },
 ];

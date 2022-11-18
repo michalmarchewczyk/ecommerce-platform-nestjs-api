@@ -1,5 +1,5 @@
-import { AttributeValueType } from '../entities/attribute-type.entity';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { AttributeValueType } from '../entities/attribute-value-type.enum';
 
 export class AttributeTypeDto {
   @IsString()

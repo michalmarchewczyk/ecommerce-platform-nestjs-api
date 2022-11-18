@@ -11,13 +11,11 @@ import { AttributeDto } from './dto/attribute.dto';
 import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 import { NotFoundError } from '../errors/not-found.error';
-import {
-  AttributeType,
-  AttributeValueType,
-} from './entities/attribute-type.entity';
+import { AttributeType } from './entities/attribute-type.entity';
 import { AttributeTypeDto } from './dto/attribute-type.dto';
 import { LocalFilesService } from '../local-files/local-files.service';
 import { ProductPhoto } from './entities/product-photo.entity';
+import { AttributeValueType } from './entities/attribute-value-type.enum';
 
 describe('ProductsController', () => {
   let controller: ProductsController;

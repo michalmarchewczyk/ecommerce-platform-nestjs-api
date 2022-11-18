@@ -12,8 +12,8 @@ import { ProductUpdateDto } from '../src/products/dto/product-update.dto';
 import { AttributeDto } from '../src/products/dto/attribute.dto';
 import { AttributeTypeDto } from '../src/products/dto/attribute-type.dto';
 import { setupRbacTests } from './utils/setup-rbac-tests';
-import { AttributeValueType } from '../src/products/entities/attribute-type.entity';
 import { SettingsService } from '../src/settings/settings.service';
+import { AttributeValueType } from '../src/products/entities/attribute-value-type.enum';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;

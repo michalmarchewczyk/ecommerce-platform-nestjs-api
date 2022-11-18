@@ -8,10 +8,7 @@ import { Attribute } from './entities/attribute.entity';
 import { AttributeDto } from './dto/attribute.dto';
 import { ProductPhoto } from './entities/product-photo.entity';
 import { NotFoundError } from '../errors/not-found.error';
-import {
-  AttributeType,
-  AttributeValueType,
-} from './entities/attribute-type.entity';
+import { AttributeType } from './entities/attribute-type.entity';
 import {
   isBooleanString,
   isHexColor,
@@ -23,6 +20,7 @@ import { parse } from 'json2csv';
 import * as csv from 'csvtojson';
 import { OrderItem } from '../orders/entities/order-item.entity';
 import { LocalFilesService } from '../local-files/local-files.service';
+import { AttributeValueType } from './entities/attribute-value-type.enum';
 
 @Injectable()
 export class ProductsService {

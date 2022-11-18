@@ -1,12 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Attribute } from './attribute.entity';
-
-export enum AttributeValueType {
-  String = 'string',
-  Number = 'number',
-  Boolean = 'boolean',
-  Color = 'color',
-}
+import { AttributeValueType } from './attribute-value-type.enum';
 
 @Entity('attribute-types')
 export class AttributeType {

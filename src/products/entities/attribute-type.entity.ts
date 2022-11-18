@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Attribute } from './attribute.entity';
 import { AttributeValueType } from './attribute-value-type.enum';
 
-@Entity('attribute-types')
+@Entity('attribute_types')
 export class AttributeType {
   @PrimaryGeneratedColumn()
   id: number;

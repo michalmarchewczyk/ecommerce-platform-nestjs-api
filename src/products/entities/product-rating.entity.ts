@@ -11,7 +11,7 @@ import { Product } from './product.entity';
 import { User } from '../../users/entities/user.entity';
 import { ProductRatingPhoto } from './product-rating-photo.entity';
 
-@Entity('product-ratings')
+@Entity('product_ratings')
 export class ProductRating {
   @PrimaryGeneratedColumn()
   id: number;

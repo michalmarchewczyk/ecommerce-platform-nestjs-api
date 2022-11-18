@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DeliveriesService } from './deliveries.service';
+import { DeliveryMethodsService } from './delivery-methods.service';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { DeliveryMethod } from '../entities/delivery-method.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -7,22 +7,24 @@ import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-gener
 import { DeliveryMethodDto } from '../dto/delivery-method.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
-describe('DeliveriesService', () => {
-  let service: DeliveriesService;
-  let mockDeliveriesRepository: RepositoryMockService<DeliveryMethod>;
+describe('DeliveryMethodsService', () => {
+  let service: DeliveryMethodsService;
+  let mockDeliveryMethodsRepository: RepositoryMockService<DeliveryMethod>;
   let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        DeliveriesService,
+        DeliveryMethodsService,
         RepositoryMockService.getProvider(DeliveryMethod),
         DtoGeneratorService,
       ],
     }).compile();
 
-    service = module.get<DeliveriesService>(DeliveriesService);
-    mockDeliveriesRepository = module.get(getRepositoryToken(DeliveryMethod));
+    service = module.get<DeliveryMethodsService>(DeliveryMethodsService);
+    mockDeliveryMethodsRepository = module.get(
+      getRepositoryToken(DeliveryMethod),
+    );
     generate = module
       .get(DtoGeneratorService)
       .generate.bind(module.get(DtoGeneratorService));
@@ -35,7 +37,7 @@ describe('DeliveriesService', () => {
   describe('getMethods', () => {
     it('should return all delivery methods', async () => {
       const methods = await service.getMethods();
-      expect(methods).toEqual(mockDeliveriesRepository.find());
+      expect(methods).toEqual(mockDeliveryMethodsRepository.find());
     });
   });
 
@@ -71,7 +73,7 @@ describe('DeliveriesService', () => {
       const deleted = await service.deleteMethod(id);
       expect(deleted).toBe(true);
       expect(
-        mockDeliveriesRepository.entities.find((m) => m.id === id),
+        mockDeliveryMethodsRepository.entities.find((m) => m.id === id),
       ).toBeUndefined();
     });
 

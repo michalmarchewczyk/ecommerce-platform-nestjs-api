@@ -16,14 +16,14 @@ import { ForbiddenException } from '@nestjs/common';
 import { OrderUpdateDto } from './dto/order-update.dto';
 import { OrderItemDto } from './dto/order-item.dto';
 import { ProductCreateDto } from '../products/dto/product-create.dto';
-import { DeliveriesService } from './deliveries/deliveries.service';
+import { DeliveryMethodsService } from './delivery-methods/delivery-methods.service';
 import { DeliveryMethod } from './entities/delivery-method.entity';
 import { OrderDeliveryDto } from './dto/order-delivery.dto';
 import { DeliveryMethodDto } from './dto/delivery-method.dto';
 import { OrderPaymentDto } from './dto/order-payment.dto';
 import { PaymentMethodDto } from './dto/payment-method.dto';
 import { PaymentMethod } from './entities/payment-method.entity';
-import { PaymentsService } from './payments/payments.service';
+import { PaymentMethodsService } from './payment-methods/payment-methods.service';
 import { NotFoundError } from '../errors/not-found.error';
 import { AttributeType } from '../products/entities/attribute-type.entity';
 import { LocalFilesService } from '../local-files/local-files.service';
@@ -34,8 +34,8 @@ describe('OrdersController', () => {
   let mockOrdersRepository: RepositoryMockService<Order>;
   let mockUsersRepository: RepositoryMockService<User>;
   let mockProductsRepository: RepositoryMockService<Product>;
-  let mockDeliveriesRepository: RepositoryMockService<DeliveryMethod>;
-  let mockPaymentsRepository: RepositoryMockService<PaymentMethod>;
+  let mockDeliveryMethodsRepository: RepositoryMockService<DeliveryMethod>;
+  let mockPaymentMethodsRepository: RepositoryMockService<PaymentMethod>;
   let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
@@ -45,8 +45,8 @@ describe('OrdersController', () => {
         OrdersService,
         UsersService,
         ProductsService,
-        DeliveriesService,
-        PaymentsService,
+        DeliveryMethodsService,
+        PaymentMethodsService,
         RepositoryMockService.getProvider(Order),
         RepositoryMockService.getProvider(User),
         RepositoryMockService.getProvider(Product),
@@ -69,8 +69,12 @@ describe('OrdersController', () => {
     mockOrdersRepository = module.get(getRepositoryToken(Order));
     mockUsersRepository = module.get(getRepositoryToken(User));
     mockProductsRepository = module.get(getRepositoryToken(Product));
-    mockDeliveriesRepository = module.get(getRepositoryToken(DeliveryMethod));
-    mockPaymentsRepository = module.get(getRepositoryToken(PaymentMethod));
+    mockDeliveryMethodsRepository = module.get(
+      getRepositoryToken(DeliveryMethod),
+    );
+    mockPaymentMethodsRepository = module.get(
+      getRepositoryToken(PaymentMethod),
+    );
     generate = module
       .get(DtoGeneratorService)
       .generate.bind(module.get(DtoGeneratorService));
@@ -109,10 +113,10 @@ describe('OrdersController', () => {
       const { id: productId } = await mockProductsRepository.save(
         generate(ProductCreateDto, false),
       );
-      const { id: deliveryMethodId } = await mockDeliveriesRepository.save(
+      const { id: deliveryMethodId } = await mockDeliveryMethodsRepository.save(
         generate(DeliveryMethodDto, false),
       );
-      const { id: paymentMethodId } = await mockPaymentsRepository.save(
+      const { id: paymentMethodId } = await mockPaymentMethodsRepository.save(
         generate(PaymentMethodDto, false),
       );
       createData.items[0].productId = productId;
@@ -141,10 +145,10 @@ describe('OrdersController', () => {
       const { id: productId } = await mockProductsRepository.save(
         generate(ProductCreateDto, false),
       );
-      const { id: deliveryMethodId } = await mockDeliveriesRepository.save(
+      const { id: deliveryMethodId } = await mockDeliveryMethodsRepository.save(
         generate(DeliveryMethodDto, false),
       );
-      const { id: paymentMethodId } = await mockPaymentsRepository.save(
+      const { id: paymentMethodId } = await mockPaymentMethodsRepository.save(
         generate(PaymentMethodDto, false),
       );
       createData.items[0].productId = productId;
@@ -166,10 +170,10 @@ describe('OrdersController', () => {
       const { id: productId } = await mockProductsRepository.save(
         generate(ProductCreateDto, false),
       );
-      const { id: deliveryMethodId } = await mockDeliveriesRepository.save(
+      const { id: deliveryMethodId } = await mockDeliveryMethodsRepository.save(
         generate(DeliveryMethodDto, false),
       );
-      const { id: paymentMethodId } = await mockPaymentsRepository.save(
+      const { id: paymentMethodId } = await mockPaymentMethodsRepository.save(
         generate(PaymentMethodDto, false),
       );
       createData.items[0].productId = productId;

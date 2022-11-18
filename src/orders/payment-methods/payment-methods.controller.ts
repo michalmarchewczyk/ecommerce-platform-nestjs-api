@@ -8,7 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { PaymentsService } from './payments.service';
+import { PaymentMethodsService } from './payment-methods.service';
 import { PaymentMethod } from '../entities/payment-method.entity';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
 import { Role } from '../../users/entities/role.enum';
@@ -23,10 +23,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-@ApiTags('payments')
-@Controller('payments')
-export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+@ApiTags('payment methods')
+@Controller('payment-methods')
+export class PaymentMethodsController {
+  constructor(private readonly paymentMethodsService: PaymentMethodsService) {}
 
   @Get()
   @ApiOkResponse({
@@ -34,7 +34,7 @@ export class PaymentsController {
     description: 'List all payment methods',
   })
   async getPaymentMethods(): Promise<PaymentMethod[]> {
-    return this.paymentsService.getMethods();
+    return this.paymentMethodsService.getMethods();
   }
 
   @Post()
@@ -49,7 +49,7 @@ export class PaymentsController {
   async createPaymentMethod(
     @Body() methodData: PaymentMethodDto,
   ): Promise<PaymentMethod> {
-    return this.paymentsService.createMethod(methodData);
+    return this.paymentMethodsService.createMethod(methodData);
   }
 
   @Put(':id')
@@ -63,7 +63,7 @@ export class PaymentsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() methodData: PaymentMethodDto,
   ): Promise<PaymentMethod> {
-    return await this.paymentsService.updateMethod(id, methodData);
+    return await this.paymentMethodsService.updateMethod(id, methodData);
   }
 
   @Delete(':id')
@@ -75,6 +75,6 @@ export class PaymentsController {
   async deletePaymentMethod(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    await this.paymentsService.deleteMethod(id);
+    await this.paymentMethodsService.deleteMethod(id);
   }
 }

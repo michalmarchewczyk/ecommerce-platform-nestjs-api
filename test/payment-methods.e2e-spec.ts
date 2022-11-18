@@ -7,9 +7,9 @@ import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
 import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
 import { setupRbacTests } from './utils/setup-rbac-tests';
-import { DeliveryMethodDto } from '../src/orders/dto/delivery-method.dto';
+import { PaymentMethodDto } from '../src/orders/dto/payment-method.dto';
 
-describe.only('DeliveriesController (e2e)', () => {
+describe.only('PaymentMethodsController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
   let cookieHeader: string;
@@ -44,15 +44,15 @@ describe.only('DeliveriesController (e2e)', () => {
     await app.close();
   });
 
-  describe('/deliveries (GET)', () => {
-    it('should return all delivery methods', async () => {
-      const createData = generate(DeliveryMethodDto);
+  describe('/payment-methods (GET)', () => {
+    it('should return all payment methods', async () => {
+      const createData = generate(PaymentMethodDto);
       await request(app.getHttpServer())
-        .post('/deliveries')
+        .post('/payment-methods')
         .set('Cookie', cookieHeader)
         .send(createData);
       const response = await request(app.getHttpServer())
-        .get('/deliveries')
+        .get('/payment-methods')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
       expect(response.body).toContainEqual({
@@ -62,11 +62,11 @@ describe.only('DeliveriesController (e2e)', () => {
     });
   });
 
-  describe('/deliveries (POST)', () => {
-    it('should create a delivery method', async () => {
-      const createData = generate(DeliveryMethodDto);
+  describe('/payment-methods (POST)', () => {
+    it('should create a payment method', async () => {
+      const createData = generate(PaymentMethodDto);
       const response = await request(app.getHttpServer())
-        .post('/deliveries')
+        .post('/payment-methods')
         .set('Cookie', cookieHeader)
         .send(createData);
       expect(response.status).toBe(201);
@@ -78,7 +78,7 @@ describe.only('DeliveriesController (e2e)', () => {
 
     it('should return error if the data is invalid', async () => {
       const response = await request(app.getHttpServer())
-        .post('/deliveries')
+        .post('/payment-methods')
         .set('Cookie', cookieHeader)
         .send({
           name: '',
@@ -97,18 +97,18 @@ describe.only('DeliveriesController (e2e)', () => {
     });
   });
 
-  describe('/deliveries/:id (PUT)', () => {
-    it('should update a delivery method', async () => {
-      const createData = generate(DeliveryMethodDto);
+  describe('/payment-methods/:id (PUT)', () => {
+    it('should update a payment method', async () => {
+      const createData = generate(PaymentMethodDto);
       const { id } = (
         await request(app.getHttpServer())
-          .post('/deliveries')
+          .post('/payment-methods')
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body;
-      const updateData = generate(DeliveryMethodDto);
+      const updateData = generate(PaymentMethodDto);
       const response = await request(app.getHttpServer())
-        .put(`/deliveries/${id}`)
+        .put(`/payment-methods/${id}`)
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(200);
@@ -119,29 +119,29 @@ describe.only('DeliveriesController (e2e)', () => {
     });
 
     it('should return error if method is not found', async () => {
-      const updateData = generate(DeliveryMethodDto);
+      const updateData = generate(PaymentMethodDto);
       const response = await request(app.getHttpServer())
-        .put('/deliveries/12345')
+        .put('/payment-methods/12345')
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['delivery method with id=12345 not found'],
+        message: ['payment method with id=12345 not found'],
         error: 'Not Found',
       });
     });
 
     it('should return error if the data is invalid', async () => {
-      const createData = generate(DeliveryMethodDto);
+      const createData = generate(PaymentMethodDto);
       const { id } = (
         await request(app.getHttpServer())
-          .post('/deliveries')
+          .post('/payment-methods')
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body;
       const response = await request(app.getHttpServer())
-        .put(`/deliveries/${id}`)
+        .put(`/payment-methods/${id}`)
         .set('Cookie', cookieHeader)
         .send({
           name: '',
@@ -160,47 +160,47 @@ describe.only('DeliveriesController (e2e)', () => {
     });
   });
 
-  describe('/deliveries/:id (DELETE)', () => {
-    it('should delete a delivery method', async () => {
-      const createData = generate(DeliveryMethodDto);
+  describe('/payment-methods/:id (DELETE)', () => {
+    it('should delete a payment method', async () => {
+      const createData = generate(PaymentMethodDto);
       const { id } = (
         await request(app.getHttpServer())
-          .post('/deliveries')
+          .post('/payment-methods')
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body;
       const response = await request(app.getHttpServer())
-        .delete(`/deliveries/${id}`)
+        .delete(`/payment-methods/${id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
     });
 
     it('should return error if method is not found', async () => {
       const response = await request(app.getHttpServer())
-        .delete('/deliveries/12345')
+        .delete('/payment-methods/12345')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        message: ['delivery method with id=12345 not found'],
+        message: ['payment method with id=12345 not found'],
         error: 'Not Found',
       });
     });
   });
 
   describe(
-    'RBAC for /deliveries',
+    'RBAC for /payment-methods',
     setupRbacTests(
       () => app,
       () => testUsers,
       [
         [
-          '/deliveries (GET)',
+          '/payment-methods (GET)',
           [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
         ],
-        ['/deliveries (POST)', [Role.Admin]],
-        ['/deliveries/:id (PUT)', [Role.Admin]],
-        ['/deliveries/:id (DELETE)', [Role.Admin]],
+        ['/payment-methods (POST)', [Role.Admin]],
+        ['/payment-methods/:id (PUT)', [Role.Admin]],
+        ['/payment-methods/:id (DELETE)', [Role.Admin]],
       ],
     ),
   );

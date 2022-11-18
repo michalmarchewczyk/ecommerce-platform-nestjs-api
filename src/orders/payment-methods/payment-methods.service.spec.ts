@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PaymentsService } from './payments.service';
+import { PaymentMethodsService } from './payment-methods.service';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { PaymentMethod } from '../entities/payment-method.entity';
@@ -7,22 +7,24 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
-describe('PaymentsService', () => {
-  let service: PaymentsService;
-  let mockPaymentsRepository: RepositoryMockService<PaymentMethod>;
+describe('PaymentMethodsService', () => {
+  let service: PaymentMethodsService;
+  let mockPaymentMethodsRepository: RepositoryMockService<PaymentMethod>;
   let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        PaymentsService,
+        PaymentMethodsService,
         RepositoryMockService.getProvider(PaymentMethod),
         DtoGeneratorService,
       ],
     }).compile();
 
-    service = module.get<PaymentsService>(PaymentsService);
-    mockPaymentsRepository = module.get(getRepositoryToken(PaymentMethod));
+    service = module.get<PaymentMethodsService>(PaymentMethodsService);
+    mockPaymentMethodsRepository = module.get(
+      getRepositoryToken(PaymentMethod),
+    );
     generate = module
       .get(DtoGeneratorService)
       .generate.bind(module.get(DtoGeneratorService));
@@ -35,7 +37,7 @@ describe('PaymentsService', () => {
   describe('getMethods', () => {
     it('should return all payment methods', async () => {
       const methods = await service.getMethods();
-      expect(methods).toEqual(mockPaymentsRepository.find());
+      expect(methods).toEqual(mockPaymentMethodsRepository.find());
     });
   });
 
@@ -71,7 +73,7 @@ describe('PaymentsService', () => {
       const deleted = await service.deleteMethod(id);
       expect(deleted).toBe(true);
       expect(
-        mockPaymentsRepository.entities.find((m) => m.id === id),
+        mockPaymentMethodsRepository.entities.find((m) => m.id === id),
       ).toBeUndefined();
     });
 

@@ -68,7 +68,7 @@ describe.only('OrdersController (e2e)', () => {
     const deliveryMethodData = generate(DeliveryMethodDto);
     testDeliveryMethod = (
       await request(app.getHttpServer())
-        .post('/deliveries')
+        .post('/delivery-methods')
         .set('Cookie', cookieHeader)
         .send(deliveryMethodData)
     ).body;
@@ -76,7 +76,7 @@ describe.only('OrdersController (e2e)', () => {
     const paymentMethodData = generate(PaymentMethodDto);
     testPaymentMethod = (
       await request(app.getHttpServer())
-        .post('/payments')
+        .post('/payment-methods')
         .set('Cookie', cookieHeader)
         .send(paymentMethodData)
     ).body;

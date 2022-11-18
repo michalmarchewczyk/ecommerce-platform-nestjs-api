@@ -8,8 +8,8 @@ import { ProductsService } from '../products/products.service';
 import { OrderUpdateDto } from './dto/order-update.dto';
 import { OrderItem } from './entities/order-item.entity';
 import { OrderDelivery } from './entities/order-delivery.entity';
-import { DeliveriesService } from './deliveries/deliveries.service';
-import { PaymentsService } from './payments/payments.service';
+import { DeliveryMethodsService } from './delivery-methods/delivery-methods.service';
+import { PaymentMethodsService } from './payment-methods/payment-methods.service';
 import { OrderPayment } from './entities/order-payment.entity';
 import { NotFoundError } from '../errors/not-found.error';
 
@@ -20,8 +20,8 @@ export class OrdersService {
     private readonly ordersRepository: Repository<Order>,
     private readonly usersService: UsersService,
     private readonly productsService: ProductsService,
-    private readonly deliveriesService: DeliveriesService,
-    private readonly paymentsService: PaymentsService,
+    private readonly deliveryMethodsService: DeliveryMethodsService,
+    private readonly paymentMethodsService: PaymentMethodsService,
   ) {}
 
   async getOrders(): Promise<Order[]> {
@@ -77,14 +77,14 @@ export class OrdersService {
     order.contactEmail = orderData.contactEmail;
     order.contactPhone = orderData.contactPhone;
     order.message = orderData.message;
-    const deliveryMethod = await this.deliveriesService.getMethod(
+    const deliveryMethod = await this.deliveryMethodsService.getMethod(
       orderData.delivery.methodId,
     );
     const delivery = new OrderDelivery();
     Object.assign(delivery, orderData.delivery);
     order.delivery = delivery;
     order.delivery.method = deliveryMethod;
-    const paymentMethod = await this.paymentsService.getMethod(
+    const paymentMethod = await this.paymentMethodsService.getMethod(
       orderData.payment.methodId,
     );
     const payment = new OrderPayment();
@@ -121,14 +121,14 @@ export class OrdersService {
       }
     }
     if (orderData.delivery) {
-      const deliveryMethod = await this.deliveriesService.getMethod(
+      const deliveryMethod = await this.deliveryMethodsService.getMethod(
         orderData.delivery.methodId,
       );
       Object.assign(order.delivery, orderData.delivery);
       order.delivery.method = deliveryMethod;
     }
     if (orderData.payment) {
-      const paymentMethod = await this.paymentsService.getMethod(
+      const paymentMethod = await this.paymentMethodsService.getMethod(
         orderData.payment.methodId,
       );
       Object.assign(order.payment, orderData.payment);

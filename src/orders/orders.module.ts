@@ -6,9 +6,9 @@ import { Order } from './entities/order.entity';
 import { UsersModule } from '../users/users.module';
 import { ProductsModule } from '../products/products.module';
 import { OrderItem } from './entities/order-item.entity';
-import { DeliveriesModule } from './deliveries/deliveries.module';
+import { DeliveryMethodsModule } from './delivery-methods/delivery-methods.module';
 import { OrderDelivery } from './entities/order-delivery.entity';
-import { PaymentsModule } from './payments/payments.module';
+import { PaymentMethodsModule } from './payment-methods/payment-methods.module';
 import { OrderPayment } from './entities/order-payment.entity';
 import { OrdersSubscriber } from './orders.subscriber';
 
@@ -17,8 +17,8 @@ import { OrdersSubscriber } from './orders.subscriber';
     TypeOrmModule.forFeature([Order, OrderItem, OrderDelivery, OrderPayment]),
     UsersModule,
     ProductsModule,
-    DeliveriesModule,
-    PaymentsModule,
+    DeliveryMethodsModule,
+    PaymentMethodsModule,
   ],
   providers: [OrdersService, OrdersSubscriber],
   controllers: [OrdersController],

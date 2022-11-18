@@ -7,7 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { DeliveriesService } from './deliveries.service';
+import { DeliveryMethodsService } from './delivery-methods.service';
 import { DeliveryMethod } from '../entities/delivery-method.entity';
 import { DeliveryMethodDto } from '../dto/delivery-method.dto';
 import { Roles } from '../../auth/roles.decorator';
@@ -22,10 +22,12 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-@ApiTags('deliveries')
-@Controller('deliveries')
-export class DeliveriesController {
-  constructor(private readonly deliveriesService: DeliveriesService) {}
+@ApiTags('delivery methods')
+@Controller('delivery-methods')
+export class DeliveryMethodsController {
+  constructor(
+    private readonly deliveryMethodsService: DeliveryMethodsService,
+  ) {}
 
   @Get()
   @ApiOkResponse({
@@ -33,7 +35,7 @@ export class DeliveriesController {
     description: 'List all delivery methods',
   })
   async getDeliveryMethods(): Promise<DeliveryMethod[]> {
-    return this.deliveriesService.getMethods();
+    return this.deliveryMethodsService.getMethods();
   }
 
   @Post()
@@ -48,7 +50,7 @@ export class DeliveriesController {
   async createDeliveryMethod(
     @Body() body: DeliveryMethodDto,
   ): Promise<DeliveryMethod> {
-    return this.deliveriesService.createMethod(body);
+    return this.deliveryMethodsService.createMethod(body);
   }
 
   @Put(':id')
@@ -65,7 +67,7 @@ export class DeliveriesController {
     @Param('id') id: number,
     @Body() body: DeliveryMethodDto,
   ): Promise<DeliveryMethod> {
-    return await this.deliveriesService.updateMethod(id, body);
+    return await this.deliveryMethodsService.updateMethod(id, body);
   }
 
   @Delete(':id')
@@ -75,6 +77,6 @@ export class DeliveriesController {
   @ApiNotFoundResponse({ description: 'Delivery method not found' })
   @ApiOkResponse({ description: 'Delivery method deleted' })
   async deleteDeliveryMethod(@Param('id') id: number): Promise<void> {
-    await this.deliveriesService.deleteMethod(id);
+    await this.deliveryMethodsService.deleteMethod(id);
   }
 }

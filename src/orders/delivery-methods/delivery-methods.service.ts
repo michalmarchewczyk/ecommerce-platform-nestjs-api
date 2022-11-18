@@ -6,18 +6,20 @@ import { DeliveryMethodDto } from '../dto/delivery-method.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
 @Injectable()
-export class DeliveriesService {
+export class DeliveryMethodsService {
   constructor(
     @InjectRepository(DeliveryMethod)
-    private readonly deliveriesRepository: Repository<DeliveryMethod>,
+    private readonly deliveryMethodsRepository: Repository<DeliveryMethod>,
   ) {}
 
   async getMethods(): Promise<DeliveryMethod[]> {
-    return this.deliveriesRepository.find();
+    return this.deliveryMethodsRepository.find();
   }
 
   async getMethod(id: number): Promise<DeliveryMethod> {
-    const method = await this.deliveriesRepository.findOne({ where: { id } });
+    const method = await this.deliveryMethodsRepository.findOne({
+      where: { id },
+    });
     if (!method) {
       throw new NotFoundError('delivery method', 'id', id.toString());
     }
@@ -29,29 +31,33 @@ export class DeliveriesService {
     method.name = methodData.name;
     method.description = methodData.description;
     method.price = methodData.price;
-    return this.deliveriesRepository.save(method);
+    return this.deliveryMethodsRepository.save(method);
   }
 
   async updateMethod(
     id: number,
     methodData: DeliveryMethodDto,
   ): Promise<DeliveryMethod> {
-    const method = await this.deliveriesRepository.findOne({ where: { id } });
+    const method = await this.deliveryMethodsRepository.findOne({
+      where: { id },
+    });
     if (!method) {
       throw new NotFoundError('delivery method', 'id', id.toString());
     }
     method.name = methodData.name;
     method.description = methodData.description;
     method.price = methodData.price;
-    return this.deliveriesRepository.save(method);
+    return this.deliveryMethodsRepository.save(method);
   }
 
   async deleteMethod(id: number): Promise<boolean> {
-    const method = await this.deliveriesRepository.findOne({ where: { id } });
+    const method = await this.deliveryMethodsRepository.findOne({
+      where: { id },
+    });
     if (!method) {
       throw new NotFoundError('delivery method', 'id', id.toString());
     }
-    await this.deliveriesRepository.delete({ id });
+    await this.deliveryMethodsRepository.delete({ id });
     return true;
   }
 }

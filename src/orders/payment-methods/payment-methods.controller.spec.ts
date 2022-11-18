@@ -1,30 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PaymentsController } from './payments.controller';
+import { PaymentMethodsController } from './payment-methods.controller';
 import { PaymentMethod } from '../entities/payment-method.entity';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { PaymentsService } from './payments.service';
+import { PaymentMethodsService } from './payment-methods.service';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
-describe('PaymentsController', () => {
-  let controller: PaymentsController;
-  let mockPaymentsRepository: RepositoryMockService<PaymentMethod>;
+describe('PaymentMethodsController', () => {
+  let controller: PaymentMethodsController;
+  let mockPaymentMethodsRepository: RepositoryMockService<PaymentMethod>;
   let generate: DtoGeneratorService['generate'];
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [PaymentsController],
+      controllers: [PaymentMethodsController],
       providers: [
-        PaymentsService,
+        PaymentMethodsService,
         RepositoryMockService.getProvider(PaymentMethod),
         DtoGeneratorService,
       ],
     }).compile();
 
-    controller = module.get<PaymentsController>(PaymentsController);
-    mockPaymentsRepository = module.get(getRepositoryToken(PaymentMethod));
+    controller = module.get<PaymentMethodsController>(PaymentMethodsController);
+    mockPaymentMethodsRepository = module.get(
+      getRepositoryToken(PaymentMethod),
+    );
     generate = module
       .get(DtoGeneratorService)
       .generate.bind(module.get(DtoGeneratorService));
@@ -37,7 +39,7 @@ describe('PaymentsController', () => {
   describe('getMethods', () => {
     it('should return all payment methods', async () => {
       const methods = await controller.getPaymentMethods();
-      expect(methods).toEqual(mockPaymentsRepository.find());
+      expect(methods).toEqual(mockPaymentMethodsRepository.find());
     });
   });
 
@@ -72,7 +74,7 @@ describe('PaymentsController', () => {
       const { id } = await controller.createPaymentMethod(createData);
       await controller.deletePaymentMethod(id);
       expect(
-        mockPaymentsRepository.entities.find((m) => m.id === id),
+        mockPaymentMethodsRepository.entities.find((m) => m.id === id),
       ).toBeUndefined();
     });
 

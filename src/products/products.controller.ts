@@ -7,13 +7,11 @@ import {
   Header,
   MaxFileSizeValidator,
   Param,
-  ParseBoolPipe,
   ParseFilePipe,
   ParseIntPipe,
   Patch,
   Post,
   Query,
-  StreamableFile,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -33,7 +31,6 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiProduces,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -152,74 +149,5 @@ export class ProductsController {
     @Body() attributes: AttributeDto[],
   ): Promise<Product> {
     return await this.productsService.updateProductAttributes(id, attributes);
-  }
-
-  @Get('/:id/photos/:photoId')
-  @ApiOkResponse({
-    schema: {
-      type: 'string',
-      format: 'binary',
-    },
-    description: 'Product photo with given id',
-  })
-  @ApiProduces('image/*')
-  @ApiNotFoundResponse({ description: 'Product photo not found' })
-  async getProductPhoto(
-    @Param('id', ParseIntPipe) id: number,
-    @Param('photoId', ParseIntPipe) photoId: number,
-    @Query('thumbnail', ParseBoolPipe) thumbnail?: boolean,
-  ): Promise<StreamableFile> {
-    return await this.productsService.getProductPhoto(
-      id,
-      photoId,
-      thumbnail ?? false,
-    );
-  }
-
-  @Post('/:id/photos')
-  @Roles(Role.Admin, Role.Manager)
-  @ApiUnauthorizedResponse({ description: 'User not logged in' })
-  @ApiForbiddenResponse({ description: 'User not authorized' })
-  @ApiNotFoundResponse({ description: 'Product not found' })
-  @ApiCreatedResponse({ type: Product, description: 'Product photo added' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
-  async addProductPhoto(
-    @Param('id', ParseIntPipe) id: number,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
-          new FileTypeValidator({ fileType: /^image\/(png|jpe?g|gif|webp)/ }),
-        ],
-      }),
-    )
-    file: Express.Multer.File,
-  ): Promise<Product> {
-    return await this.productsService.addProductPhoto(id, file);
-  }
-
-  @Delete('/:id/photos/:photoId')
-  @Roles(Role.Admin, Role.Manager)
-  @ApiUnauthorizedResponse({ description: 'User not logged in' })
-  @ApiForbiddenResponse({ description: 'User not authorized' })
-  @ApiNotFoundResponse({ description: 'Product not found' })
-  @ApiOkResponse({ type: Product, description: 'Product photo deleted' })
-  async deleteProductPhoto(
-    @Param('id', ParseIntPipe) id: number,
-    @Param('photoId', ParseIntPipe) photoId: number,
-  ): Promise<Product> {
-    return await this.productsService.deleteProductPhoto(id, photoId);
   }
 }

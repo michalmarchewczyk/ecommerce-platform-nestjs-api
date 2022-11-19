@@ -8,13 +8,10 @@ import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generato
 import { ProductCreateDto } from './dto/product-create.dto';
 import { ProductUpdateDto } from './dto/product-update.dto';
 import { AttributeDto } from './dto/attribute.dto';
-import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
 import { NotFoundError } from '../errors/not-found.error';
 import { AttributeType } from './entities/attribute-type.entity';
 import { AttributeTypeDto } from './dto/attribute-type.dto';
-import { LocalFilesService } from '../local-files/local-files.service';
-import { ProductPhoto } from './entities/product-photo.entity';
 import { AttributeValueType } from './entities/attribute-value-type.enum';
 
 describe('ProductsController', () => {
@@ -31,18 +28,7 @@ describe('ProductsController', () => {
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(AttributeType),
-        RepositoryMockService.getProvider(ProductPhoto),
         DtoGeneratorService,
-        {
-          provide: LocalFilesService,
-          useValue: {
-            savePhoto: jest.fn((v) => ({
-              path: v.path,
-              mimeType: v.mimetype,
-            })),
-            createPhotoThumbnail: jest.fn((v: string) => v + '-thumbnail'),
-          },
-        },
       ],
     }).compile();
 
@@ -192,54 +178,6 @@ describe('ProductsController', () => {
       await expect(
         controller.updateProductAttributes(12345, []),
       ).rejects.toThrow(NotFoundError);
-    });
-  });
-
-  describe('addProductPhoto', () => {
-    it('should add product photo', async () => {
-      const createData = generate(ProductCreateDto);
-      const { id } = mockProductsRepository.save(createData);
-      const fileMetadata = generateFileMetadata();
-      const updated = await controller.addProductPhoto(id, fileMetadata);
-      expect(updated.photos).toHaveLength(1);
-      expect(
-        mockProductsRepository.entities.find((p) => p.id === id)?.photos,
-      ).toEqual([
-        {
-          path: fileMetadata.path,
-          mimeType: 'image/jpeg',
-          thumbnailPath: fileMetadata.path + '-thumbnail',
-        },
-      ]);
-    });
-
-    it('should throw error when product not found', async () => {
-      const fileMetadata = generateFileMetadata();
-      await expect(
-        controller.addProductPhoto(12345, fileMetadata),
-      ).rejects.toThrow(NotFoundError);
-    });
-  });
-
-  describe('deleteProductPhoto', () => {
-    it('should delete product photo', async () => {
-      const createData = generate(ProductCreateDto);
-      const { id } = mockProductsRepository.save(createData);
-      const photoId = (
-        await controller.addProductPhoto(id, generateFileMetadata())
-      ).photos[0].id;
-      const updated = await controller.deleteProductPhoto(id, photoId);
-      expect(updated).toBeDefined();
-      expect(updated.photos).toHaveLength(0);
-      expect(
-        mockProductsRepository.entities.find((p) => p.id === id)?.photos,
-      ).toEqual([]);
-    });
-
-    it('should throw error when product not found', async () => {
-      await expect(controller.deleteProductPhoto(12345, 12345)).rejects.toThrow(
-        NotFoundError,
-      );
     });
   });
 });

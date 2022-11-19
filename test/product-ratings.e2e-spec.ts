@@ -71,7 +71,7 @@ describe('ProductRatingsController (e2e)', () => {
     await app.close();
   });
 
-  describe('/product-ratings/:productId (GET)', () => {
+  describe('/products/:productId/ratings (GET)', () => {
     it('should return product ratings', async () => {
       const response = await request(app.getHttpServer())
         .get(`/products/${testProduct.id}/ratings`)
@@ -109,7 +109,7 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
-  describe('/product-ratings/:productId (POST)', () => {
+  describe('/products/:productId/ratings (POST)', () => {
     it('should create product rating', async () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
@@ -255,7 +255,7 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
-  describe('/products/:productId/:id/photos/:photoId (GET)', () => {
+  describe('/products/:productId/ratings/:id/photos/:photoId (GET)', () => {
     it('should be able to get product rating photos', async () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
@@ -370,7 +370,7 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
-  describe('/products/:productId/:id/photos (POST)', () => {
+  describe('/products/:productId/ratings/:id/photos (POST)', () => {
     it('should add photo to product rating', async () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
@@ -483,7 +483,7 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
-  describe('/products/:productId/:id/photos/:photoId (DELETE)', () => {
+  describe('/products/:productId/ratings/:id/photos/:photoId (DELETE)', () => {
     it('should delete photo from product rating', async () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;

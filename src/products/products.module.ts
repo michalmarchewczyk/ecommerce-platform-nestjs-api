@@ -5,28 +5,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { AttributeType } from './entities/attribute-type.entity';
 import { Attribute } from './entities/attribute.entity';
-import { ProductPhoto } from './entities/product-photo.entity';
 import { AttributeTypesModule } from './attribute-types/attribute-types.module';
-import { MulterModule } from '@nestjs/platform-express';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductRatingsModule } from './product-ratings/product-ratings.module';
-import { LocalFilesModule } from '../local-files/local-files.module';
+import { ProductPhotosModule } from './product-photos/product-photos.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Product, Attribute, AttributeType, ProductPhoto]),
+    TypeOrmModule.forFeature([Product, Attribute, AttributeType]),
     AttributeTypesModule,
-    MulterModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        dest: configService.get<string>('uploadPath'),
-      }),
-      inject: [ConfigService],
-    }),
     CategoriesModule,
     ProductRatingsModule,
-    LocalFilesModule,
+    ProductPhotosModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

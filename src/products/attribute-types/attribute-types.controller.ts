@@ -9,7 +9,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { AttributeType } from '../entities/attribute-type.entity';
-import { AttributesService } from './attributes.service';
+import { AttributeTypesService } from './attribute-types.service';
 import { Roles } from '../../auth/roles.decorator';
 import { Role } from '../../users/entities/role.enum';
 import { AttributeTypeDto } from '../dto/attribute-type.dto';
@@ -23,12 +23,12 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-@ApiTags('attributes')
+@ApiTags('attribute types')
 @ApiUnauthorizedResponse({ description: 'User not logged in' })
 @ApiForbiddenResponse({ description: 'User not authorized' })
-@Controller('attributes')
-export class AttributesController {
-  constructor(private readonly attributesService: AttributesService) {}
+@Controller('attribute-types')
+export class AttributeTypesController {
+  constructor(private readonly attributeTypesService: AttributeTypesService) {}
 
   @Get()
   @Roles(Role.Admin, Role.Manager)
@@ -37,7 +37,7 @@ export class AttributesController {
     description: 'List of attribute types',
   })
   async getAttributeTypes(): Promise<AttributeType[]> {
-    return this.attributesService.getAttributeTypes();
+    return this.attributeTypesService.getAttributeTypes();
   }
 
   @Post()
@@ -50,7 +50,7 @@ export class AttributesController {
   async createAttributeType(
     @Body() attributeType: AttributeTypeDto,
   ): Promise<AttributeType> {
-    return this.attributesService.createAttributeType(attributeType);
+    return this.attributeTypesService.createAttributeType(attributeType);
   }
 
   @Put('/:id')
@@ -62,7 +62,10 @@ export class AttributesController {
     @Param('id', ParseIntPipe) id: number,
     @Body() attributeType: AttributeTypeDto,
   ): Promise<AttributeType> {
-    return await this.attributesService.updateAttributeType(id, attributeType);
+    return await this.attributeTypesService.updateAttributeType(
+      id,
+      attributeType,
+    );
   }
 
   @Delete('/:id')
@@ -72,6 +75,6 @@ export class AttributesController {
   async deleteAttributeType(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
-    await this.attributesService.deleteAttributeType(id);
+    await this.attributeTypesService.deleteAttributeType(id);
   }
 }

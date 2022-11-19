@@ -288,7 +288,7 @@ describe('ProductsController (e2e)', () => {
       attributeTypeData.valueType = AttributeValueType.String;
       const attrId = (
         await request(app.getHttpServer())
-          .post('/attributes')
+          .post('/attribute-types')
           .set('Cookie', cookieHeader)
           .send(attributeTypeData)
       ).body.id;
@@ -336,7 +336,7 @@ describe('ProductsController (e2e)', () => {
       attributeTypeData.valueType = AttributeValueType.Number;
       const attrId = (
         await request(app.getHttpServer())
-          .post('/attributes')
+          .post('/attribute-types')
           .set('Cookie', cookieHeader)
           .send(attributeTypeData)
       ).body.id;

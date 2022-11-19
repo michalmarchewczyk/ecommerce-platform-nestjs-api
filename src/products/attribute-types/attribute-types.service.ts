@@ -6,7 +6,7 @@ import { AttributeTypeDto } from '../dto/attribute-type.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
 @Injectable()
-export class AttributesService {
+export class AttributeTypesService {
   constructor(
     @InjectRepository(AttributeType)
     readonly attributeTypesRepository: Repository<AttributeType>,

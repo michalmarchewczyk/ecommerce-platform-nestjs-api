@@ -21,7 +21,7 @@ describe('ProductsController', () => {
   let controller: ProductsController;
   let generate: DtoGeneratorService['generate'];
   let mockProductsRepository: RepositoryMockService<Product>;
-  let mockAttributesTypesRepository: RepositoryMockService<AttributeType>;
+  let mockAttributeTypesRepository: RepositoryMockService<AttributeType>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -51,7 +51,7 @@ describe('ProductsController', () => {
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));
     mockProductsRepository = module.get(getRepositoryToken(Product));
-    mockAttributesTypesRepository = module.get(
+    mockAttributeTypesRepository = module.get(
       getRepositoryToken(AttributeType),
     );
   });
@@ -158,7 +158,7 @@ describe('ProductsController', () => {
       const attributeTypeData = generate(AttributeTypeDto);
       attributeTypeData.valueType = AttributeValueType.String;
       const { id: attrId } =
-        mockAttributesTypesRepository.save(attributeTypeData);
+        mockAttributeTypesRepository.save(attributeTypeData);
       let attributesData = generate(AttributeDto, false, 4);
       attributesData = attributesData.map((a) => ({ ...a, typeId: attrId }));
       const updated = await controller.updateProductAttributes(

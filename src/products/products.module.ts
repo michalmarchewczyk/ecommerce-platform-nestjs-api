@@ -6,7 +6,7 @@ import { Product } from './entities/product.entity';
 import { AttributeType } from './entities/attribute-type.entity';
 import { Attribute } from './entities/attribute.entity';
 import { ProductPhoto } from './entities/product-photo.entity';
-import { AttributesModule } from './attributes/attributes.module';
+import { AttributeTypesModule } from './attribute-types/attribute-types.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
@@ -16,7 +16,7 @@ import { LocalFilesModule } from '../local-files/local-files.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Product, Attribute, AttributeType, ProductPhoto]),
-    AttributesModule,
+    AttributeTypesModule,
     MulterModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

@@ -10,7 +10,7 @@ import { AttributeType } from '../src/products/entities/attribute-type.entity';
 import { AttributeTypeDto } from '../src/products/dto/attribute-type.dto';
 import { setupRbacTests } from './utils/setup-rbac-tests';
 
-describe('AttributesController (e2e)', () => {
+describe('AttributeTypesController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
   let cookieHeader: string;
@@ -43,7 +43,7 @@ describe('AttributesController (e2e)', () => {
 
     testAttributeType = (
       await request(app.getHttpServer())
-        .post('/attributes')
+        .post('/attribute-types')
         .set('Cookie', cookieHeader)
         .send({
           name: 'Test attribute',
@@ -56,21 +56,21 @@ describe('AttributesController (e2e)', () => {
     await app.close();
   });
 
-  describe('/attributes (GET)', () => {
+  describe('/attribute-types (GET)', () => {
     it('should return all attribute types', async () => {
       const response = await request(app.getHttpServer())
-        .get('/attributes')
+        .get('/attribute-types')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
       expect(response.body).toContainEqual(testAttributeType);
     });
   });
 
-  describe('/attributes (POST)', () => {
+  describe('/attribute-types (POST)', () => {
     it('should create new attribute type', async () => {
       const createData = generate(AttributeTypeDto);
       const response = await request(app.getHttpServer())
-        .post('/attributes')
+        .post('/attribute-types')
         .set('Cookie', cookieHeader)
         .send(createData);
       expect(response.status).toBe(201);
@@ -82,7 +82,7 @@ describe('AttributesController (e2e)', () => {
 
     it('should return error when data is invalid', async () => {
       const response = await request(app.getHttpServer())
-        .post('/attributes')
+        .post('/attribute-types')
         .set('Cookie', cookieHeader)
         .send({
           name: '',
@@ -100,18 +100,18 @@ describe('AttributesController (e2e)', () => {
     });
   });
 
-  describe('/attributes/:id (PUT)', () => {
+  describe('/attribute-types/:id (PUT)', () => {
     it('should update attribute type', async () => {
       const createData = generate(AttributeTypeDto);
       const id = (
         await request(app.getHttpServer())
-          .post('/attributes')
+          .post('/attribute-types')
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const updateData = generate(AttributeTypeDto);
       const response = await request(app.getHttpServer())
-        .put(`/attributes/${id}`)
+        .put(`/attribute-types/${id}`)
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(200);
@@ -123,7 +123,7 @@ describe('AttributesController (e2e)', () => {
 
     it('should return error when data is invalid', async () => {
       const response = await request(app.getHttpServer())
-        .put('/attributes/' + testAttributeType.id)
+        .put('/attribute-types/' + testAttributeType.id)
         .set('Cookie', cookieHeader)
         .send({
           name: '',
@@ -143,7 +143,7 @@ describe('AttributesController (e2e)', () => {
     it('should return error when attribute type does not exist', async () => {
       const updateData = generate(AttributeTypeDto);
       const response = await request(app.getHttpServer())
-        .put('/attributes/12345')
+        .put('/attribute-types/12345')
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(404);
@@ -155,17 +155,17 @@ describe('AttributesController (e2e)', () => {
     });
   });
 
-  describe('/attributes/:id (DELETE)', () => {
+  describe('/attribute-types/:id (DELETE)', () => {
     it('should delete attribute type', async () => {
       const createData = generate(AttributeTypeDto);
       const id = (
         await request(app.getHttpServer())
-          .post('/attributes')
+          .post('/attribute-types')
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
-        .delete(`/attributes/${id}`)
+        .delete(`/attribute-types/${id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
       expect(response.body).toEqual({});
@@ -173,7 +173,7 @@ describe('AttributesController (e2e)', () => {
 
     it('should return error when attribute type does not exist', async () => {
       const response = await request(app.getHttpServer())
-        .delete('/attributes/12345')
+        .delete('/attribute-types/12345')
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
@@ -185,15 +185,15 @@ describe('AttributesController (e2e)', () => {
   });
 
   describe(
-    'RBAC for /attributes',
+    'RBAC for /attribute-types',
     setupRbacTests(
       () => app,
       () => testUsers,
       [
-        ['/attributes (GET)', [Role.Admin, Role.Manager]],
-        ['/attributes (POST)', [Role.Admin, Role.Manager]],
-        ['/attributes/:id (PUT)', [Role.Admin, Role.Manager]],
-        ['/attributes/:id (DELETE)', [Role.Admin, Role.Manager]],
+        ['/attribute-types (GET)', [Role.Admin, Role.Manager]],
+        ['/attribute-types (POST)', [Role.Admin, Role.Manager]],
+        ['/attribute-types/:id (PUT)', [Role.Admin, Role.Manager]],
+        ['/attribute-types/:id (DELETE)', [Role.Admin, Role.Manager]],
       ],
     ),
   );

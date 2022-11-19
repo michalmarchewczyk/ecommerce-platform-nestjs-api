@@ -57,12 +57,12 @@ describe('ProductRatingsController (e2e)', () => {
     createData.rating = 5;
     testRating = (
       await request(app.getHttpServer())
-        .post(`/product-ratings/${testProduct.id}`)
+        .post(`/products/${testProduct.id}/ratings`)
         .set('Cookie', cookieHeader)
         .send(createData)
     ).body;
     await request(app.getHttpServer())
-      .post(`/product-ratings/${testProduct.id}/${testRating.id}/photos`)
+      .post(`/products/${testProduct.id}/ratings/${testRating.id}/photos`)
       .set('Cookie', cookieHeader)
       .attach('file', './test/assets/test.jpg');
   });
@@ -74,7 +74,7 @@ describe('ProductRatingsController (e2e)', () => {
   describe('/product-ratings/:productId (GET)', () => {
     it('should return product ratings', async () => {
       const response = await request(app.getHttpServer())
-        .get(`/product-ratings/${testProduct.id}`)
+        .get(`/products/${testProduct.id}/ratings`)
         .set('Cookie', cookieHeader);
       const { product, user, ...expected } = testRating;
       expect(response.body).toContainEqual({
@@ -90,7 +90,7 @@ describe('ProductRatingsController (e2e)', () => {
       )?.id;
       await settings.updateSetting(settingId ?? -1, { value: 'false' });
       const response = await request(app.getHttpServer())
-        .get(`/product-ratings/${testProduct.id}`)
+        .get(`/products/${testProduct.id}/ratings`)
         .set('Cookie', cookieHeader);
       const { product, user, ...expected } = testRating;
       expect(response.body).toContainEqual({
@@ -102,7 +102,7 @@ describe('ProductRatingsController (e2e)', () => {
 
     it('should return empty array if product not found', async () => {
       const response = await request(app.getHttpServer())
-        .get(`/product-ratings/${12345}`)
+        .get(`/products/${12345}/ratings`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
       expect(response.body).toEqual([]);
@@ -114,7 +114,7 @@ describe('ProductRatingsController (e2e)', () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${testProduct.id}`)
+        .post(`/products/${testProduct.id}/ratings`)
         .set('Cookie', cookieHeader)
         .send(createData);
       expect(response.status).toBe(201);
@@ -128,7 +128,7 @@ describe('ProductRatingsController (e2e)', () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${12345}`)
+        .post(`/products/${12345}/ratings`)
         .set('Cookie', cookieHeader)
         .send(createData);
       expect(response.status).toBe(404);
@@ -140,20 +140,20 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
-  describe('/product-ratings/:productId/:id (PUT)', () => {
+  describe('/products/:productId/ratings/:id (PUT)', () => {
     it('should update product rating', async () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const updateData = generate(ProductRatingDto, true);
       updateData.rating = 4;
       const response = await request(app.getHttpServer())
-        .put(`/product-ratings/${testProduct.id}/${id}`)
+        .put(`/products/${testProduct.id}/ratings/${id}`)
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(200);
@@ -172,7 +172,7 @@ describe('ProductRatingsController (e2e)', () => {
       const updateData = generate(ProductRatingDto, true);
       updateData.rating = 4;
       const response2 = await request(app.getHttpServer())
-        .put(`/product-ratings/${testProduct.id}/${testRating.id}`)
+        .put(`/products/${testProduct.id}/ratings/${testRating.id}`)
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response2.status).toBe(403);
@@ -187,7 +187,7 @@ describe('ProductRatingsController (e2e)', () => {
       const updateData = generate(ProductRatingDto);
       updateData.rating = 4;
       const response = await request(app.getHttpServer())
-        .put(`/product-ratings/${12345}/${testRating.id}`)
+        .put(`/products/${12345}/ratings/${testRating.id}`)
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(404);
@@ -202,7 +202,7 @@ describe('ProductRatingsController (e2e)', () => {
       const updateData = generate(ProductRatingDto);
       updateData.rating = 4;
       const response = await request(app.getHttpServer())
-        .put(`/product-ratings/${testProduct.id}/${12345}`)
+        .put(`/products/${testProduct.id}/ratings/${12345}`)
         .set('Cookie', cookieHeader)
         .send(updateData);
       expect(response.status).toBe(404);
@@ -214,25 +214,25 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
-  describe('/product-ratings/:productId/:id (DELETE)', () => {
+  describe('/products/:productId/ratings/:id (DELETE)', () => {
     it('should delete product rating', async () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
-        .delete(`/product-ratings/${testProduct.id}/${id}`)
+        .delete(`/products/${testProduct.id}/ratings/${id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
     });
 
     it('should return error if product not found', async () => {
       const response = await request(app.getHttpServer())
-        .delete(`/product-ratings/${12345}/${testRating.id}`)
+        .delete(`/products/${12345}/ratings/${testRating.id}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
@@ -244,7 +244,7 @@ describe('ProductRatingsController (e2e)', () => {
 
     it('should return error if product rating not found', async () => {
       const response = await request(app.getHttpServer())
-        .delete(`/product-ratings/${testProduct.id}/${12345}`)
+        .delete(`/products/${testProduct.id}/ratings/${12345}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
@@ -255,22 +255,22 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
-  describe('/product-ratings/:productId/:id/photos/:photoId (GET)', () => {
+  describe('/products/:productId/:id/photos/:photoId (GET)', () => {
     it('should be able to get product rating photos', async () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .post(`/products/${testProduct.id}/ratings/${id}/photos`)
         .set('Cookie', cookieHeader)
         .attach('file', './test/assets/test.jpg');
       const response2 = await request(app.getHttpServer()).get(
-        `/product-ratings/${testProduct.id}/${id}/photos/${response.body.photos[0].id}`,
+        `/products/${testProduct.id}/ratings/${id}/photos/${response.body.photos[0].id}`,
       );
       expect(response2.status).toBe(200);
       expect(response2.header['content-type']).toBe('image/jpeg');
@@ -281,16 +281,16 @@ describe('ProductRatingsController (e2e)', () => {
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .post(`/products/${testProduct.id}/ratings/${id}/photos`)
         .set('Cookie', cookieHeader)
         .attach('file', './test/assets/test.jpg');
       const response2 = await request(app.getHttpServer()).get(
-        `/product-ratings/${testProduct.id}/${id}/photos/${response.body.photos[0].id}?thumbnail=true`,
+        `/products/${testProduct.id}/ratings/${id}/photos/${response.body.photos[0].id}?thumbnail=true`,
       );
       expect(response2.status).toBe(200);
       expect(response2.header['content-type']).toBe('image/jpeg');
@@ -301,12 +301,12 @@ describe('ProductRatingsController (e2e)', () => {
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .post(`/products/${testProduct.id}/ratings/${id}/photos`)
         .set('Cookie', cookieHeader)
         .attach('file', './test/assets/test.jpg');
       const settings = await app.get(SettingsService);
@@ -315,7 +315,7 @@ describe('ProductRatingsController (e2e)', () => {
       )?.id;
       await settings.updateSetting(settingId ?? -1, { value: 'false' });
       const response2 = await request(app.getHttpServer()).get(
-        `/product-ratings/${testProduct.id}/${id}/photos/${response.body.photos[0].id}`,
+        `/products/${testProduct.id}/ratings/${id}/photos/${response.body.photos[0].id}`,
       );
       expect(response2.status).toBe(404);
       expect(response2.body).toEqual({
@@ -328,7 +328,7 @@ describe('ProductRatingsController (e2e)', () => {
 
     it('should return error if product not found', async () => {
       const response = await request(app.getHttpServer())
-        .get(`/product-ratings/${12345}/${testRating.id}/photos/${12345}`)
+        .get(`/products/${12345}/ratings/${testRating.id}/photos/${12345}`)
         .set('Cookie', cookieHeader)
         .send();
       expect(response.status).toBe(404);
@@ -341,7 +341,7 @@ describe('ProductRatingsController (e2e)', () => {
 
     it('should return error if product rating not found', async () => {
       const response = await request(app.getHttpServer())
-        .get(`/product-ratings/${testProduct.id}/${12345}/photos/${12345}`)
+        .get(`/products/${testProduct.id}/ratings/${12345}/photos/${12345}`)
         .set('Cookie', cookieHeader)
         .send();
       expect(response.status).toBe(404);
@@ -355,7 +355,9 @@ describe('ProductRatingsController (e2e)', () => {
     it('should return error if product rating photo not found', async () => {
       const response = await request(app.getHttpServer())
         .get(
-          `/product-ratings/${testProduct.id}/${testRating.id}/photos/${12345}`,
+          `/products/${testProduct.id}/ratings/${
+            testRating.id
+          }/photos/${12345}`,
         )
         .set('Cookie', cookieHeader)
         .send();
@@ -368,18 +370,18 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
-  describe('/product-ratings/:productId/:id/photos (POST)', () => {
+  describe('/products/:productId/:id/photos (POST)', () => {
     it('should add photo to product rating', async () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .post(`/products/${testProduct.id}/ratings/${id}/photos`)
         .set('Cookie', cookieHeader)
         .attach('file', './test/assets/test.jpg');
       expect(response.status).toBe(201);
@@ -410,12 +412,12 @@ describe('ProductRatingsController (e2e)', () => {
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .post(`/products/${testProduct.id}/ratings/${id}/photos`)
         .set('Cookie', cookieHeader)
         .attach('file', './test/assets/test.txt');
       expect(response.status).toBe(400);
@@ -437,12 +439,12 @@ describe('ProductRatingsController (e2e)', () => {
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+        .post(`/products/${testProduct.id}/ratings/${id}/photos`)
         .set('Cookie', cookieHeader)
         .attach('file', './test/assets/test.jpg');
       expect(response.status).toBe(404);
@@ -456,7 +458,7 @@ describe('ProductRatingsController (e2e)', () => {
 
     it('should return error if product not found', async () => {
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${12345}/${testRating.id}/photos`)
+        .post(`/products/${12345}/ratings/${testRating.id}/photos`)
         .set('Cookie', cookieHeader)
         .attach('file', './test/assets/test.jpg');
       expect(response.status).toBe(404);
@@ -469,7 +471,7 @@ describe('ProductRatingsController (e2e)', () => {
 
     it('should return error if product rating not found', async () => {
       const response = await request(app.getHttpServer())
-        .post(`/product-ratings/${testProduct.id}/${12345}/photos`)
+        .post(`/products/${testProduct.id}/ratings/${12345}/photos`)
         .set('Cookie', cookieHeader)
         .attach('file', './test/assets/test.jpg');
       expect(response.status).toBe(404);
@@ -481,24 +483,24 @@ describe('ProductRatingsController (e2e)', () => {
     });
   });
 
-  describe('/product-ratings/:productId/:id/photos/:photoId (DELETE)', () => {
+  describe('/products/:productId/:id/photos/:photoId (DELETE)', () => {
     it('should delete photo from product rating', async () => {
       const createData = generate(ProductRatingDto, true);
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const photoId = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+          .post(`/products/${testProduct.id}/ratings/${id}/photos`)
           .set('Cookie', cookieHeader)
           .attach('file', './test/assets/test.jpg')
       ).body.photos[0].id;
       const response = await request(app.getHttpServer())
-        .delete(`/product-ratings/${testProduct.id}/${id}/photos/${photoId}`)
+        .delete(`/products/${testProduct.id}/ratings/${id}/photos/${photoId}`)
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(200);
       expect(response.body.photos).toEqual([]);
@@ -509,13 +511,13 @@ describe('ProductRatingsController (e2e)', () => {
       createData.rating = 5;
       const id = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}`)
+          .post(`/products/${testProduct.id}/ratings`)
           .set('Cookie', cookieHeader)
           .send(createData)
       ).body.id;
       const photoId = (
         await request(app.getHttpServer())
-          .post(`/product-ratings/${testProduct.id}/${id}/photos`)
+          .post(`/products/${testProduct.id}/ratings/${id}/photos`)
           .set('Cookie', cookieHeader)
           .attach('file', './test/assets/test.jpg')
       ).body.photos[0].id;
@@ -525,7 +527,7 @@ describe('ProductRatingsController (e2e)', () => {
       )?.id;
       await settings.updateSetting(settingId ?? -1, { value: 'false' });
       const response2 = await request(app.getHttpServer())
-        .delete(`/product-ratings/${testProduct.id}/${id}/photos/${photoId}`)
+        .delete(`/products/${testProduct.id}/ratings/${id}/photos/${photoId}`)
         .set('Cookie', cookieHeader);
       expect(response2.status).toBe(404);
       expect(response2.body).toEqual({
@@ -538,7 +540,7 @@ describe('ProductRatingsController (e2e)', () => {
 
     it('should return error if product not found', async () => {
       const response = await request(app.getHttpServer())
-        .delete(`/product-ratings/${12345}/${testRating.id}/photos/${12345}`)
+        .delete(`/products/${12345}/ratings/${testRating.id}/photos/${12345}`)
         .set('Cookie', cookieHeader)
         .send();
       expect(response.status).toBe(404);
@@ -551,7 +553,7 @@ describe('ProductRatingsController (e2e)', () => {
 
     it('should return error if product rating not found', async () => {
       const response = await request(app.getHttpServer())
-        .delete(`/product-ratings/${testProduct.id}/${12345}/photos/${12345}`)
+        .delete(`/products/${testProduct.id}/ratings/${12345}/photos/${12345}`)
         .set('Cookie', cookieHeader)
         .send();
       expect(response.status).toBe(404);
@@ -564,37 +566,37 @@ describe('ProductRatingsController (e2e)', () => {
   });
 
   describe(
-    'RBAC for /product-ratings',
+    'RBAC for /products/:productId/ratings',
     setupRbacTests(
       () => app,
       () => testUsers,
       [
         [
-          '/product-ratings/:productId (GET)',
+          '/products/:productId/ratings (GET)',
           [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
         ],
         [
-          '/product-ratings/:productId (POST)',
+          '/products/:productId/ratings (POST)',
           [Role.Admin, Role.Manager, Role.Sales, Role.Customer],
         ],
         [
-          '/product-ratings/:productId/:id (PUT)',
+          '/products/:productId/ratings/:id (PUT)',
           [Role.Admin, Role.Manager, Role.Sales, Role.Customer],
         ],
         [
-          '/product-ratings/:productId/:id (DELETE)',
+          '/products/:productId/ratings/:id (DELETE)',
           [Role.Admin, Role.Manager, Role.Sales],
         ],
         [
-          '/product-ratings/:productId/:id/photos/:photoId (GET)',
+          '/products/:productId/ratings/:id/photos/:photoId (GET)',
           [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
         ],
         [
-          '/product-ratings/:productId/:id/photos (POST)',
+          '/products/:productId/ratings/:id/photos (POST)',
           [Role.Admin, Role.Manager, Role.Sales, Role.Customer],
         ],
         [
-          '/product-ratings/:productId/:id/photos/:photoId (DELETE)',
+          '/products/:productId/ratings/:id/photos/:photoId (DELETE)',
           [Role.Admin, Role.Manager, Role.Sales],
         ],
       ],

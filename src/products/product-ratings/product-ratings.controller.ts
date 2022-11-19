@@ -40,11 +40,11 @@ import { Product } from '../entities/product.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('product ratings')
-@Controller('product-ratings')
+@Controller('products/:productId/ratings')
 export class ProductRatingsController {
   constructor(private readonly productRatingsService: ProductRatingsService) {}
 
-  @Get(':productId')
+  @Get('')
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiOkResponse({
     type: [ProductRating],
@@ -56,7 +56,7 @@ export class ProductRatingsController {
     return await this.productRatingsService.getProductRatings(productId);
   }
 
-  @Post(':productId')
+  @Post('')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
@@ -78,7 +78,7 @@ export class ProductRatingsController {
     );
   }
 
-  @Put(':productId/:id')
+  @Put(':id')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
@@ -105,7 +105,7 @@ export class ProductRatingsController {
     );
   }
 
-  @Delete(':productId/:id')
+  @Delete(':id')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
@@ -126,7 +126,7 @@ export class ProductRatingsController {
     await this.productRatingsService.deleteProductRating(productId, id);
   }
 
-  @Get(':productId/:id/photos/:photoId')
+  @Get(':id/photos/:photoId')
   @ApiOkResponse({
     schema: {
       type: 'string',
@@ -150,7 +150,7 @@ export class ProductRatingsController {
     );
   }
 
-  @Post(':productId/:id/photos')
+  @Post(':id/photos')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
@@ -200,7 +200,7 @@ export class ProductRatingsController {
     );
   }
 
-  @Delete(':productId/:id/photos/:photoId')
+  @Delete(':id/photos/:photoId')
   @Roles(Role.Admin, Role.Manager, Role.Sales, Role.Customer)
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })

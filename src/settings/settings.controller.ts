@@ -11,7 +11,7 @@ import { SettingsService } from './settings.service';
 import { Setting } from './entities/setting.entity';
 import { SettingCreateDto } from './dto/setting-create.dto';
 import { SettingUpdateDto } from './dto/setting-update.dto';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../users/entities/role.enum';
 import {
   ApiBadRequestResponse,

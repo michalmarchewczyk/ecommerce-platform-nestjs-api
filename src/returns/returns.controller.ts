@@ -9,10 +9,10 @@ import {
   Post,
 } from '@nestjs/common';
 import { ReturnsService } from './returns.service';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { Return } from './entities/return.entity';
 import { User } from '../users/entities/user.entity';
-import { ReqUser } from '../auth/user.decorator';
+import { ReqUser } from '../auth/decorators/user.decorator';
 import { ReturnCreateDto } from './dto/return-create.dto';
 import { ReturnUpdateDto } from './dto/return-update.dto';
 import { Role } from '../users/entities/role.enum';

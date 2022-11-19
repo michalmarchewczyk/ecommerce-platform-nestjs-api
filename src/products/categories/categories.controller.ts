@@ -9,7 +9,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
-import { Roles } from '../../auth/roles.decorator';
+import { Roles } from '../../auth/decorators/roles.decorator';
 import { Role } from '../../users/entities/role.enum';
 import { CategoryCreateDto } from '../dto/category-create.dto';
 import { CategoryUpdateDto } from '../dto/category-update.dto';

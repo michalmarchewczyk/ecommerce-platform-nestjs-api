@@ -8,14 +8,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import configuration, { schema } from './config/configuration';
+import configuration from './config/configuration';
 import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import * as createRedisStore from 'connect-redis';
 import { RedisClient } from 'redis';
 import { RedisModule, REDIS_CLIENT } from './redis';
-import { RolesGuard } from './auth/roles.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
 import { ProductsModule } from './products/products.module';
 import { LocalFilesModule } from './local-files/local-files.module';
 import { OrdersModule } from './orders/orders.module';
@@ -23,6 +23,7 @@ import { ReturnsModule } from './returns/returns.module';
 import { ServiceErrorInterceptor } from './errors/service-error.interceptor';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { SettingsModule } from './settings/settings.module';
+import { schema } from './config/configuration.schema';
 
 @Module({
   imports: [
@@ -91,7 +92,7 @@ export class AppModule {
       .apply(
         session({
           store: new RedisStore({ client: this.redisClient }),
-          secret: this.configService.get<string>('session.secret')!,
+          secret: this.configService.get<string>('session.secret') ?? '',
           resave: false,
           saveUninitialized: false,
           cookie: {

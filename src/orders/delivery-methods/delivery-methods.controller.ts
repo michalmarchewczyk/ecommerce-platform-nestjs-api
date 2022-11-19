@@ -10,7 +10,7 @@ import {
 import { DeliveryMethodsService } from './delivery-methods.service';
 import { DeliveryMethod } from '../entities/delivery-method.entity';
 import { DeliveryMethodDto } from '../dto/delivery-method.dto';
-import { Roles } from '../../auth/roles.decorator';
+import { Roles } from '../../auth/decorators/roles.decorator';
 import { Role } from '../../users/entities/role.enum';
 import {
   ApiBadRequestResponse,

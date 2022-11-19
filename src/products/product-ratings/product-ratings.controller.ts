@@ -20,9 +20,9 @@ import {
 import { ProductRatingsService } from './product-ratings.service';
 import { ProductRatingDto } from '../dto/product-rating.dto';
 import { ProductRating } from '../entities/product-rating.entity';
-import { Roles } from '../../auth/roles.decorator';
+import { Roles } from '../../auth/decorators/roles.decorator';
 import { Role } from '../../users/entities/role.enum';
-import { ReqUser } from '../../auth/user.decorator';
+import { ReqUser } from '../../auth/decorators/user.decorator';
 import { User } from '../../users/entities/user.entity';
 import {
   ApiBadRequestResponse,

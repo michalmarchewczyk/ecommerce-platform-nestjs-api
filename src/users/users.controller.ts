@@ -8,12 +8,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from './entities/role.enum';
 import { User } from './entities/user.entity';
-import { SessionAuthGuard } from '../auth/session-auth.guard';
+import { SessionAuthGuard } from '../auth/guards/session-auth.guard';
 import { UserUpdateDto } from './dto/user-update.dto';
-import { ReqUser } from '../auth/user.decorator';
+import { ReqUser } from '../auth/decorators/user.decorator';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,

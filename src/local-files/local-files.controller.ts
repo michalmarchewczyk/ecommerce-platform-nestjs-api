@@ -21,7 +21,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import * as tar from 'tar';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../users/entities/role.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';

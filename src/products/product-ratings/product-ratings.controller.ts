@@ -140,13 +140,13 @@ export class ProductRatingsController {
     @Param('productId', ParseIntPipe) productId: number,
     @Param('id', ParseIntPipe) id: number,
     @Param('photoId', ParseIntPipe) photoId: number,
-    @Query('thumbnail', ParseBoolPipe) thumbnail?: boolean,
+    @Query('thumbnail', ParseBoolPipe) thumbnail: boolean,
   ): Promise<StreamableFile> {
     return await this.productRatingsService.getProductRatingPhoto(
       productId,
       id,
       photoId,
-      thumbnail ?? false,
+      thumbnail,
     );
   }
 

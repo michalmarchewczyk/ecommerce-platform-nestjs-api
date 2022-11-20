@@ -21,8 +21,8 @@ export class AuthService implements OnModuleInit {
   async addAdminUser(): Promise<void> {
     try {
       const user = await this.register({
-        email: this.config.get('admin.email') ?? '',
-        password: this.config.get('admin.password') ?? '',
+        email: this.config.get('admin.email', ''),
+        password: this.config.get('admin.password', ''),
       });
       await this.usersService.updateUser(user.id, { role: Role.Admin });
     } catch (e) {

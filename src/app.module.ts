@@ -92,7 +92,7 @@ export class AppModule {
       .apply(
         session({
           store: new RedisStore({ client: this.redisClient }),
-          secret: this.configService.get<string>('session.secret') ?? '',
+          secret: this.configService.get<string>('session.secret', ''),
           resave: false,
           saveUninitialized: false,
           cookie: {

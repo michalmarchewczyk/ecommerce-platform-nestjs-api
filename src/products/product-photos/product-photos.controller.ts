@@ -49,12 +49,12 @@ export class ProductPhotosController {
   async getProductPhoto(
     @Param('id', ParseIntPipe) id: number,
     @Param('photoId', ParseIntPipe) photoId: number,
-    @Query('thumbnail', ParseBoolPipe) thumbnail?: boolean,
+    @Query('thumbnail', ParseBoolPipe) thumbnail: boolean,
   ): Promise<StreamableFile> {
     return await this.productPhotosService.getProductPhoto(
       id,
       photoId,
-      thumbnail ?? false,
+      thumbnail,
     );
   }
 

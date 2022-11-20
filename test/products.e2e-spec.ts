@@ -198,6 +198,32 @@ describe('ProductsController (e2e)', () => {
       );
     });
 
+    it('should return error if product photos order is not correct', async () => {
+      const createData = generate(ProductCreateDto);
+      const id = (
+        await request(app.getHttpServer())
+          .post('/products')
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const response = await request(app.getHttpServer())
+        .post('/products/' + id + '/photos')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      const response2 = await request(app.getHttpServer())
+        .patch('/products/' + id)
+        .set('Cookie', cookieHeader)
+        .send({
+          photosOrder: '12345,' + response.body.photos[0].id,
+        });
+      expect(response2.status).toBe(404);
+      expect(response2.body).toEqual({
+        statusCode: 404,
+        message: ['product photo not found'],
+        error: 'Not Found',
+      });
+    });
+
     it('should return error if product not found', async () => {
       const updateData = generate(ProductUpdateDto, true);
       const response = await request(app.getHttpServer())

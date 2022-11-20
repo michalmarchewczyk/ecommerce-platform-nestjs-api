@@ -429,6 +429,25 @@ describe('ProductRatingsController (e2e)', () => {
       });
     });
 
+    it('should return error if user is not an author of rating', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          ...testUsers.getCredentials(Role.Customer),
+        });
+      const cookieHeader = response.headers['set-cookie'];
+      const response2 = await request(app.getHttpServer())
+        .post(`/products/${testProduct.id}/ratings/${testRating.id}/photos`)
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/test.jpg');
+      expect(response2.status).toBe(403);
+      expect(response2.body).toEqual({
+        statusCode: 403,
+        error: 'Forbidden',
+        message: ['forbidden'],
+      });
+    });
+
     it('should return error if disabled by setting', async () => {
       const settings = await app.get(SettingsService);
       const settingId = (await settings.getSettings()).find(

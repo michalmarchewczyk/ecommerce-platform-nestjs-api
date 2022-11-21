@@ -16,14 +16,13 @@ import * as createRedisStore from 'connect-redis';
 import { RedisClient } from 'redis';
 import { RedisModule, REDIS_CLIENT } from './redis';
 import { RolesGuard } from './auth/guards/roles.guard';
-import { ProductsModule } from './products/products.module';
 import { LocalFilesModule } from './local-files/local-files.module';
-import { OrdersModule } from './orders/orders.module';
-import { ReturnsModule } from './returns/returns.module';
 import { ServiceErrorInterceptor } from './errors/service-error.interceptor';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { SettingsModule } from './settings/settings.module';
 import { schema } from './config/configuration.schema';
+import { CatalogModule } from './catalog/catalog.module';
+import { SalesModule } from './sales/sales.module';
 
 @Module({
   imports: [
@@ -50,15 +49,14 @@ import { schema } from './config/configuration.schema';
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
-    AuthModule,
     RedisModule,
-    ProductsModule,
-    LocalFilesModule,
-    OrdersModule,
-    ReturnsModule,
-    WishlistsModule,
+    AuthModule,
+    UsersModule,
     SettingsModule,
+    LocalFilesModule,
+    CatalogModule,
+    SalesModule,
+    WishlistsModule,
   ],
   controllers: [],
   providers: [

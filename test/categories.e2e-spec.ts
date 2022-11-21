@@ -6,11 +6,11 @@ import { Role } from '../src/users/entities/role.enum';
 import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
 import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
-import { Category } from '../src/products/entities/category.entity';
-import { Product } from '../src/products/entities/product.entity';
-import { CategoryCreateDto } from '../src/products/dto/category-create.dto';
-import { ProductCreateDto } from '../src/products/dto/product-create.dto';
-import { CategoryUpdateDto } from '../src/products/dto/category-update.dto';
+import { Category } from '../src/catalog/entities/category.entity';
+import { Product } from '../src/catalog/entities/product.entity';
+import { CategoryCreateDto } from '../src/catalog/dto/category-create.dto';
+import { ProductCreateDto } from '../src/catalog/dto/product-create.dto';
+import { CategoryUpdateDto } from '../src/catalog/dto/category-update.dto';
 import { setupRbacTests } from './utils/setup-rbac-tests';
 
 describe('CategoriesController (e2e)', () => {

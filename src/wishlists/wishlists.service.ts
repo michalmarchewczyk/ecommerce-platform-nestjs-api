@@ -6,7 +6,7 @@ import { User } from '../users/entities/user.entity';
 import { WishlistCreateDto } from './dto/wishlist-create.dto';
 import { WishlistUpdateDto } from './dto/wishlist-update.dto';
 import { NotFoundError } from '../errors/not-found.error';
-import { Product } from '../products/entities/product.entity';
+import { Product } from '../catalog/entities/product.entity';
 
 @Injectable()
 export class WishlistsService {

@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
-import { Role } from '../src/users/entities/role.enum';
-import { TestUsersService } from './utils/test-users/test-users.service';
-import { TestUsersModule } from './utils/test-users/test-users.module';
-import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
-import { setupRbacTests } from './utils/setup-rbac-tests';
-import { DeliveryMethodDto } from '../src/sales/dto/delivery-method.dto';
+import { AppModule } from '../../src/app.module';
+import { Role } from '../../src/users/entities/role.enum';
+import { TestUsersService } from '../utils/test-users/test-users.service';
+import { TestUsersModule } from '../utils/test-users/test-users.module';
+import { DtoGeneratorService } from '../utils/dto-generator/dto-generator.service';
+import { setupRbacTests } from '../utils/setup-rbac-tests';
+import { DeliveryMethodDto } from '../../src/sales/dto/delivery-method.dto';
 
 describe.only('DeliveryMethodsController (e2e)', () => {
   let app: INestApplication;

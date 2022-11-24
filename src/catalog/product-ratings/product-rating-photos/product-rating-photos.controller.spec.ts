@@ -8,9 +8,9 @@ import { ProductRatingPhoto } from './models/product-rating-photo.entity';
 import { LocalFilesService } from '../../../local-files/local-files.service';
 import { SettingsService } from '../../../settings/settings.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ProductCreateDto } from '../../dto/product-create.dto';
+import { ProductCreateDto } from '../../products/dto/product-create.dto';
 import { ProductRatingPhotosService } from './product-rating-photos.service';
-import { ProductRatingDto } from '../../dto/product-rating.dto';
+import { ProductRatingDto } from '../dto/product-rating.dto';
 import { generateFileMetadata } from '../../../../test/utils/generate-file-metadata';
 import { NotFoundError } from '../../../errors/not-found.error';
 

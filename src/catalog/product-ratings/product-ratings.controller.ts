@@ -10,7 +10,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ProductRatingsService } from './product-ratings.service';
-import { ProductRatingDto } from '../dto/product-rating.dto';
+import { ProductRatingDto } from './dto/product-rating.dto';
 import { ProductRating } from './models/product-rating.entity';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { Role } from '../../users/models/role.enum';

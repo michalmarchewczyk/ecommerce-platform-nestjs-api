@@ -7,7 +7,7 @@ import { RepositoryMockService } from '../../../test/utils/repository-mock/repos
 import { ReturnsService } from './returns.service';
 import { Order } from '../orders/models/order.entity';
 import { ReturnCreateDto } from './dto/return-create.dto';
-import { OrderCreateDto } from '../dto/order-create.dto';
+import { OrderCreateDto } from '../orders/dto/order-create.dto';
 import { User } from '../../users/models/user.entity';
 import { Role } from '../../users/models/role.enum';
 import { NotFoundError } from '../../errors/not-found.error';

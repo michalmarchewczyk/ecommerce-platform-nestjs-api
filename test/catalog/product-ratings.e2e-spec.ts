@@ -6,10 +6,10 @@ import { Role } from '../../src/users/models/role.enum';
 import { TestUsersService } from '../utils/test-users/test-users.service';
 import { TestUsersModule } from '../utils/test-users/test-users.module';
 import { DtoGeneratorService } from '../utils/dto-generator/dto-generator.service';
-import { ProductCreateDto } from '../../src/catalog/dto/product-create.dto';
+import { ProductCreateDto } from '../../src/catalog/products/dto/product-create.dto';
 import { Product } from '../../src/catalog/products/models/product.entity';
 import { setupRbacTests } from '../utils/setup-rbac-tests';
-import { ProductRatingDto } from '../../src/catalog/dto/product-rating.dto';
+import { ProductRatingDto } from '../../src/catalog/product-ratings/dto/product-rating.dto';
 import { ProductRating } from '../../src/catalog/product-ratings/models/product-rating.entity';
 import { SettingsService } from '../../src/settings/settings.service';
 

@@ -19,9 +19,9 @@ import { ProductsService } from './products.service';
 import { Product } from './models/product.entity';
 import { Role } from '../../users/models/role.enum';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import { ProductCreateDto } from '../dto/product-create.dto';
-import { ProductUpdateDto } from '../dto/product-update.dto';
-import { AttributeDto } from '../dto/attribute.dto';
+import { ProductCreateDto } from './dto/product-create.dto';
+import { ProductUpdateDto } from './dto/product-update.dto';
+import { AttributeDto } from './dto/attribute.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBadRequestResponse,

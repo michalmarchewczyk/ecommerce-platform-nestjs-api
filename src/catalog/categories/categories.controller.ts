@@ -11,8 +11,8 @@ import {
 import { CategoriesService } from './categories.service';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { Role } from '../../users/models/role.enum';
-import { CategoryCreateDto } from '../dto/category-create.dto';
-import { CategoryUpdateDto } from '../dto/category-update.dto';
+import { CategoryCreateDto } from './dto/category-create.dto';
+import { CategoryUpdateDto } from './dto/category-update.dto';
 import { Product } from '../products/models/product.entity';
 import { Category } from './models/category.entity';
 import {

@@ -6,7 +6,7 @@ import { Product } from '../models/product.entity';
 import { ProductPhoto } from './models/product-photo.entity';
 import { LocalFilesService } from '../../../local-files/local-files.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ProductCreateDto } from '../../dto/product-create.dto';
+import { ProductCreateDto } from '../dto/product-create.dto';
 import { generateFileMetadata } from '../../../../test/utils/generate-file-metadata';
 import { NotFoundError } from '../../../errors/not-found.error';
 

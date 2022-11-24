@@ -12,7 +12,7 @@ import { AttributeType } from './models/attribute-type.entity';
 import { AttributeTypesService } from './attribute-types.service';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { Role } from '../../users/models/role.enum';
-import { AttributeTypeDto } from '../dto/attribute-type.dto';
+import { AttributeTypeDto } from './dto/attribute-type.dto';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,

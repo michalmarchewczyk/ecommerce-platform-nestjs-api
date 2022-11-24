@@ -7,7 +7,7 @@ import { TestUsersService } from '../utils/test-users/test-users.service';
 import { TestUsersModule } from '../utils/test-users/test-users.module';
 import { DtoGeneratorService } from '../utils/dto-generator/dto-generator.service';
 import { setupRbacTests } from '../utils/setup-rbac-tests';
-import { PaymentMethodDto } from '../../src/sales/dto/payment-method.dto';
+import { PaymentMethodDto } from '../../src/sales/payment-methods/dto/payment-method.dto';
 
 describe.only('PaymentMethodsController (e2e)', () => {
   let app: INestApplication;

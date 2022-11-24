@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PaymentMethod } from './models/payment-method.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaymentMethodDto } from '../dto/payment-method.dto';
+import { PaymentMethodDto } from './dto/payment-method.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
 @Injectable()

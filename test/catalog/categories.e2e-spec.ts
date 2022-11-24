@@ -8,9 +8,9 @@ import { TestUsersModule } from '../utils/test-users/test-users.module';
 import { DtoGeneratorService } from '../utils/dto-generator/dto-generator.service';
 import { Category } from '../../src/catalog/categories/models/category.entity';
 import { Product } from '../../src/catalog/products/models/product.entity';
-import { CategoryCreateDto } from '../../src/catalog/dto/category-create.dto';
-import { ProductCreateDto } from '../../src/catalog/dto/product-create.dto';
-import { CategoryUpdateDto } from '../../src/catalog/dto/category-update.dto';
+import { CategoryCreateDto } from '../../src/catalog/categories/dto/category-create.dto';
+import { ProductCreateDto } from '../../src/catalog/products/dto/product-create.dto';
+import { CategoryUpdateDto } from '../../src/catalog/categories/dto/category-update.dto';
 import { setupRbacTests } from '../utils/setup-rbac-tests';
 
 describe('CategoriesController (e2e)', () => {

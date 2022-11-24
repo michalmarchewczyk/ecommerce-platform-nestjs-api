@@ -6,11 +6,11 @@ import { Role } from '../../src/users/models/role.enum';
 import { TestUsersService } from '../utils/test-users/test-users.service';
 import { TestUsersModule } from '../utils/test-users/test-users.module';
 import { DtoGeneratorService } from '../utils/dto-generator/dto-generator.service';
-import { ProductCreateDto } from '../../src/catalog/dto/product-create.dto';
+import { ProductCreateDto } from '../../src/catalog/products/dto/product-create.dto';
 import { Product } from '../../src/catalog/products/models/product.entity';
-import { ProductUpdateDto } from '../../src/catalog/dto/product-update.dto';
-import { AttributeDto } from '../../src/catalog/dto/attribute.dto';
-import { AttributeTypeDto } from '../../src/catalog/dto/attribute-type.dto';
+import { ProductUpdateDto } from '../../src/catalog/products/dto/product-update.dto';
+import { AttributeDto } from '../../src/catalog/products/dto/attribute.dto';
+import { AttributeTypeDto } from '../../src/catalog/attribute-types/dto/attribute-type.dto';
 import { setupRbacTests } from '../utils/setup-rbac-tests';
 import { AttributeValueType } from '../../src/catalog/attribute-types/models/attribute-value-type.enum';
 

@@ -4,7 +4,7 @@ import { RepositoryMockService } from '../../../test/utils/repository-mock/repos
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { PaymentMethod } from './models/payment-method.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { PaymentMethodDto } from '../dto/payment-method.dto';
+import { PaymentMethodDto } from './dto/payment-method.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
 describe('PaymentMethodsService', () => {

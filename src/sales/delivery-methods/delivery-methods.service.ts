@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { DeliveryMethod } from './models/delivery-method.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeliveryMethodDto } from '../dto/delivery-method.dto';
+import { DeliveryMethodDto } from './dto/delivery-method.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
 @Injectable()

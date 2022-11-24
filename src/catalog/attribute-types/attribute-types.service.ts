@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AttributeType } from './models/attribute-type.entity';
 import { Repository } from 'typeorm';
-import { AttributeTypeDto } from '../dto/attribute-type.dto';
+import { AttributeTypeDto } from './dto/attribute-type.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
 @Injectable()

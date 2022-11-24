@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { ProductRating } from './models/product-rating.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductRatingDto } from '../dto/product-rating.dto';
+import { ProductRatingDto } from './dto/product-rating.dto';
 import { Product } from '../products/models/product.entity';
 import { NotFoundError } from '../../errors/not-found.error';
 import { User } from '../../users/models/user.entity';

@@ -5,7 +5,7 @@ import { Wishlist } from './models/wishlist.entity';
 import { Product } from '../catalog/products/models/product.entity';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ProductCreateDto } from '../catalog/dto/product-create.dto';
+import { ProductCreateDto } from '../catalog/products/dto/product-create.dto';
 import { WishlistCreateDto } from './dto/wishlist-create.dto';
 import { User } from '../users/models/user.entity';
 import { NotFoundError } from '../errors/not-found.error';

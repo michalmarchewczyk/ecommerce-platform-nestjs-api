@@ -6,18 +6,18 @@ import { Role } from '../../src/users/models/role.enum';
 import { TestUsersService } from '../utils/test-users/test-users.service';
 import { TestUsersModule } from '../utils/test-users/test-users.module';
 import { DtoGeneratorService } from '../utils/dto-generator/dto-generator.service';
-import { ProductCreateDto } from '../../src/catalog/dto/product-create.dto';
+import { ProductCreateDto } from '../../src/catalog/products/dto/product-create.dto';
 import { Product } from '../../src/catalog/products/models/product.entity';
 import { setupRbacTests } from '../utils/setup-rbac-tests';
-import { OrderCreateDto } from '../../src/sales/dto/order-create.dto';
+import { OrderCreateDto } from '../../src/sales/orders/dto/order-create.dto';
 import { Order } from '../../src/sales/orders/models/order.entity';
-import { OrderUpdateDto } from '../../src/sales/dto/order-update.dto';
-import { DeliveryMethodDto } from '../../src/sales/dto/delivery-method.dto';
+import { OrderUpdateDto } from '../../src/sales/orders/dto/order-update.dto';
+import { DeliveryMethodDto } from '../../src/sales/delivery-methods/dto/delivery-method.dto';
 import { DeliveryMethod } from '../../src/sales/delivery-methods/models/delivery-method.entity';
-import { OrderDeliveryDto } from '../../src/sales/dto/order-delivery.dto';
+import { OrderDeliveryDto } from '../../src/sales/orders/dto/order-delivery.dto';
 import { PaymentMethod } from '../../src/sales/payment-methods/models/payment-method.entity';
-import { PaymentMethodDto } from '../../src/sales/dto/payment-method.dto';
-import { OrderPaymentDto } from '../../src/sales/dto/order-payment.dto';
+import { PaymentMethodDto } from '../../src/sales/payment-methods/dto/payment-method.dto';
+import { OrderPaymentDto } from '../../src/sales/orders/dto/order-payment.dto';
 import { OrderStatus } from '../../src/sales/orders/models/order-status.enum';
 
 describe.only('OrdersController (e2e)', () => {

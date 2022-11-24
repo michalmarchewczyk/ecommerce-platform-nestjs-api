@@ -6,7 +6,7 @@ import { Role } from '../../src/users/models/role.enum';
 import { TestUsersService } from '../utils/test-users/test-users.service';
 import { TestUsersModule } from '../utils/test-users/test-users.module';
 import { DtoGeneratorService } from '../utils/dto-generator/dto-generator.service';
-import { ProductCreateDto } from '../../src/catalog/dto/product-create.dto';
+import { ProductCreateDto } from '../../src/catalog/products/dto/product-create.dto';
 import { setupRbacTests } from '../utils/setup-rbac-tests';
 import { SettingsService } from '../../src/settings/settings.service';
 

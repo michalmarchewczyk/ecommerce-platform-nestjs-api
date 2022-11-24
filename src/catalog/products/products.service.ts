@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './models/product.entity';
 import { In, Repository } from 'typeorm';
-import { ProductCreateDto } from '../dto/product-create.dto';
-import { ProductUpdateDto } from '../dto/product-update.dto';
+import { ProductCreateDto } from './dto/product-create.dto';
+import { ProductUpdateDto } from './dto/product-update.dto';
 import { Attribute } from './models/attribute.entity';
-import { AttributeDto } from '../dto/attribute.dto';
+import { AttributeDto } from './dto/attribute.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 import { AttributeType } from '../attribute-types/models/attribute-type.entity';
 import {

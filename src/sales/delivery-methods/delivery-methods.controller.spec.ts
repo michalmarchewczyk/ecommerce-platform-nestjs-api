@@ -5,7 +5,7 @@ import { RepositoryMockService } from '../../../test/utils/repository-mock/repos
 import { DeliveryMethod } from './models/delivery-method.entity';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DeliveryMethodDto } from '../dto/delivery-method.dto';
+import { DeliveryMethodDto } from './dto/delivery-method.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 
 describe('DeliveryMethodsController', () => {

@@ -7,7 +7,7 @@ import { TestUsersService } from '../utils/test-users/test-users.service';
 import { TestUsersModule } from '../utils/test-users/test-users.module';
 import { DtoGeneratorService } from '../utils/dto-generator/dto-generator.service';
 import { AttributeType } from '../../src/catalog/attribute-types/models/attribute-type.entity';
-import { AttributeTypeDto } from '../../src/catalog/dto/attribute-type.dto';
+import { AttributeTypeDto } from '../../src/catalog/attribute-types/dto/attribute-type.dto';
 import { setupRbacTests } from '../utils/setup-rbac-tests';
 
 describe('AttributeTypesController (e2e)', () => {

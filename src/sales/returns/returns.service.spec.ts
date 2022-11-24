@@ -6,7 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { ReturnCreateDto } from './dto/return-create.dto';
 import { Order } from '../orders/models/order.entity';
-import { OrderCreateDto } from '../dto/order-create.dto';
+import { OrderCreateDto } from '../orders/dto/order-create.dto';
 import { User } from '../../users/models/user.entity';
 import { NotFoundError } from '../../errors/not-found.error';
 

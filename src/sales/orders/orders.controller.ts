@@ -10,11 +10,11 @@ import {
 } from '@nestjs/common';
 import { Role } from '../../users/models/role.enum';
 import { OrdersService } from './orders.service';
-import { OrderCreateDto } from '../dto/order-create.dto';
+import { OrderCreateDto } from './dto/order-create.dto';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { ReqUser } from '../../auth/decorators/user.decorator';
 import { User } from '../../users/models/user.entity';
-import { OrderUpdateDto } from '../dto/order-update.dto';
+import { OrderUpdateDto } from './dto/order-update.dto';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,

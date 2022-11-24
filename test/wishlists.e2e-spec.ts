@@ -113,7 +113,7 @@ describe.only('WishlistsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toMatchObject({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -174,7 +174,7 @@ describe.only('WishlistsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toMatchObject({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });

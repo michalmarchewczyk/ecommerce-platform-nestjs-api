@@ -3,10 +3,10 @@ import { WishlistsController } from './wishlists.controller';
 import { WishlistsService } from './wishlists.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Wishlist } from './models/wishlist.entity';
-import { Product } from '../catalog/products/models/product.entity';
+import { CatalogModule } from '../catalog/catalog.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Wishlist, Product])],
+  imports: [TypeOrmModule.forFeature([Wishlist]), CatalogModule],
   controllers: [WishlistsController],
   providers: [WishlistsService],
 })

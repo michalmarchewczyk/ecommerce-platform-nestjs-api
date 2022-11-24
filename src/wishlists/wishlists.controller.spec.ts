@@ -10,6 +10,10 @@ import { ProductCreateDto } from '../catalog/products/dto/product-create.dto';
 import { WishlistCreateDto } from './dto/wishlist-create.dto';
 import { User } from '../users/models/user.entity';
 import { NotFoundError } from '../errors/not-found.error';
+import { ProductsService } from '../catalog/products/products.service';
+import { AttributeTypesService } from '../catalog/attribute-types/attribute-types.service';
+import { AttributeType } from '../catalog/attribute-types/models/attribute-type.entity';
+import { Attribute } from '../catalog/products/models/attribute.entity';
 
 describe('WishlistsController', () => {
   let controller: WishlistsController;
@@ -24,14 +28,17 @@ describe('WishlistsController', () => {
       controllers: [WishlistsController],
       providers: [
         WishlistsService,
+        ProductsService,
+        AttributeTypesService,
         RepositoryMockService.getProvider(Wishlist),
         RepositoryMockService.getProvider(Product),
+        RepositoryMockService.getProvider(AttributeType),
+        RepositoryMockService.getProvider(Attribute),
         DtoGeneratorService,
       ],
     }).compile();
 
     controller = module.get<WishlistsController>(WishlistsController);
-
     generate = module
       .get<DtoGeneratorService>(DtoGeneratorService)
       .generate.bind(module.get<DtoGeneratorService>(DtoGeneratorService));

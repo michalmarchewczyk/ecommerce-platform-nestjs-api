@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Return } from './entities/return.entity';
+import { Return } from './models/return.entity';
 import { Repository } from 'typeorm';
 import { ReturnCreateDto } from './dto/return-create.dto';
-import { Order } from '../entities/order.entity';
+import { Order } from '../orders/models/order.entity';
 import { ReturnUpdateDto } from './dto/return-update.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 import { ConflictError } from '../../errors/conflict.error';

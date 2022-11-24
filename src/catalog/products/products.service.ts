@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from '../entities/product.entity';
+import { Product } from './models/product.entity';
 import { In, Repository } from 'typeorm';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { ProductUpdateDto } from '../dto/product-update.dto';
-import { Attribute } from '../entities/attribute.entity';
+import { Attribute } from './models/attribute.entity';
 import { AttributeDto } from '../dto/attribute.dto';
 import { NotFoundError } from '../../errors/not-found.error';
-import { AttributeType } from '../entities/attribute-type.entity';
+import { AttributeType } from '../attribute-types/models/attribute-type.entity';
 import {
   isBooleanString,
   isHexColor,
@@ -17,9 +17,9 @@ import {
 import { TypeCheckError } from '../../errors/type-check.error';
 import { parse } from 'json2csv';
 import * as csv from 'csvtojson';
-import { OrderItem } from '../../sales/entities/order-item.entity';
-import { AttributeValueType } from '../entities/attribute-value-type.enum';
-import { ProductPhoto } from '../entities/product-photo.entity';
+import { OrderItem } from '../../sales/orders/models/order-item.entity';
+import { AttributeValueType } from '../attribute-types/models/attribute-value-type.enum';
+import { ProductPhoto } from './product-photos/models/product-photo.entity';
 
 @Injectable()
 export class ProductsService {

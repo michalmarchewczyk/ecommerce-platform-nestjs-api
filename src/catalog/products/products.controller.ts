@@ -16,8 +16,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { Product } from '../entities/product.entity';
-import { Role } from '../../users/entities/role.enum';
+import { Product } from './models/product.entity';
+import { Role } from '../../users/models/role.enum';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { ProductUpdateDto } from '../dto/product-update.dto';

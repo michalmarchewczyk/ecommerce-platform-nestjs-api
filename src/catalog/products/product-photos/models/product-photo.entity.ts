@@ -1,6 +1,6 @@
 import { Entity, ManyToOne } from 'typeorm';
-import { Product } from './product.entity';
-import { Photo } from '../../local-files/entities/photo.entity';
+import { Product } from '../../models/product.entity';
+import { Photo } from '../../../../local-files/models/photo.entity';
 
 @Entity('product_photos')
 export class ProductPhoto extends Photo {

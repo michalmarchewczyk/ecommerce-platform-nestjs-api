@@ -8,10 +8,10 @@ import {
   Put,
 } from '@nestjs/common';
 import { DeliveryMethodsService } from './delivery-methods.service';
-import { DeliveryMethod } from '../entities/delivery-method.entity';
+import { DeliveryMethod } from './models/delivery-method.entity';
 import { DeliveryMethodDto } from '../dto/delivery-method.dto';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import { Role } from '../../users/entities/role.enum';
+import { Role } from '../../users/models/role.enum';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,

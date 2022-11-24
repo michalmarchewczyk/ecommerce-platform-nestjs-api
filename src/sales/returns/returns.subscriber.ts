@@ -7,9 +7,9 @@ import {
   InsertEvent,
   UpdateEvent,
 } from 'typeorm';
-import { Return } from './entities/return.entity';
+import { Return } from './models/return.entity';
 import { OrdersService } from '../orders/orders.service';
-import { OrderStatus } from '../entities/order-status.enum';
+import { OrderStatus } from '../orders/models/order-status.enum';
 
 @EventSubscriber()
 export class ReturnsSubscriber implements EntitySubscriberInterface<Return> {

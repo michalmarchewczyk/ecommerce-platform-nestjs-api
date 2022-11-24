@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ProductRatingsController } from './product-ratings.controller';
 import { ProductRatingsService } from './product-ratings.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductRating } from '../entities/product-rating.entity';
-import { Product } from '../entities/product.entity';
+import { ProductRating } from './models/product-rating.entity';
+import { Product } from '../products/models/product.entity';
 import { SettingsModule } from '../../settings/settings.module';
 import { ProductRatingPhotosModule } from './product-rating-photos/product-rating-photos.module';
 

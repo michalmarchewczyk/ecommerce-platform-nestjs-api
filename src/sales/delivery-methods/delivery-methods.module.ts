@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DeliveryMethodsController } from './delivery-methods.controller';
 import { DeliveryMethodsService } from './delivery-methods.service';
-import { DeliveryMethod } from '../entities/delivery-method.entity';
+import { DeliveryMethod } from './models/delivery-method.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({

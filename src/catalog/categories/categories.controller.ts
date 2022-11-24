@@ -10,11 +10,11 @@ import {
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import { Role } from '../../users/entities/role.enum';
+import { Role } from '../../users/models/role.enum';
 import { CategoryCreateDto } from '../dto/category-create.dto';
 import { CategoryUpdateDto } from '../dto/category-update.dto';
-import { Product } from '../entities/product.entity';
-import { Category } from '../entities/category.entity';
+import { Product } from '../products/models/product.entity';
+import { Category } from './models/category.entity';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -25,7 +25,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { CategoryGroup } from '../entities/category-group.entity';
+import { CategoryGroup } from './models/category-group.entity';
 
 @ApiTags('categories')
 @Controller('categories')

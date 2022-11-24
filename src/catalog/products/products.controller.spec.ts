@@ -2,17 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Product } from '../entities/product.entity';
-import { Attribute } from '../entities/attribute.entity';
+import { Product } from './models/product.entity';
+import { Attribute } from './models/attribute.entity';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { ProductUpdateDto } from '../dto/product-update.dto';
 import { AttributeDto } from '../dto/attribute.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { NotFoundError } from '../../errors/not-found.error';
-import { AttributeType } from '../entities/attribute-type.entity';
+import { AttributeType } from '../attribute-types/models/attribute-type.entity';
 import { AttributeTypeDto } from '../dto/attribute-type.dto';
-import { AttributeValueType } from '../entities/attribute-value-type.enum';
+import { AttributeValueType } from '../attribute-types/models/attribute-value-type.enum';
 
 describe('ProductsController', () => {
   let controller: ProductsController;

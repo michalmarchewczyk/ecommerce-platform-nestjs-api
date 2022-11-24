@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Wishlist } from './entities/wishlist.entity';
-import { User } from '../users/entities/user.entity';
+import { Wishlist } from './models/wishlist.entity';
+import { User } from '../users/models/user.entity';
 import { WishlistCreateDto } from './dto/wishlist-create.dto';
 import { WishlistUpdateDto } from './dto/wishlist-update.dto';
 import { NotFoundError } from '../errors/not-found.error';
-import { Product } from '../catalog/entities/product.entity';
+import { Product } from '../catalog/products/models/product.entity';
 
 @Injectable()
 export class WishlistsService {

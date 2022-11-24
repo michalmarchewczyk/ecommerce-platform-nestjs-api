@@ -26,8 +26,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Roles } from '../../../auth/decorators/roles.decorator';
-import { Role } from '../../../users/entities/role.enum';
-import { Product } from '../../entities/product.entity';
+import { Role } from '../../../users/models/role.enum';
+import { Product } from '../models/product.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductPhotosService } from './product-photos.service';
 

@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { ReturnStatus } from '../entities/return-status.enum';
+import { ReturnStatus } from '../models/return-status.enum';
 
 export class ReturnUpdateDto {
   @IsString()

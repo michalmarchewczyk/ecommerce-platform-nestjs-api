@@ -5,8 +5,8 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalFilesModule } from '../../../local-files/local-files.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Product } from '../../entities/product.entity';
-import { ProductPhoto } from '../../entities/product-photo.entity';
+import { Product } from '../models/product.entity';
+import { ProductPhoto } from './models/product-photo.entity';
 
 @Module({
   imports: [

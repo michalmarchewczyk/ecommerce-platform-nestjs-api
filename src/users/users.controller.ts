@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from './entities/role.enum';
-import { User } from './entities/user.entity';
+import { Role } from './models/role.enum';
+import { User } from './models/user.entity';
 import { SessionAuthGuard } from '../auth/guards/session-auth.guard';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { ReqUser } from '../auth/decorators/user.decorator';

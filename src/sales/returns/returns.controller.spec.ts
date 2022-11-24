@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReturnsController } from './returns.controller';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Return } from './entities/return.entity';
+import { Return } from './models/return.entity';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { ReturnsService } from './returns.service';
-import { Order } from '../entities/order.entity';
+import { Order } from '../orders/models/order.entity';
 import { ReturnCreateDto } from './dto/return-create.dto';
 import { OrderCreateDto } from '../dto/order-create.dto';
-import { User } from '../../users/entities/user.entity';
-import { Role } from '../../users/entities/role.enum';
+import { User } from '../../users/models/user.entity';
+import { Role } from '../../users/models/role.enum';
 import { NotFoundError } from '../../errors/not-found.error';
 
 describe('ReturnsController', () => {

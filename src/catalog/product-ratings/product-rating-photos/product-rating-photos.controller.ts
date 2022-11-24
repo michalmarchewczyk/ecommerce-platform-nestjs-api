@@ -28,12 +28,12 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Roles } from '../../../auth/decorators/roles.decorator';
-import { Role } from '../../../users/entities/role.enum';
-import { Product } from '../../entities/product.entity';
+import { Role } from '../../../users/models/role.enum';
+import { Product } from '../../products/models/product.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ReqUser } from '../../../auth/decorators/user.decorator';
-import { User } from '../../../users/entities/user.entity';
-import { ProductRating } from '../../entities/product-rating.entity';
+import { User } from '../../../users/models/user.entity';
+import { ProductRating } from '../models/product-rating.entity';
 
 @ApiTags('product ratings')
 @Controller('products/:productId/ratings/:id/photos')

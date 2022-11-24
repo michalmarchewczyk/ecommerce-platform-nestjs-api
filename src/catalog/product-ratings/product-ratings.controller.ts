@@ -11,11 +11,11 @@ import {
 } from '@nestjs/common';
 import { ProductRatingsService } from './product-ratings.service';
 import { ProductRatingDto } from '../dto/product-rating.dto';
-import { ProductRating } from '../entities/product-rating.entity';
+import { ProductRating } from './models/product-rating.entity';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import { Role } from '../../users/entities/role.enum';
+import { Role } from '../../users/models/role.enum';
 import { ReqUser } from '../../auth/decorators/user.decorator';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/models/user.entity';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,

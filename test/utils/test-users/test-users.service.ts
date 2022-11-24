@@ -1,8 +1,8 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../../src/users/entities/user.entity';
+import { User } from '../../../src/users/models/user.entity';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { Role } from '../../../src/users/entities/role.enum';
+import { Role } from '../../../src/users/models/role.enum';
 import { ConfigService } from '@nestjs/config';
 import * as argon2 from 'argon2';
 

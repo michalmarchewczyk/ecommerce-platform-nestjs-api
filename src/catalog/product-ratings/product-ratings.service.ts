@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { ProductRating } from '../entities/product-rating.entity';
+import { ProductRating } from './models/product-rating.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductRatingDto } from '../dto/product-rating.dto';
-import { Product } from '../entities/product.entity';
+import { Product } from '../products/models/product.entity';
 import { NotFoundError } from '../../errors/not-found.error';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/models/user.entity';
 import { SettingsService } from '../../settings/settings.service';
 
 @Injectable()

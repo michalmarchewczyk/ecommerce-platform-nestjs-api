@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AttributeTypesController } from './attribute-types.controller';
 import { AttributeTypesService } from './attribute-types.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { AttributeType } from '../entities/attribute-type.entity';
+import { AttributeType } from './models/attribute-type.entity';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { AttributeTypeDto } from '../dto/attribute-type.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';

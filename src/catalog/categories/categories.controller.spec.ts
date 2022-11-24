@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoriesController } from './categories.controller';
-import { Product } from '../entities/product.entity';
-import { Category } from '../entities/category.entity';
+import { Product } from '../products/models/product.entity';
+import { Category } from './models/category.entity';
 import { CategoriesService } from './categories.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
@@ -10,7 +10,7 @@ import { CategoryUpdateDto } from '../dto/category-update.dto';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { NotFoundError } from '../../errors/not-found.error';
-import { CategoryGroup } from '../entities/category-group.entity';
+import { CategoryGroup } from './models/category-group.entity';
 
 describe('CategoriesController', () => {
   let controller: CategoriesController;

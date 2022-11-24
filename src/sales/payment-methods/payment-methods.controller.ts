@@ -9,9 +9,9 @@ import {
   Put,
 } from '@nestjs/common';
 import { PaymentMethodsService } from './payment-methods.service';
-import { PaymentMethod } from '../entities/payment-method.entity';
+import { PaymentMethod } from './models/payment-method.entity';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
-import { Role } from '../../users/entities/role.enum';
+import { Role } from '../../users/models/role.enum';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import {
   ApiBadRequestResponse,

@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import { WishlistsService } from './wishlists.service';
 import { ReqUser } from '../auth/decorators/user.decorator';
-import { User } from '../users/entities/user.entity';
-import { Wishlist } from './entities/wishlist.entity';
-import { Role } from '../users/entities/role.enum';
+import { User } from '../users/models/user.entity';
+import { Wishlist } from './models/wishlist.entity';
+import { Role } from '../users/models/role.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { WishlistCreateDto } from './dto/wishlist-create.dto';
 import { WishlistUpdateDto } from './dto/wishlist-update.dto';

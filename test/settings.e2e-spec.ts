@@ -2,15 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { Role } from '../src/users/entities/role.enum';
+import { Role } from '../src/users/models/role.enum';
 import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
 import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
 import { setupRbacTests } from './utils/setup-rbac-tests';
-import { Setting } from '../src/settings/entities/setting.entity';
+import { Setting } from '../src/settings/models/setting.entity';
 import { SettingCreateDto } from '../src/settings/dto/setting-create.dto';
 import { SettingUpdateDto } from '../src/settings/dto/setting-update.dto';
-import { SettingType } from '../src/settings/entities/setting-type.enum';
+import { SettingType } from '../src/settings/models/setting-type.enum';
 
 describe('SettingsController (e2e)', () => {
   let app: INestApplication;

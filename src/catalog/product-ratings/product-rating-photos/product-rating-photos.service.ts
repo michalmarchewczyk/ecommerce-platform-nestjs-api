@@ -1,7 +1,7 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
 import { NotFoundError } from '../../../errors/not-found.error';
-import { ProductRating } from '../../entities/product-rating.entity';
-import { ProductRatingPhoto } from '../../entities/product-rating-photo.entity';
+import { ProductRating } from '../models/product-rating.entity';
+import { ProductRatingPhoto } from './models/product-rating-photo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LocalFilesService } from '../../../local-files/local-files.service';

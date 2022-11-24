@@ -3,12 +3,12 @@ import { SettingsController } from './settings.controller';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { SettingsService } from './settings.service';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
-import { Setting } from './entities/setting.entity';
+import { Setting } from './models/setting.entity';
 import { SettingCreateDto } from './dto/setting-create.dto';
 import { NotFoundError } from '../errors/not-found.error';
 import { SettingUpdateDto } from './dto/setting-update.dto';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { SettingType } from './entities/setting-type.enum';
+import { SettingType } from './models/setting-type.enum';
 
 describe('SettingsController', () => {
   let controller: SettingsController;

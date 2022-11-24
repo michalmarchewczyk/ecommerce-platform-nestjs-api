@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
-import { DeliveryMethod } from './delivery-method.entity';
+import { DeliveryMethod } from '../../delivery-methods/models/delivery-method.entity';
 
 @Entity('order_deliveries')
 export class OrderDelivery {

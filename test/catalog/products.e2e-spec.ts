@@ -2,17 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
-import { Role } from '../../src/users/entities/role.enum';
+import { Role } from '../../src/users/models/role.enum';
 import { TestUsersService } from '../utils/test-users/test-users.service';
 import { TestUsersModule } from '../utils/test-users/test-users.module';
 import { DtoGeneratorService } from '../utils/dto-generator/dto-generator.service';
 import { ProductCreateDto } from '../../src/catalog/dto/product-create.dto';
-import { Product } from '../../src/catalog/entities/product.entity';
+import { Product } from '../../src/catalog/products/models/product.entity';
 import { ProductUpdateDto } from '../../src/catalog/dto/product-update.dto';
 import { AttributeDto } from '../../src/catalog/dto/attribute.dto';
 import { AttributeTypeDto } from '../../src/catalog/dto/attribute-type.dto';
 import { setupRbacTests } from '../utils/setup-rbac-tests';
-import { AttributeValueType } from '../../src/catalog/entities/attribute-value-type.enum';
+import { AttributeValueType } from '../../src/catalog/attribute-types/models/attribute-value-type.enum';
 
 describe('ProductsController (e2e)', () => {
   let app: INestApplication;

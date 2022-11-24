@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeliveryMethodsService } from './delivery-methods.service';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
-import { DeliveryMethod } from '../entities/delivery-method.entity';
+import { DeliveryMethod } from './models/delivery-method.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { DeliveryMethodDto } from '../dto/delivery-method.dto';

@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
-import { Product } from '../../catalog/entities/product.entity';
+import { User } from '../../users/models/user.entity';
+import { Product } from '../../catalog/products/models/product.entity';
 
 @Entity('wishlists')
 export class Wishlist {

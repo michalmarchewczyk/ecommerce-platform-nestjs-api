@@ -7,7 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { OrderStatus } from '../entities/order-status.enum';
+import { OrderStatus } from '../orders/models/order-status.enum';
 import { OrderItemDto } from './order-item.dto';
 import { Type } from 'class-transformer';
 import { OrderDeliveryDto } from './order-delivery.dto';

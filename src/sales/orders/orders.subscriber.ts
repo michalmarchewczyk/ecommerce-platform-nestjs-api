@@ -7,10 +7,10 @@ import {
   InsertEvent,
   UpdateEvent,
 } from 'typeorm';
-import { Order } from '../entities/order.entity';
+import { Order } from './models/order.entity';
 import { ProductsService } from '../../catalog/products/products.service';
-import { OrderItem } from '../entities/order-item.entity';
-import { OrderStatus } from '../entities/order-status.enum';
+import { OrderItem } from './models/order-item.entity';
+import { OrderStatus } from './models/order-status.enum';
 
 @EventSubscriber()
 export class OrdersSubscriber implements EntitySubscriberInterface<Order> {

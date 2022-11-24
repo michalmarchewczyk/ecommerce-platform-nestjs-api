@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductRatingsService } from './product-ratings.service';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
-import { ProductRating } from '../entities/product-rating.entity';
-import { Product } from '../entities/product.entity';
+import { ProductRating } from './models/product-rating.entity';
+import { Product } from '../products/models/product.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { ProductCreateDto } from '../dto/product-create.dto';
 import { ProductRatingDto } from '../dto/product-rating.dto';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/models/user.entity';
 import { NotFoundError } from '../../errors/not-found.error';
-import { ProductRatingPhoto } from '../entities/product-rating-photo.entity';
+import { ProductRatingPhoto } from './product-rating-photos/models/product-rating-photo.entity';
 import { SettingsService } from '../../settings/settings.service';
 
 describe('ProductRatingsService', () => {

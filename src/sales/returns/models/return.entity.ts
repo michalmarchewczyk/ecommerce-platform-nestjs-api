@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Order } from '../../entities/order.entity';
+import { Order } from '../../orders/models/order.entity';
 import { ReturnStatus } from './return-status.enum';
 
 @Entity('returns')

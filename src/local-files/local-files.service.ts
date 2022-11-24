@@ -1,6 +1,6 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductPhoto } from '../catalog/entities/product-photo.entity';
+import { ProductPhoto } from '../catalog/products/product-photos/models/product-photo.entity';
 import { Repository } from 'typeorm';
 import * as sharp from 'sharp';
 import { createReadStream } from 'fs';

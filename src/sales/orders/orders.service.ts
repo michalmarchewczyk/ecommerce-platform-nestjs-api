@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Order } from '../entities/order.entity';
+import { Order } from './models/order.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderCreateDto } from '../dto/order-create.dto';
 import { UsersService } from '../../users/users.service';
 import { ProductsService } from '../../catalog/products/products.service';
 import { OrderUpdateDto } from '../dto/order-update.dto';
-import { OrderItem } from '../entities/order-item.entity';
-import { OrderDelivery } from '../entities/order-delivery.entity';
+import { OrderItem } from './models/order-item.entity';
+import { OrderDelivery } from './models/order-delivery.entity';
 import { DeliveryMethodsService } from '../delivery-methods/delivery-methods.service';
 import { PaymentMethodsService } from '../payment-methods/payment-methods.service';
-import { OrderPayment } from '../entities/order-payment.entity';
+import { OrderPayment } from './models/order-payment.entity';
 import { NotFoundError } from '../../errors/not-found.error';
 
 @Injectable()

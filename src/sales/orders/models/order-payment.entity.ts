@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
-import { PaymentMethod } from './payment-method.entity';
+import { PaymentMethod } from '../../payment-methods/models/payment-method.entity';
 
 @Entity('order_payments')
 export class OrderPayment {

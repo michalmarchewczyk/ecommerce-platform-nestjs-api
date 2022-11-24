@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WishlistsService } from './wishlists.service';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
-import { Wishlist } from './entities/wishlist.entity';
-import { Product } from '../catalog/entities/product.entity';
+import { Wishlist } from './models/wishlist.entity';
+import { Product } from '../catalog/products/models/product.entity';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ProductCreateDto } from '../catalog/dto/product-create.dto';
 import { WishlistCreateDto } from './dto/wishlist-create.dto';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/models/user.entity';
 import { NotFoundError } from '../errors/not-found.error';
 
 describe('WishlistsService', () => {

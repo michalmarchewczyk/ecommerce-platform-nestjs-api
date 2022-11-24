@@ -8,12 +8,12 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { Role } from '../../users/entities/role.enum';
+import { Role } from '../../users/models/role.enum';
 import { OrdersService } from './orders.service';
 import { OrderCreateDto } from '../dto/order-create.dto';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { ReqUser } from '../../auth/decorators/user.decorator';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/models/user.entity';
 import { OrderUpdateDto } from '../dto/order-update.dto';
 import {
   ApiBadRequestResponse,
@@ -24,7 +24,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Order } from '../entities/order.entity';
+import { Order } from './models/order.entity';
 
 @ApiTags('orders')
 @Controller('orders')

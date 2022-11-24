@@ -9,12 +9,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../../users/models/user.entity';
 import { OrderStatus } from './order-status.enum';
 import { OrderItem } from './order-item.entity';
 import { OrderDelivery } from './order-delivery.entity';
 import { OrderPayment } from './order-payment.entity';
-import { Return } from '../returns/entities/return.entity';
+import { Return } from '../../returns/models/return.entity';
 
 @Entity('orders')
 export class Order {

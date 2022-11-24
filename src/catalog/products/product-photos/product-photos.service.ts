@@ -1,10 +1,10 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductPhoto } from '../../entities/product-photo.entity';
+import { ProductPhoto } from './models/product-photo.entity';
 import { Repository } from 'typeorm';
 import { LocalFilesService } from '../../../local-files/local-files.service';
 import { NotFoundError } from '../../../errors/not-found.error';
-import { Product } from '../../entities/product.entity';
+import { Product } from '../models/product.entity';
 
 @Injectable()
 export class ProductPhotosService {

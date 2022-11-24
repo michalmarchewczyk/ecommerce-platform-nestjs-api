@@ -8,10 +8,10 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { AttributeType } from '../entities/attribute-type.entity';
+import { AttributeType } from './models/attribute-type.entity';
 import { AttributeTypesService } from './attribute-types.service';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import { Role } from '../../users/entities/role.enum';
+import { Role } from '../../users/models/role.enum';
 import { AttributeTypeDto } from '../dto/attribute-type.dto';
 import {
   ApiBadRequestResponse,

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaymentMethodsController } from './payment-methods.controller';
-import { PaymentMethod } from '../entities/payment-method.entity';
+import { PaymentMethod } from './models/payment-method.entity';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { DtoGeneratorService } from '../../../test/utils/dto-generator/dto-generator.service';
 import { getRepositoryToken } from '@nestjs/typeorm';

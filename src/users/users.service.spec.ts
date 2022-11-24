@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { Role } from './entities/role.enum';
+import { User } from './models/user.entity';
+import { Role } from './models/role.enum';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { RegisterDto } from '../auth/dto/register.dto';
 import { UserUpdateDto } from './dto/user-update.dto';

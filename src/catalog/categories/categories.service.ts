@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from '../entities/category.entity';
+import { Category } from './models/category.entity';
 import { Repository } from 'typeorm';
-import { Product } from '../entities/product.entity';
+import { Product } from '../products/models/product.entity';
 import { CategoryCreateDto } from '../dto/category-create.dto';
 import { CategoryUpdateDto } from '../dto/category-update.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 import { NotRelatedError } from '../../errors/not-related.error';
-import { CategoryGroup } from '../entities/category-group.entity';
+import { CategoryGroup } from './models/category-group.entity';
 
 @Injectable()
 export class CategoriesService {

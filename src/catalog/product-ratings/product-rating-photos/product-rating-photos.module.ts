@@ -4,15 +4,14 @@ import { ProductRatingPhotosController } from './product-rating-photos.controlle
 import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductRating } from '../../entities/product-rating.entity';
-import { Product } from '../../entities/product.entity';
-import { ProductRatingPhoto } from '../../entities/product-rating-photo.entity';
+import { ProductRating } from '../models/product-rating.entity';
+import { ProductRatingPhoto } from './models/product-rating-photo.entity';
 import { SettingsModule } from '../../../settings/settings.module';
 import { LocalFilesModule } from '../../../local-files/local-files.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ProductRating, Product, ProductRatingPhoto]),
+    TypeOrmModule.forFeature([ProductRating, ProductRatingPhoto]),
     MulterModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

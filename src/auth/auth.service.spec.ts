@@ -4,9 +4,9 @@ import { UsersService } from '../users/users.service';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { RegisterDto } from './dto/register.dto';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/models/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Role } from '../users/entities/role.enum';
+import { Role } from '../users/models/role.enum';
 import { ConfigService } from '@nestjs/config';
 
 describe('AuthService', () => {

@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { AttributeType } from './attribute-type.entity';
+import { AttributeType } from '../../attribute-types/models/attribute-type.entity';
 import { Product } from './product.entity';
 
 @Entity('attributes')

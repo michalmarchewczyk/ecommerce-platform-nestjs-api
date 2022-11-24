@@ -22,7 +22,7 @@ import {
 } from '@nestjs/swagger';
 import * as tar from 'tar';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Role } from '../users/entities/role.enum';
+import { Role } from '../users/models/role.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { Readable } from 'stream';

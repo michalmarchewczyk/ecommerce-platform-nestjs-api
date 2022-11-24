@@ -149,7 +149,7 @@ describe('CategoriesController (e2e)', () => {
         id: expect.any(Number),
         ...createData,
         slug: null,
-        parentCategory: { ...testCategory, groups: [] },
+        parentCategory: { ...testCategory, groups: [], parentCategory: null },
       });
     });
 
@@ -209,6 +209,7 @@ describe('CategoriesController (e2e)', () => {
       expect(response.body).toEqual({
         id,
         ...updateData,
+        parentCategory: null,
         groups: [{ name: 'test group', id: expect.any(Number) }],
       });
     });
@@ -232,7 +233,7 @@ describe('CategoriesController (e2e)', () => {
         id,
         ...updateData,
         groups: [],
-        parentCategory: { ...testCategory, groups: [] },
+        parentCategory: { ...testCategory, groups: [], parentCategory: null },
       });
     });
 
@@ -419,7 +420,7 @@ describe('CategoriesController (e2e)', () => {
         .set('Cookie', cookieHeader);
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         statusCode: 404,
         error: 'Not Found',
       });

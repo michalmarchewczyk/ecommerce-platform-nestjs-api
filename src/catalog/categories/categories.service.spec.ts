@@ -10,6 +10,10 @@ import { ProductCreateDto } from '../products/dto/product-create.dto';
 import { RepositoryMockService } from '../../../test/utils/repository-mock/repository-mock.service';
 import { NotFoundError } from '../../errors/not-found.error';
 import { CategoryGroup } from './models/category-group.entity';
+import { ProductsService } from '../products/products.service';
+import { AttributeTypesService } from '../attribute-types/attribute-types.service';
+import { AttributeType } from '../attribute-types/models/attribute-type.entity';
+import { Attribute } from '../products/models/attribute.entity';
 
 describe('CategoriesService', () => {
   let service: CategoriesService;
@@ -22,7 +26,11 @@ describe('CategoriesService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CategoriesService,
+        ProductsService,
+        AttributeTypesService,
         RepositoryMockService.getProvider(Product),
+        RepositoryMockService.getProvider(AttributeType),
+        RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(Category),
         RepositoryMockService.getProvider(CategoryGroup),
         DtoGeneratorService,

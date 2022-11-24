@@ -3,18 +3,17 @@ import { Repository } from 'typeorm';
 import { ProductRating } from './models/product-rating.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductRatingDto } from './dto/product-rating.dto';
-import { Product } from '../products/models/product.entity';
 import { NotFoundError } from '../../errors/not-found.error';
 import { User } from '../../users/models/user.entity';
 import { SettingsService } from '../../settings/settings.service';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class ProductRatingsService {
   constructor(
     @InjectRepository(ProductRating)
     private readonly productRatingsRepository: Repository<ProductRating>,
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
+    private productsService: ProductsService,
     private settingsService: SettingsService,
   ) {}
 
@@ -32,17 +31,25 @@ export class ProductRatingsService {
     return rating;
   }
 
+  async getProductRating(
+    id: number,
+    productId: number,
+  ): Promise<ProductRating> {
+    const productRating = await this.productRatingsRepository.findOne({
+      where: { id, product: { id: productId } },
+    });
+    if (!productRating) {
+      throw new NotFoundError('product rating');
+    }
+    return productRating;
+  }
+
   async createProductRating(
     user: User,
     productId: number,
     createData: ProductRatingDto,
   ): Promise<ProductRating> {
-    const product = await this.productRepository.findOne({
-      where: { id: productId },
-    });
-    if (!product) {
-      throw new NotFoundError('product', 'id', productId.toString());
-    }
+    const product = await this.productsService.getProduct(productId);
     const newProductRating = new ProductRating();
     newProductRating.user = user;
     newProductRating.product = product;
@@ -63,24 +70,14 @@ export class ProductRatingsService {
     id: number,
     updateData: ProductRatingDto,
   ): Promise<ProductRating> {
-    const productRating = await this.productRatingsRepository.findOne({
-      where: { id, product: { id: productId } },
-    });
-    if (!productRating) {
-      throw new NotFoundError('product rating');
-    }
+    const productRating = await this.getProductRating(id, productId);
     productRating.rating = updateData.rating;
     productRating.comment = updateData.comment;
     return this.productRatingsRepository.save(productRating);
   }
 
   async deleteProductRating(productId: number, id: number): Promise<boolean> {
-    const productRating = await this.productRatingsRepository.findOne({
-      where: { id, product: { id: productId } },
-    });
-    if (!productRating) {
-      throw new NotFoundError('product rating');
-    }
+    await this.getProductRating(id, productId);
     await this.productRatingsRepository.delete({
       id,
       product: { id: productId },

@@ -8,5 +8,6 @@ import { AttributeType } from './models/attribute-type.entity';
   imports: [TypeOrmModule.forFeature([AttributeType])],
   providers: [AttributeTypesService],
   controllers: [AttributeTypesController],
+  exports: [AttributeTypesService],
 })
 export class AttributeTypesModule {}

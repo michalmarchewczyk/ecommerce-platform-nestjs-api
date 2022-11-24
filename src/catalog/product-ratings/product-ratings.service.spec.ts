@@ -11,6 +11,10 @@ import { User } from '../../users/models/user.entity';
 import { NotFoundError } from '../../errors/not-found.error';
 import { ProductRatingPhoto } from './product-rating-photos/models/product-rating-photo.entity';
 import { SettingsService } from '../../settings/settings.service';
+import { ProductsService } from '../products/products.service';
+import { AttributeTypesService } from '../attribute-types/attribute-types.service';
+import { AttributeType } from '../attribute-types/models/attribute-type.entity';
+import { Attribute } from '../products/models/attribute.entity';
 
 describe('ProductRatingsService', () => {
   let service: ProductRatingsService;
@@ -23,9 +27,13 @@ describe('ProductRatingsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductRatingsService,
+        ProductsService,
+        AttributeTypesService,
         RepositoryMockService.getProvider(ProductRating),
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(ProductRatingPhoto),
+        RepositoryMockService.getProvider(AttributeType),
+        RepositoryMockService.getProvider(Attribute),
         DtoGeneratorService,
         {
           provide: SettingsService,

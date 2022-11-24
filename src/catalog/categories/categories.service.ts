@@ -8,16 +8,16 @@ import { CategoryUpdateDto } from './dto/category-update.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 import { NotRelatedError } from '../../errors/not-related.error';
 import { CategoryGroup } from './models/category-group.entity';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
-    @InjectRepository(Product)
-    private productsRepository: Repository<Product>,
     @InjectRepository(CategoryGroup)
     private categoryGroupsRepository: Repository<CategoryGroup>,
+    private productsService: ProductsService,
   ) {}
 
   async getCategories(): Promise<Category[]> {
@@ -26,10 +26,18 @@ export class CategoriesService {
     });
   }
 
-  async getCategory(id: number): Promise<Category> {
+  async getCategory(
+    id: number,
+    children = true,
+    products = false,
+  ): Promise<Category> {
     const category = await this.categoriesRepository.findOne({
       where: { id },
-      relations: ['childCategories', 'parentCategory'],
+      relations: [
+        'parentCategory',
+        ...(children ? ['childCategories'] : []),
+        ...(products ? ['products'] : []),
+      ],
     });
     if (!category) {
       throw new NotFoundError('category', 'id', id.toString());
@@ -56,10 +64,7 @@ export class CategoriesService {
     id: number,
     categoryData: CategoryUpdateDto,
   ): Promise<Category> {
-    const category = await this.categoriesRepository.findOne({ where: { id } });
-    if (!category) {
-      throw new NotFoundError('category', 'id', id.toString());
-    }
+    const category = await this.getCategory(id, false);
     Object.assign(category, categoryData);
     if (categoryData.parentCategoryId) {
       await this.updateParentCategory(category, categoryData.parentCategoryId);
@@ -85,69 +90,32 @@ export class CategoriesService {
     category: Category,
     parentCategoryId: number,
   ): Promise<boolean> {
-    const parentCategory = await this.categoriesRepository.findOne({
-      where: { id: parentCategoryId },
-    });
-    if (!parentCategory) {
-      throw new NotFoundError('category', 'id', parentCategoryId.toString());
-    }
-    category.parentCategory = parentCategory;
+    category.parentCategory = await this.getCategory(parentCategoryId, false);
     return true;
   }
 
   async deleteCategory(id: number): Promise<boolean> {
-    const category = await this.categoriesRepository.findOne({ where: { id } });
-    if (!category) {
-      throw new NotFoundError('category', 'id', id.toString());
-    }
+    await this.getCategory(id, false);
     await this.categoriesRepository.delete({ id });
     return true;
   }
 
   async getCategoryProducts(id: number): Promise<Product[]> {
-    const category = await this.categoriesRepository.findOne({
-      where: { id },
-      relations: ['products'],
-    });
-    if (!category) {
-      throw new NotFoundError('category', 'id', id.toString());
-    }
+    const category = await this.getCategory(id, false, true);
     return category.products;
   }
 
   async addCategoryProduct(id: number, productId: number): Promise<Product> {
-    const product = await this.productsRepository.findOne({
-      where: { id: productId },
-    });
-    if (!productId || !product) {
-      throw new NotFoundError('product');
-    }
-    const category = await this.categoriesRepository.findOne({
-      where: { id },
-      relations: ['products'],
-    });
-    if (!category) {
-      throw new NotFoundError('category', 'id', id.toString());
-    }
+    const product = await this.productsService.getProduct(productId);
+    const category = await this.getCategory(id, false, true);
     category.products.push(product);
     await this.categoriesRepository.save(category);
     return product;
   }
 
   async deleteCategoryProduct(id: number, productId: number): Promise<boolean> {
-    const product = await this.productsRepository.findOne({
-      where: { id: productId },
-    });
-    if (!productId || !product) {
-      throw new NotFoundError('product');
-    }
-    const category = await this.categoriesRepository.findOne({
-      where: { id },
-      relations: ['products'],
-    });
-    if (!category) {
-      throw new NotFoundError('category', 'id', id.toString());
-    }
+    const product = await this.productsService.getProduct(productId);
+    const category = await this.getCategory(id, false, true);
     if (!category.products.some((p) => p.id === product.id)) {
       throw new NotRelatedError('category', 'product');
     }

@@ -7,16 +7,8 @@ import { ProductUpdateDto } from './dto/product-update.dto';
 import { Attribute } from './models/attribute.entity';
 import { AttributeDto } from './dto/attribute.dto';
 import { NotFoundError } from '../../errors/not-found.error';
-import { AttributeType } from '../attribute-types/models/attribute-type.entity';
-import {
-  isBooleanString,
-  isHexColor,
-  isNumberString,
-  isString,
-} from 'class-validator';
-import { TypeCheckError } from '../../errors/type-check.error';
 import { OrderItem } from '../../sales/orders/models/order-item.entity';
-import { AttributeValueType } from '../attribute-types/models/attribute-value-type.enum';
+import { AttributeTypesService } from '../attribute-types/attribute-types.service';
 
 @Injectable()
 export class ProductsService {
@@ -24,8 +16,7 @@ export class ProductsService {
     @InjectRepository(Product) private productsRepository: Repository<Product>,
     @InjectRepository(Attribute)
     private attributesRepository: Repository<Attribute>,
-    @InjectRepository(AttributeType)
-    private attributeTypesRepository: Repository<AttributeType>,
+    private attributeTypesService: AttributeTypesService,
   ) {}
 
   async getProducts(): Promise<Product[]> {
@@ -50,10 +41,7 @@ export class ProductsService {
     id: number,
     productData: ProductUpdateDto,
   ): Promise<Product> {
-    const product = await this.productsRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new NotFoundError('product', 'id', id.toString());
-    }
+    const product = await this.getProduct(id);
     if (productData.photosOrder) {
       await this.checkProductPhotosOrder(product, productData.photosOrder);
     }
@@ -74,10 +62,7 @@ export class ProductsService {
   }
 
   async deleteProduct(id: number): Promise<boolean> {
-    const product = await this.productsRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new NotFoundError('product', 'id', id.toString());
-    }
+    await this.getProduct(id);
     await this.productsRepository.delete({ id });
     return true;
   }
@@ -117,19 +102,16 @@ export class ProductsService {
     id: number,
     attributes: AttributeDto[],
   ): Promise<Product> {
-    const product = await this.productsRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new NotFoundError('product', 'id', id.toString());
-    }
+    const product = await this.getProduct(id);
     const attributesToSave = [];
     for (const attribute of attributes) {
-      const attributeType = await this.attributeTypesRepository.findOne({
-        where: { id: attribute.typeId },
-      });
-      if (!attributeType) {
-        throw new NotFoundError('attribute type');
-      }
-      await this.checkAttributeType(attributeType.valueType, attribute.value);
+      const attributeType = await this.attributeTypesService.getAttributeType(
+        attribute.typeId,
+      );
+      await this.attributeTypesService.checkAttributeType(
+        attributeType.valueType,
+        attribute.value,
+      );
       const newAttribute = new Attribute();
       newAttribute.type = attributeType;
       newAttribute.value = attribute.value;
@@ -137,18 +119,5 @@ export class ProductsService {
     }
     product.attributes = await this.attributesRepository.save(attributesToSave);
     return this.productsRepository.save(product);
-  }
-
-  private async checkAttributeType(type: AttributeValueType, value: any) {
-    (<[AttributeValueType, (value: any) => boolean][]>[
-      [AttributeValueType.String, isString],
-      [AttributeValueType.Number, isNumberString],
-      [AttributeValueType.Boolean, isBooleanString],
-      [AttributeValueType.Color, isHexColor],
-    ]).forEach((check) => {
-      if (type === check[0] && !check[1](value)) {
-        throw new TypeCheckError('attribute value', check[0]);
-      }
-    });
   }
 }

@@ -3,18 +3,18 @@ import { ProductRatingsController } from './product-ratings.controller';
 import { ProductRatingsService } from './product-ratings.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductRating } from './models/product-rating.entity';
-import { Product } from '../products/models/product.entity';
 import { SettingsModule } from '../../settings/settings.module';
 import { ProductRatingPhotosModule } from './product-rating-photos/product-rating-photos.module';
+import { ProductsModule } from '../products/products.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ProductRating, Product]),
+    TypeOrmModule.forFeature([ProductRating]),
     ProductRatingPhotosModule,
+    ProductsModule,
     SettingsModule,
   ],
   controllers: [ProductRatingsController],
   providers: [ProductRatingsService],
-  exports: [ProductRatingsService],
 })
 export class ProductRatingsModule {}

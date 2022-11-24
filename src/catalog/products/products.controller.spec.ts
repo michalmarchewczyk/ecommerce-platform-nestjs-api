@@ -13,6 +13,7 @@ import { NotFoundError } from '../../errors/not-found.error';
 import { AttributeType } from '../attribute-types/models/attribute-type.entity';
 import { AttributeTypeDto } from '../attribute-types/dto/attribute-type.dto';
 import { AttributeValueType } from '../attribute-types/models/attribute-value-type.enum';
+import { AttributeTypesService } from '../attribute-types/attribute-types.service';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -25,6 +26,7 @@ describe('ProductsController', () => {
       controllers: [ProductsController],
       providers: [
         ProductsService,
+        AttributeTypesService,
         RepositoryMockService.getProvider(Product),
         RepositoryMockService.getProvider(Attribute),
         RepositoryMockService.getProvider(AttributeType),

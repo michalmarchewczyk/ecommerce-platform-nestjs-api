@@ -26,6 +26,7 @@ import { NotFoundError } from '../../errors/not-found.error';
 import { AttributeType } from '../../catalog/attribute-types/models/attribute-type.entity';
 import { LocalFilesService } from '../../local-files/local-files.service';
 import { ProductPhoto } from '../../catalog/products/product-photos/models/product-photo.entity';
+import { AttributeTypesService } from '../../catalog/attribute-types/attribute-types.service';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -42,6 +43,7 @@ describe('OrdersService', () => {
         OrdersService,
         UsersService,
         ProductsService,
+        AttributeTypesService,
         DeliveryMethodsService,
         PaymentMethodsService,
         RepositoryMockService.getProvider(Order),

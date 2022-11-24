@@ -34,6 +34,13 @@ export const BUILTIN_SETTINGS: SettingCreateDto[] = [
   },
   {
     builtin: true,
+    name: 'Product ratings',
+    description: 'Allow users to rate products',
+    type: SettingType.Boolean,
+    defaultValue: 'true',
+  },
+  {
+    builtin: true,
     name: 'Product rating photos',
     description: 'Allow users to upload photos for product ratings',
     type: SettingType.Boolean,

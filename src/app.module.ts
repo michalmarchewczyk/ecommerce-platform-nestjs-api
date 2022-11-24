@@ -23,7 +23,7 @@ import { SettingsModule } from './settings/settings.module';
 import { schema } from './config/configuration.schema';
 import { CatalogModule } from './catalog/catalog.module';
 import { SalesModule } from './sales/sales.module';
-import { FeatureEnabledGuard } from './settings/guards/feature-enabled.guard';
+import { FeaturesEnabledGuard } from './settings/guards/features-enabled.guard';
 
 @Module({
   imports: [
@@ -75,7 +75,7 @@ import { FeatureEnabledGuard } from './settings/guards/feature-enabled.guard';
     },
     {
       provide: APP_GUARD,
-      useClass: FeatureEnabledGuard,
+      useClass: FeaturesEnabledGuard,
     },
     {
       provide: APP_INTERCEPTOR,

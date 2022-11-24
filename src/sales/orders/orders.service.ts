@@ -95,20 +95,7 @@ export class OrdersService {
   }
 
   async updateOrder(id: number, orderData: OrderUpdateDto): Promise<Order> {
-    const order = await this.ordersRepository.findOne({
-      where: { id },
-      relations: [
-        'user',
-        'items',
-        'items.product',
-        'delivery',
-        'payment',
-        'return',
-      ],
-    });
-    if (!order) {
-      throw new NotFoundError('order', 'id', id.toString());
-    }
+    const order = await this.getOrder(id);
     if (orderData.items) {
       order.items = [];
       for (const item of orderData.items) {

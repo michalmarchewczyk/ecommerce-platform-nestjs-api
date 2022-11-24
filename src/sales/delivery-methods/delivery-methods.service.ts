@@ -38,12 +38,7 @@ export class DeliveryMethodsService {
     id: number,
     methodData: DeliveryMethodDto,
   ): Promise<DeliveryMethod> {
-    const method = await this.deliveryMethodsRepository.findOne({
-      where: { id },
-    });
-    if (!method) {
-      throw new NotFoundError('delivery method', 'id', id.toString());
-    }
+    const method = await this.getMethod(id);
     method.name = methodData.name;
     method.description = methodData.description;
     method.price = methodData.price;
@@ -51,12 +46,7 @@ export class DeliveryMethodsService {
   }
 
   async deleteMethod(id: number): Promise<boolean> {
-    const method = await this.deliveryMethodsRepository.findOne({
-      where: { id },
-    });
-    if (!method) {
-      throw new NotFoundError('delivery method', 'id', id.toString());
-    }
+    await this.getMethod(id);
     await this.deliveryMethodsRepository.delete({ id });
     return true;
   }

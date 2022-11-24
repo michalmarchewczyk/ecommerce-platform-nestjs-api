@@ -3,18 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Return } from './models/return.entity';
 import { Repository } from 'typeorm';
 import { ReturnCreateDto } from './dto/return-create.dto';
-import { Order } from '../orders/models/order.entity';
 import { ReturnUpdateDto } from './dto/return-update.dto';
 import { NotFoundError } from '../../errors/not-found.error';
 import { ConflictError } from '../../errors/conflict.error';
+import { OrdersService } from '../orders/orders.service';
 
 @Injectable()
 export class ReturnsService {
   constructor(
     @InjectRepository(Return)
     private readonly returnsRepository: Repository<Return>,
-    @InjectRepository(Order)
-    private readonly ordersRepository: Repository<Order>,
+    private ordersService: OrdersService,
   ) {}
 
   async getReturns(): Promise<Return[]> {
@@ -49,22 +48,9 @@ export class ReturnsService {
     return !!foundReturn;
   }
 
-  async checkOrderUser(userId: number, orderId: number): Promise<boolean> {
-    const order = await this.ordersRepository.findOne({
-      where: { id: orderId, user: { id: userId } },
-    });
-    return !!order;
-  }
-
   async createReturn(returnDto: ReturnCreateDto): Promise<Return> {
     const newReturn = new Return();
-    const order = await this.ordersRepository.findOne({
-      where: { id: returnDto.orderId },
-      relations: ['items'],
-    });
-    if (!order) {
-      throw new NotFoundError('order', 'id', returnDto.orderId.toString());
-    }
+    const order = await this.ordersService.getOrder(returnDto.orderId);
     try {
       newReturn.order = order;
       newReturn.message = returnDto.message;
@@ -75,13 +61,7 @@ export class ReturnsService {
   }
 
   async updateReturn(id: number, returnDto: ReturnUpdateDto): Promise<Return> {
-    const foundReturn = await this.returnsRepository.findOne({
-      where: { id },
-      relations: ['order'],
-    });
-    if (!foundReturn) {
-      throw new NotFoundError('return', 'id', id.toString());
-    }
+    const foundReturn = await this.getReturn(id);
     Object.assign(foundReturn, returnDto);
     return this.returnsRepository.save(foundReturn);
   }

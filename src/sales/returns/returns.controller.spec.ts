@@ -11,6 +11,18 @@ import { OrderCreateDto } from '../orders/dto/order-create.dto';
 import { User } from '../../users/models/user.entity';
 import { Role } from '../../users/models/role.enum';
 import { NotFoundError } from '../../errors/not-found.error';
+import { OrdersService } from '../orders/orders.service';
+import { UsersService } from '../../users/users.service';
+import { ProductsService } from '../../catalog/products/products.service';
+import { AttributeTypesService } from '../../catalog/attribute-types/attribute-types.service';
+import { DeliveryMethodsService } from '../delivery-methods/delivery-methods.service';
+import { PaymentMethodsService } from '../payment-methods/payment-methods.service';
+import { Product } from '../../catalog/products/models/product.entity';
+import { Attribute } from '../../catalog/products/models/attribute.entity';
+import { DeliveryMethod } from '../delivery-methods/models/delivery-method.entity';
+import { PaymentMethod } from '../payment-methods/models/payment-method.entity';
+import { AttributeType } from '../../catalog/attribute-types/models/attribute-type.entity';
+import { ProductPhoto } from '../../catalog/products/product-photos/models/product-photo.entity';
 
 describe('ReturnsController', () => {
   let controller: ReturnsController;
@@ -23,8 +35,21 @@ describe('ReturnsController', () => {
       controllers: [ReturnsController],
       providers: [
         ReturnsService,
+        OrdersService,
+        UsersService,
+        ProductsService,
+        AttributeTypesService,
+        DeliveryMethodsService,
+        PaymentMethodsService,
         RepositoryMockService.getProvider(Return),
         RepositoryMockService.getProvider(Order),
+        RepositoryMockService.getProvider(User),
+        RepositoryMockService.getProvider(Product),
+        RepositoryMockService.getProvider(Attribute),
+        RepositoryMockService.getProvider(DeliveryMethod),
+        RepositoryMockService.getProvider(PaymentMethod),
+        RepositoryMockService.getProvider(AttributeType),
+        RepositoryMockService.getProvider(ProductPhoto),
         DtoGeneratorService,
       ],
     }).compile();

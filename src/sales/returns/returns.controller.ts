@@ -25,13 +25,17 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { OrdersService } from '../orders/orders.service';
 
 @ApiUnauthorizedResponse({ description: 'User not logged in' })
 @ApiForbiddenResponse({ description: 'User not authorized' })
 @ApiTags('returns')
 @Controller('returns')
 export class ReturnsController {
-  constructor(private readonly returnsService: ReturnsService) {}
+  constructor(
+    private returnsService: ReturnsService,
+    private ordersService: OrdersService,
+  ) {}
 
   @Get()
   @Roles(Role.Admin, Role.Manager, Role.Sales)
@@ -63,7 +67,7 @@ export class ReturnsController {
     @ReqUser() user: User,
     @Body() body: ReturnCreateDto,
   ): Promise<Return> {
-    const checkUser = await this.returnsService.checkOrderUser(
+    const checkUser = await this.ordersService.checkOrderUser(
       user.id,
       body.orderId,
     );

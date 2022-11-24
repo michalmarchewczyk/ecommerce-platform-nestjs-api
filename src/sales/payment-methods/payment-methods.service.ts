@@ -38,23 +38,13 @@ export class PaymentMethodsService {
     id: number,
     methodData: PaymentMethodDto,
   ): Promise<PaymentMethod> {
-    const method = await this.paymentMethodsRepository.findOne({
-      where: { id },
-    });
-    if (!method) {
-      throw new NotFoundError('payment method', 'id', id.toString());
-    }
+    const method = await this.getMethod(id);
     Object.assign(method, methodData);
     return this.paymentMethodsRepository.save(method);
   }
 
   async deleteMethod(id: number): Promise<boolean> {
-    const method = await this.paymentMethodsRepository.findOne({
-      where: { id },
-    });
-    if (!method) {
-      throw new NotFoundError('payment method', 'id', id.toString());
-    }
+    await this.getMethod(id);
     await this.paymentMethodsRepository.delete({ id });
     return true;
   }

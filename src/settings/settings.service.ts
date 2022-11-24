@@ -1,12 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { QueryFailedError, Repository } from 'typeorm';
-import { Setting } from './entities/setting.entity';
+import { Setting } from './models/setting.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SettingCreateDto } from './dto/setting-create.dto';
 import { NotFoundError } from '../errors/not-found.error';
 import { SettingUpdateDto } from './dto/setting-update.dto';
 import { BUILTIN_SETTINGS } from './builtin-settings.data';
-import { SettingType } from './entities/setting-type.enum';
+import { SettingType } from './models/setting-type.enum';
 import { TypeCheckError } from '../errors/type-check.error';
 import validator from 'validator';
 import isISO4217 = validator.isISO4217;

@@ -1,7 +1,4 @@
 import { Injectable, StreamableFile } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ProductPhoto } from '../products/entities/product-photo.entity';
-import { Repository } from 'typeorm';
 import * as sharp from 'sharp';
 import { createReadStream } from 'fs';
 import * as path from 'path';
@@ -9,11 +6,7 @@ import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class LocalFilesService {
-  constructor(
-    @InjectRepository(ProductPhoto)
-    private productPhotosRepository: Repository<ProductPhoto>,
-    private settingsService: SettingsService,
-  ) {}
+  constructor(private settingsService: SettingsService) {}
 
   async getPhoto(filepath: string, mimeType: string) {
     const stream = createReadStream(path.join(process.cwd(), filepath));
@@ -59,9 +52,5 @@ export class LocalFilesService {
       .jpeg({ quality: 80, mozjpeg: true })
       .toFile(outputPath);
     return outputPath;
-  }
-
-  async exportProductPhotos(): Promise<ProductPhoto[]> {
-    return this.productPhotosRepository.find();
   }
 }

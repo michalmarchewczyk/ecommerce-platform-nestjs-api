@@ -2,14 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { Role } from '../src/users/entities/role.enum';
+import { Role } from '../src/users/models/role.enum';
 import { TestUsersService } from './utils/test-users/test-users.service';
 import { TestUsersModule } from './utils/test-users/test-users.module';
 import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
-import { ProductCreateDto } from '../src/products/dto/product-create.dto';
-import { Product } from '../src/products/entities/product.entity';
+import { ProductCreateDto } from '../src/catalog/products/dto/product-create.dto';
+import { Product } from '../src/catalog/products/models/product.entity';
 import { setupRbacTests } from './utils/setup-rbac-tests';
-import { Wishlist } from '../src/wishlists/entities/wishlist.entity';
+import { Wishlist } from '../src/wishlists/models/wishlist.entity';
 import { WishlistCreateDto } from '../src/wishlists/dto/wishlist-create.dto';
 
 describe.only('WishlistsController (e2e)', () => {
@@ -113,7 +113,7 @@ describe.only('WishlistsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toMatchObject({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });
@@ -174,7 +174,7 @@ describe.only('WishlistsController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toMatchObject({
         statusCode: 404,
-        message: ['product not found'],
+        message: ['product with id=12345 not found'],
         error: 'Not Found',
       });
     });

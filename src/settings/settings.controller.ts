@@ -8,11 +8,11 @@ import {
   Post,
 } from '@nestjs/common';
 import { SettingsService } from './settings.service';
-import { Setting } from './entities/setting.entity';
+import { Setting } from './models/setting.entity';
 import { SettingCreateDto } from './dto/setting-create.dto';
 import { SettingUpdateDto } from './dto/setting-update.dto';
-import { Roles } from '../auth/roles.decorator';
-import { Role } from '../users/entities/role.enum';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../users/models/role.enum';
 import {
   ApiBadRequestResponse,
   ApiConflictResponse,

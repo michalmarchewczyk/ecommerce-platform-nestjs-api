@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { User } from './entities/user.entity';
+import { User } from './models/user.entity';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';

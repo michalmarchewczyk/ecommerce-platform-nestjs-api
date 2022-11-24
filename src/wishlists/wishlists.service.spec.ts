@@ -1,14 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WishlistsService } from './wishlists.service';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
-import { Wishlist } from './entities/wishlist.entity';
-import { Product } from '../products/entities/product.entity';
+import { Wishlist } from './models/wishlist.entity';
+import { Product } from '../catalog/products/models/product.entity';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ProductCreateDto } from '../products/dto/product-create.dto';
+import { ProductCreateDto } from '../catalog/products/dto/product-create.dto';
 import { WishlistCreateDto } from './dto/wishlist-create.dto';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/models/user.entity';
 import { NotFoundError } from '../errors/not-found.error';
+import { ProductsService } from '../catalog/products/products.service';
+import { AttributeTypesService } from '../catalog/attribute-types/attribute-types.service';
+import { AttributeType } from '../catalog/attribute-types/models/attribute-type.entity';
+import { Attribute } from '../catalog/products/models/attribute.entity';
 
 describe('WishlistsService', () => {
   let service: WishlistsService;
@@ -22,8 +26,12 @@ describe('WishlistsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WishlistsService,
+        ProductsService,
+        AttributeTypesService,
         RepositoryMockService.getProvider(Wishlist),
         RepositoryMockService.getProvider(Product),
+        RepositoryMockService.getProvider(AttributeType),
+        RepositoryMockService.getProvider(Attribute),
         DtoGeneratorService,
       ],
     }).compile();

@@ -1,5 +1,5 @@
 import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
-import { SettingType } from '../entities/setting-type.enum';
+import { SettingType } from '../models/setting-type.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SettingCreateDto {

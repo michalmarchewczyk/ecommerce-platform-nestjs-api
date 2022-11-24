@@ -5,7 +5,7 @@ import { AppModule } from '../src/app.module';
 import { DtoGeneratorService } from './utils/dto-generator/dto-generator.service';
 import { RegisterDto } from '../src/auth/dto/register.dto';
 import { LoginDto } from '../src/auth/dto/login.dto';
-import { Role } from '../src/users/entities/role.enum';
+import { Role } from '../src/users/models/role.enum';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;

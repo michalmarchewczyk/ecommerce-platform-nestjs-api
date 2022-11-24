@@ -4,9 +4,9 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { DtoGeneratorService } from '../../test/utils/dto-generator/dto-generator.service';
 import { RegisterDto } from './dto/register.dto';
-import { User } from '../users/entities/user.entity';
+import { User } from '../users/models/user.entity';
 import { RepositoryMockService } from '../../test/utils/repository-mock/repository-mock.service';
-import { Role } from '../users/entities/role.enum';
+import { Role } from '../users/models/role.enum';
 import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 

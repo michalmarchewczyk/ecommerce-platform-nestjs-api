@@ -1,4 +1,4 @@
-import { Role } from '../../src/users/entities/role.enum';
+import { Role } from '../../src/users/models/role.enum';
 import * as request from 'supertest';
 import { parseEndpoint } from './parse-endpoint';
 import { INestApplication } from '@nestjs/common';

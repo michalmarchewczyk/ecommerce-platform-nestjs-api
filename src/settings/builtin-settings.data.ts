@@ -1,5 +1,5 @@
 import { SettingCreateDto } from './dto/setting-create.dto';
-import { SettingType } from './entities/setting-type.enum';
+import { SettingType } from './models/setting-type.enum';
 
 export const BUILTIN_SETTINGS: SettingCreateDto[] = [
   {
@@ -31,6 +31,13 @@ export const BUILTIN_SETTINGS: SettingCreateDto[] = [
       'Size of automatically generated thumbnails (in pixels, [SIZE]x[SIZE])',
     type: SettingType.Number,
     defaultValue: '400',
+  },
+  {
+    builtin: true,
+    name: 'Product ratings',
+    description: 'Allow users to leave product ratings',
+    type: SettingType.Boolean,
+    defaultValue: 'true',
   },
   {
     builtin: true,

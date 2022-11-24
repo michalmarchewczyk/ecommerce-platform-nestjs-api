@@ -1,24 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Wishlist } from './entities/wishlist.entity';
-import { User } from '../users/entities/user.entity';
+import { Wishlist } from './models/wishlist.entity';
+import { User } from '../users/models/user.entity';
 import { WishlistCreateDto } from './dto/wishlist-create.dto';
 import { WishlistUpdateDto } from './dto/wishlist-update.dto';
 import { NotFoundError } from '../errors/not-found.error';
-import { Product } from '../products/entities/product.entity';
+import { ProductsService } from '../catalog/products/products.service';
 
 @Injectable()
 export class WishlistsService {
   constructor(
     @InjectRepository(Wishlist)
     private readonly wishlistsRepository: Repository<Wishlist>,
-    @InjectRepository(Product)
-    private readonly productsRepository: Repository<Product>,
+    private productsService: ProductsService,
   ) {}
 
   async getUserWishlists(user: User): Promise<Wishlist[]> {
     return this.wishlistsRepository.find({ where: { user: { id: user.id } } });
+  }
+
+  async getWishlist(userId: number, id: number): Promise<Wishlist> {
+    const wishlist = await this.wishlistsRepository.findOne({
+      where: {
+        id,
+        user: { id: userId },
+      },
+    });
+    if (!wishlist) {
+      throw new NotFoundError('wishlist');
+    }
+    return wishlist;
   }
 
   async createWishlist(
@@ -30,12 +42,7 @@ export class WishlistsService {
     wishlist.name = createData.name;
     wishlist.products = [];
     for (const productId of createData.productIds) {
-      const product = await this.productsRepository.findOne({
-        where: { id: productId },
-      });
-      if (!product) {
-        throw new NotFoundError('product');
-      }
+      const product = await this.productsService.getProduct(productId);
       wishlist.products.push(product);
     }
     return this.wishlistsRepository.save(wishlist);
@@ -46,39 +53,18 @@ export class WishlistsService {
     id: number,
     updateData: WishlistUpdateDto,
   ): Promise<Wishlist> {
-    const wishlist = await this.wishlistsRepository.findOne({
-      where: {
-        id,
-        user: { id: user.id },
-      },
-    });
-    if (!wishlist) {
-      throw new NotFoundError('wishlist');
-    }
+    const wishlist = await this.getWishlist(user.id, id);
     wishlist.name = updateData.name ?? wishlist.name;
     wishlist.products = [];
     for (const productId of updateData.productIds ?? []) {
-      const product = await this.productsRepository.findOne({
-        where: { id: productId },
-      });
-      if (!product) {
-        throw new NotFoundError('product');
-      }
+      const product = await this.productsService.getProduct(productId);
       wishlist.products.push(product);
     }
     return this.wishlistsRepository.save(wishlist);
   }
 
   async deleteWishlist(user: User, id: number): Promise<boolean> {
-    const wishlist = await this.wishlistsRepository.findOne({
-      where: {
-        id,
-        user: { id: user.id },
-      },
-    });
-    if (!wishlist) {
-      throw new NotFoundError('wishlist');
-    }
+    await this.getWishlist(user.id, id);
     await this.wishlistsRepository.delete({ id });
     return true;
   }

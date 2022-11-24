@@ -8,21 +8,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import configuration, { schema } from './config/configuration';
+import configuration from './config/configuration';
 import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import * as createRedisStore from 'connect-redis';
 import { RedisClient } from 'redis';
 import { RedisModule, REDIS_CLIENT } from './redis';
-import { RolesGuard } from './auth/roles.guard';
-import { ProductsModule } from './products/products.module';
+import { RolesGuard } from './auth/guards/roles.guard';
 import { LocalFilesModule } from './local-files/local-files.module';
-import { OrdersModule } from './orders/orders.module';
-import { ReturnsModule } from './returns/returns.module';
 import { ServiceErrorInterceptor } from './errors/service-error.interceptor';
 import { WishlistsModule } from './wishlists/wishlists.module';
 import { SettingsModule } from './settings/settings.module';
+import { schema } from './config/configuration.schema';
+import { CatalogModule } from './catalog/catalog.module';
+import { SalesModule } from './sales/sales.module';
+import { FeaturesEnabledGuard } from './settings/guards/features-enabled.guard';
 
 @Module({
   imports: [
@@ -49,15 +50,14 @@ import { SettingsModule } from './settings/settings.module';
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
-    AuthModule,
     RedisModule,
-    ProductsModule,
-    LocalFilesModule,
-    OrdersModule,
-    ReturnsModule,
-    WishlistsModule,
+    AuthModule,
+    UsersModule,
     SettingsModule,
+    LocalFilesModule,
+    CatalogModule,
+    SalesModule,
+    WishlistsModule,
   ],
   controllers: [],
   providers: [
@@ -72,6 +72,10 @@ import { SettingsModule } from './settings/settings.module';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: FeaturesEnabledGuard,
     },
     {
       provide: APP_INTERCEPTOR,
@@ -91,7 +95,7 @@ export class AppModule {
       .apply(
         session({
           store: new RedisStore({ client: this.redisClient }),
-          secret: this.configService.get<string>('session.secret')!,
+          secret: this.configService.get<string>('session.secret', ''),
           resave: false,
           saveUninitialized: false,
           cookie: {

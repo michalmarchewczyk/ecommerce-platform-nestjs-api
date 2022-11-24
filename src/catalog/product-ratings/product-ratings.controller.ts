@@ -25,8 +25,10 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Features } from '../../settings/guards/features.decorator';
 
 @ApiTags('product ratings')
+@Features('Product ratings')
 @Controller('products/:productId/ratings')
 export class ProductRatingsController {
   constructor(private readonly productRatingsService: ProductRatingsService) {}

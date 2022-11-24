@@ -107,6 +107,23 @@ describe('ProductRatingsController (e2e)', () => {
       expect(response.status).toBe(200);
       expect(response.body).toEqual([]);
     });
+
+    it('should return error if disabled by setting', async () => {
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Product ratings',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
+      const response = await request(app.getHttpServer())
+        .get(`/products/${testProduct.id}/ratings`)
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        message: 'Not Found',
+      });
+      await settings.updateSetting(settingId ?? -1, { value: 'true' });
+    });
   });
 
   describe('/products/:productId/ratings (POST)', () => {
@@ -137,6 +154,26 @@ describe('ProductRatingsController (e2e)', () => {
         error: 'Not Found',
         message: ['product with id=12345 not found'],
       });
+    });
+
+    it('should return error if disabled by setting', async () => {
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Product ratings',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const response = await request(app.getHttpServer())
+        .post(`/products/${testProduct.id}/ratings`)
+        .set('Cookie', cookieHeader)
+        .send(createData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        message: 'Not Found',
+      });
+      await settings.updateSetting(settingId ?? -1, { value: 'true' });
     });
   });
 
@@ -212,6 +249,34 @@ describe('ProductRatingsController (e2e)', () => {
         message: ['product rating not found'],
       });
     });
+
+    it('should return error if disabled by setting', async () => {
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/products/${testProduct.id}/ratings`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Product ratings',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
+      const updateData = generate(ProductRatingDto, true);
+      updateData.rating = 4;
+      const response = await request(app.getHttpServer())
+        .put(`/products/${testProduct.id}/ratings/${id}`)
+        .set('Cookie', cookieHeader)
+        .send(updateData);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        message: 'Not Found',
+      });
+      await settings.updateSetting(settingId ?? -1, { value: 'true' });
+    });
   });
 
   describe('/products/:productId/ratings/:id (DELETE)', () => {
@@ -252,6 +317,31 @@ describe('ProductRatingsController (e2e)', () => {
         error: 'Not Found',
         message: ['product rating not found'],
       });
+    });
+
+    it('should return error if disabled by setting', async () => {
+      const createData = generate(ProductRatingDto, true);
+      createData.rating = 5;
+      const id = (
+        await request(app.getHttpServer())
+          .post(`/products/${testProduct.id}/ratings`)
+          .set('Cookie', cookieHeader)
+          .send(createData)
+      ).body.id;
+      const settings = await app.get(SettingsService);
+      const settingId = (await settings.getSettings()).find(
+        (s) => s.name === 'Product ratings',
+      )?.id;
+      await settings.updateSetting(settingId ?? -1, { value: 'false' });
+      const response = await request(app.getHttpServer())
+        .delete(`/products/${testProduct.id}/ratings/${id}`)
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        message: 'Not Found',
+      });
+      await settings.updateSetting(settingId ?? -1, { value: 'true' });
     });
   });
 

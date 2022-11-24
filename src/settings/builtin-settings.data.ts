@@ -35,7 +35,7 @@ export const BUILTIN_SETTINGS: SettingCreateDto[] = [
   {
     builtin: true,
     name: 'Product ratings',
-    description: 'Allow users to rate products',
+    description: 'Allow users to leave product ratings',
     type: SettingType.Boolean,
     defaultValue: 'true',
   },

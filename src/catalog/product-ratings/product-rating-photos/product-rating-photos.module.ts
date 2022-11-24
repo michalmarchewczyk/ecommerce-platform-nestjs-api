@@ -6,7 +6,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductRating } from '../models/product-rating.entity';
 import { ProductRatingPhoto } from './models/product-rating-photo.entity';
-import { SettingsModule } from '../../../settings/settings.module';
 import { LocalFilesModule } from '../../../local-files/local-files.module';
 
 @Module({
@@ -19,7 +18,6 @@ import { LocalFilesModule } from '../../../local-files/local-files.module';
       }),
       inject: [ConfigService],
     }),
-    SettingsModule,
     LocalFilesModule,
   ],
   providers: [ProductRatingPhotosService],

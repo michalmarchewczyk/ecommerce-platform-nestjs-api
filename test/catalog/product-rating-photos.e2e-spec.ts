@@ -136,8 +136,7 @@ describe('ProductRatingPhotosController (e2e)', () => {
       expect(response2.status).toBe(404);
       expect(response2.body).toEqual({
         statusCode: 404,
-        error: 'Not Found',
-        message: ['product rating photo not found'],
+        message: 'Not Found',
       });
       await settings.updateSetting(settingId ?? -1, { value: 'true' });
     });
@@ -285,8 +284,7 @@ describe('ProductRatingPhotosController (e2e)', () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         statusCode: 404,
-        error: 'Not Found',
-        message: ['product rating not found'],
+        message: 'Not Found',
       });
       await settings.updateSetting(settingId ?? -1, { value: 'true' });
     });
@@ -367,8 +365,7 @@ describe('ProductRatingPhotosController (e2e)', () => {
       expect(response2.status).toBe(404);
       expect(response2.body).toEqual({
         statusCode: 404,
-        error: 'Not Found',
-        message: ['product rating photo not found'],
+        message: 'Not Found',
       });
       await settings.updateSetting(settingId ?? -1, { value: 'true' });
     });

@@ -34,8 +34,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ReqUser } from '../../../auth/decorators/user.decorator';
 import { User } from '../../../users/models/user.entity';
 import { ProductRating } from '../models/product-rating.entity';
+import { Feature } from '../../../settings/guards/feature.decorator';
 
 @ApiTags('product ratings')
+@Feature('Product rating photos')
 @Controller('products/:productId/ratings/:id/photos')
 export class ProductRatingPhotosController {
   constructor(private productRatingPhotosService: ProductRatingPhotosService) {}

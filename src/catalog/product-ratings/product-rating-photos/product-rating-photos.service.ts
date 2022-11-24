@@ -5,7 +5,6 @@ import { ProductRatingPhoto } from './models/product-rating-photo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LocalFilesService } from '../../../local-files/local-files.service';
-import { SettingsService } from '../../../settings/settings.service';
 
 @Injectable()
 export class ProductRatingPhotosService {
@@ -15,7 +14,6 @@ export class ProductRatingPhotosService {
     @InjectRepository(ProductRatingPhoto)
     private readonly productRatingPhotosRepository: Repository<ProductRatingPhoto>,
     private readonly localFilesService: LocalFilesService,
-    private settingsService: SettingsService,
   ) {}
 
   async checkProductRatingUser(id: number, userId: number): Promise<boolean> {
@@ -31,14 +29,6 @@ export class ProductRatingPhotosService {
     photoId: number,
     thumbnail: boolean,
   ): Promise<StreamableFile> {
-    if (
-      (await this.settingsService.getSettingValueByName(
-        'Product rating photos',
-      )) !== 'true'
-    ) {
-      throw new NotFoundError('product rating photo');
-    }
-
     const ratingPhoto = await this.productRatingPhotosRepository.findOne({
       where: {
         id: photoId,
@@ -62,13 +52,6 @@ export class ProductRatingPhotosService {
     productRatingId: number,
     file: Express.Multer.File,
   ): Promise<ProductRating> {
-    if (
-      (await this.settingsService.getSettingValueByName(
-        'Product rating photos',
-      )) !== 'true'
-    ) {
-      throw new NotFoundError('product rating');
-    }
     const productRating = await this.productRatingsRepository.findOne({
       where: { id: productRatingId, product: { id: productId } },
     });
@@ -95,13 +78,6 @@ export class ProductRatingPhotosService {
     productRatingId: number,
     photoId: number,
   ): Promise<ProductRating> {
-    if (
-      (await this.settingsService.getSettingValueByName(
-        'Product rating photos',
-      )) !== 'true'
-    ) {
-      throw new NotFoundError('product rating photo');
-    }
     const productRating = await this.productRatingsRepository.findOne({
       where: { id: productRatingId, product: { id: productId } },
     });

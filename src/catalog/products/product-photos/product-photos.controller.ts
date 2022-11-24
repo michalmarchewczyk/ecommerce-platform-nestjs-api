@@ -30,6 +30,8 @@ import { Role } from '../../../users/models/role.enum';
 import { Product } from '../models/product.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductPhotosService } from './product-photos.service';
+import { fileBodySchema } from '../../../local-files/models/file-body.schema';
+import { fileResponseSchema } from '../../../local-files/models/file-response.schema';
 
 @ApiTags('products')
 @Controller('products/:id')
@@ -38,10 +40,7 @@ export class ProductPhotosController {
 
   @Get('photos/:photoId')
   @ApiOkResponse({
-    schema: {
-      type: 'string',
-      format: 'binary',
-    },
+    schema: fileResponseSchema,
     description: 'Product photo with given id',
   })
   @ApiProduces('image/*')
@@ -64,17 +63,7 @@ export class ProductPhotosController {
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiCreatedResponse({ type: Product, description: 'Product photo added' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
+  @ApiBody({ schema: fileBodySchema })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   async addProductPhoto(

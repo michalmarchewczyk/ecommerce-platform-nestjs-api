@@ -29,12 +29,13 @@ import {
 } from '@nestjs/swagger';
 import { Roles } from '../../../auth/decorators/roles.decorator';
 import { Role } from '../../../users/models/role.enum';
-import { Product } from '../../products/models/product.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ReqUser } from '../../../auth/decorators/user.decorator';
 import { User } from '../../../users/models/user.entity';
 import { ProductRating } from '../models/product-rating.entity';
 import { Features } from '../../../settings/guards/features.decorator';
+import { fileResponseSchema } from '../../../local-files/models/file-response.schema';
+import { fileBodySchema } from '../../../local-files/models/file-body.schema';
 
 @ApiTags('product ratings')
 @Features('Product ratings', 'Product rating photos')
@@ -44,10 +45,7 @@ export class ProductRatingPhotosController {
 
   @Get(':photoId')
   @ApiOkResponse({
-    schema: {
-      type: 'string',
-      format: 'binary',
-    },
+    schema: fileResponseSchema,
     description: 'Product rating photo with given id',
   })
   @ApiProduces('image/*')
@@ -72,20 +70,10 @@ export class ProductRatingPhotosController {
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product rating not found' })
   @ApiCreatedResponse({
-    type: Product,
+    type: ProductRating,
     description: 'Product rating photo added',
   })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
+  @ApiBody({ schema: fileBodySchema })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   async addProductRatingPhoto(
@@ -119,7 +107,10 @@ export class ProductRatingPhotosController {
   @ApiUnauthorizedResponse({ description: 'User not logged in' })
   @ApiForbiddenResponse({ description: 'User not authorized' })
   @ApiNotFoundResponse({ description: 'Product rating not found' })
-  @ApiOkResponse({ type: Product, description: 'Product rating photo deleted' })
+  @ApiOkResponse({
+    type: ProductRating,
+    description: 'Product rating photo deleted',
+  })
   async deleteProductRatingPhoto(
     @ReqUser() user: User,
     @Param('productId', ParseIntPipe) productId: number,

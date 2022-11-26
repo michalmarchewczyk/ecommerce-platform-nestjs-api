@@ -24,6 +24,7 @@ import { schema } from './config/configuration.schema';
 import { CatalogModule } from './catalog/catalog.module';
 import { SalesModule } from './sales/sales.module';
 import { FeaturesEnabledGuard } from './settings/guards/features-enabled.guard';
+import { ImportExportModule } from './import-export/import-export.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { FeaturesEnabledGuard } from './settings/guards/features-enabled.guard';
     CatalogModule,
     SalesModule,
     WishlistsModule,
+    ImportExportModule,
   ],
   controllers: [],
   providers: [

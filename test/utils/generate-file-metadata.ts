@@ -4,7 +4,7 @@ const getRandomString = () => {
   return Math.random().toString(36).substring(2, 15);
 };
 
-export const generateFileMetadata = () => {
+export const generateFileMetadata = (data?: string) => {
   const filename = getRandomString();
   return {
     fieldname: 'file',
@@ -15,7 +15,7 @@ export const generateFileMetadata = () => {
     destination: './uploads',
     filename,
     path: `./uploads/${filename}`,
-    buffer: Buffer.from('file'),
+    buffer: Buffer.from(data ?? 'file'),
     stream: new Readable(),
   };
 };

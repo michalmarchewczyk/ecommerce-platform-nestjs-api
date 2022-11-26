@@ -10,20 +10,9 @@ export class ExportService {
   async export(data: DataType[]) {
     const toExport: Record<string, any> = {};
     for (const key of data) {
-      if (this.checkDataType(key)) {
-        toExport[key] = await this.exportCollection(key);
-      }
+      toExport[key] = await this.exportCollection(key);
     }
     return toExport;
-  }
-
-  private checkDataType(type: string): type is DataType {
-    return (
-      type in DataType ||
-      (Object.keys(DataType) as Array<keyof typeof DataType>).some(
-        (k) => DataType[k] === type,
-      )
-    );
   }
 
   private async exportCollection(type: DataType) {

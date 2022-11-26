@@ -8,7 +8,10 @@ import { Importer } from './models/importer.interface';
 export class ImportService {
   constructor(private settingsImporter: SettingsImporter) {}
 
-  async import(json: string) {
+  async import(json: string): Promise<{
+    imports: Record<string, boolean>;
+    errors: string[];
+  }> {
     const data = JSON.parse(json);
     const imports: Record<string, boolean> = {};
     const errors: string[] = [];

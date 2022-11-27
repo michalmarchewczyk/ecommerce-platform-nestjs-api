@@ -36,8 +36,15 @@ describe('ExportController', () => {
       };
       const result = await controller.export(res as any, {
         data: [DataType.Settings],
+        format: 'json',
       });
-      expect(result).toEqual({ settings: ['test'] });
+      let str = '';
+      result.getStream().on('data', (chunk) => {
+        str += chunk;
+      });
+      result.getStream().on('end', () => {
+        expect(str).toEqual('{"settings":["test"]}');
+      });
       expect(res.header).toHaveBeenCalledWith(
         'Content-Disposition',
         `attachment; filename="export-${new Date().toISOString()}.json"`,

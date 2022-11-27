@@ -28,8 +28,14 @@ describe('ExportService', () => {
 
   describe('export', () => {
     it('should return an object with the exported data', async () => {
-      const result = await service.export([DataType.Settings]);
-      expect(result).toEqual({ settings: ['test'] });
+      const result = await service.export([DataType.Settings], 'json');
+      let str = '';
+      result.getStream().on('data', (chunk) => {
+        str += chunk;
+      });
+      result.getStream().on('end', () => {
+        expect(str).toEqual('{"settings":["test"]}');
+      });
     });
   });
 });

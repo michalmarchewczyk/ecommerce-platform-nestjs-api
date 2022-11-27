@@ -28,7 +28,10 @@ describe('ImportService', () => {
   describe('import', () => {
     it('should call import on all importers', async () => {
       const settingsImporter = service['settingsImporter'];
-      const result = await service.import('{"settings": ["test"]}');
+      const result = await service.import(
+        Buffer.from('{"settings": ["test"]}', 'utf-8'),
+        'application/json',
+      );
       expect(settingsImporter.import).toHaveBeenCalledWith(['test']);
       expect(result).toEqual({
         imports: {
@@ -40,7 +43,10 @@ describe('ImportService', () => {
 
     it('should ignore unknown data types', async () => {
       const settingsImporter = service['settingsImporter'];
-      const result = await service.import('{"unknown": ["test"]}');
+      const result = await service.import(
+        Buffer.from('{"unknown": ["test"]}', 'utf-8'),
+        'application/json',
+      );
       expect(settingsImporter.import).not.toHaveBeenCalled();
       expect(result).toEqual({
         imports: {},
@@ -53,7 +59,10 @@ describe('ImportService', () => {
       settingsImporter.import = jest.fn(() => {
         throw new Error('test error');
       });
-      const result = await service.import('{"settings": ["test"]}');
+      const result = await service.import(
+        Buffer.from('{"settings": ["test"]}', 'utf-8'),
+        'application/json',
+      );
       expect(settingsImporter.import).toHaveBeenCalledWith(['test']);
       expect(result).toEqual({
         imports: {

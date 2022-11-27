@@ -39,11 +39,15 @@ export class ImportController {
   async import(
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: 'application/json' })],
+        validators: [
+          new FileTypeValidator({
+            fileType: /(^application\/json$)|(^application\/gzip$)/,
+          }),
+        ],
       }),
     )
     file: Express.Multer.File,
   ) {
-    return await this.importService.import(file.buffer.toString('utf-8'));
+    return await this.importService.import(file.buffer, file.mimetype);
   }
 }

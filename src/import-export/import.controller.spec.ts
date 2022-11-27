@@ -32,7 +32,7 @@ describe('ImportController', () => {
     it('should call import on all importers', async () => {
       const settingsImporter = controller['importService']['settingsImporter'];
       const result = await controller.import(
-        generateFileMetadata('{"settings": ["test"]}'),
+        generateFileMetadata('{"settings": ["test"]}', 'application/json'),
       );
       expect(settingsImporter.import).toHaveBeenCalledWith(['test']);
       expect(result).toEqual({
@@ -46,7 +46,7 @@ describe('ImportController', () => {
     it('should ignore unknown data types', async () => {
       const settingsImporter = controller['importService']['settingsImporter'];
       const result = await controller.import(
-        generateFileMetadata('{"unknown": ["test"]}'),
+        generateFileMetadata('{"unknown": ["test"]}', 'application/json'),
       );
       expect(settingsImporter.import).not.toHaveBeenCalled();
       expect(result).toEqual({
@@ -61,7 +61,7 @@ describe('ImportController', () => {
         throw new Error('test error');
       });
       const result = await controller.import(
-        generateFileMetadata('{"settings": ["test"]}'),
+        generateFileMetadata('{"settings": ["test"]}', 'application/json'),
       );
       expect(settingsImporter.import).toHaveBeenCalledWith(['test']);
       expect(result).toEqual({

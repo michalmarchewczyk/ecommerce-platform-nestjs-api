@@ -4,13 +4,13 @@ const getRandomString = () => {
   return Math.random().toString(36).substring(2, 15);
 };
 
-export const generateFileMetadata = (data?: string) => {
+export const generateFileMetadata = (data?: string, mimetype?: string) => {
   const filename = getRandomString();
   return {
     fieldname: 'file',
     originalname: `${getRandomString()}.jpg`,
     encoding: '8bit',
-    mimetype: 'image/jpeg',
+    mimetype: mimetype ?? 'image/jpeg',
     size: Math.floor(Math.random() * 1000) + 1,
     destination: './uploads',
     filename,

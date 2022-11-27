@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, Res } from '@nestjs/common';
+import { Body, Controller, Get, Res } from '@nestjs/common';
 import {
   ApiForbiddenResponse,
   ApiTags,
@@ -19,15 +19,18 @@ export class ExportController {
   constructor(private exportService: ExportService) {}
 
   @Get('')
-  @Header('Content-Type', 'application/json')
   async export(
     @Res({ passthrough: true }) res: Response,
     @Body() data: ExportDto,
   ) {
+    const ext = data.format === 'csv' ? 'tar.gz' : 'json';
+    const contentType =
+      data.format === 'csv' ? 'application/gzip' : 'application/json';
+    res.header('Content-Type', contentType);
     res.header(
       'Content-Disposition',
-      `attachment; filename="export-${new Date().toISOString()}.json"`,
+      `attachment; filename="export-${new Date().toISOString()}.${ext}"`,
     );
-    return await this.exportService.export(data.data);
+    return await this.exportService.export(data.data, data.format);
   }
 }

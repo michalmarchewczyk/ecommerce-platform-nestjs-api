@@ -25,7 +25,7 @@ export class ImportService {
     if (filetype === 'application/json') {
       collections = await this.parseJson(data.toString());
     } else if (filetype === 'application/gzip') {
-      collections = await this.parseCsv(data);
+      collections = await this.parseZip(data);
     }
     const imports: Record<string, boolean> = {};
     const errors: string[] = [];
@@ -46,7 +46,7 @@ export class ImportService {
     return JSON.parse(data);
   }
 
-  private async parseCsv(data: Buffer): Promise<Record<string, Collection>> {
+  private async parseZip(data: Buffer): Promise<Record<string, Collection>> {
     const stream = Readable.from(data);
     const filenames: string[] = [];
     const tarStream = tar.extract({
@@ -61,11 +61,38 @@ export class ImportService {
     for (const filename of filenames) {
       const filePath = path.join(os.tmpdir(), filename);
       const csv = await fs.readFile(filePath, { encoding: 'utf-8' });
-      collections[filename.split('.')[0]] = await csvtojson({
-        checkType: false, // TODO: check data types for builtin and value columns
-      }).fromString(csv);
+      collections[filename.split('.')[0]] = await this.parseCsv(csv);
     }
     return collections;
+  }
+
+  private async parseCsv(csv: string) {
+    const parser: Record<string, any> = {};
+    const headers = (
+      await csvtojson({
+        output: 'csv',
+        noheader: true,
+      }).fromString(csv.split(os.EOL)[0])
+    )[0];
+    for (const header of headers) {
+      parser[header] = 'string';
+    }
+    return csvtojson({
+      checkType: true,
+      colParser: parser,
+    })
+      .preFileLine((fileLineString, lineIdx) => {
+        if (lineIdx === 1) {
+          const columns = fileLineString.split(',');
+          columns.forEach((column, index) => {
+            if (!column.startsWith('"') || !column.endsWith('"')) {
+              delete parser[headers[index]];
+            }
+          });
+        }
+        return fileLineString;
+      })
+      .fromString(csv);
   }
 
   private checkDataType(type: string): type is DataType {

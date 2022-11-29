@@ -13,9 +13,21 @@ export class SettingsImporter implements Importer {
   async import(settings: Collection): Promise<boolean> {
     const parsedSettings = this.parseSettings(settings);
     for (const setting of parsedSettings) {
+      if (setting.builtin) {
+        try {
+          const { id } = await this.settingsService.getSettingByName(
+            setting.name,
+          );
+          await this.settingsService.updateSetting(id, {
+            value: setting.value,
+          });
+        } catch (e) {
+          await this.settingsService.createSetting(setting);
+        }
+      } else {
+        await this.settingsService.createSetting(setting);
+      }
       // TODO: handle conflicts
-      // TODO: handle builtin settings
-      await this.settingsService.createSetting(setting);
     }
     return true;
   }

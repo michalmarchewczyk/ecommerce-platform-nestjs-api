@@ -9,10 +9,14 @@ import * as os from 'os';
 import * as path from 'path';
 import * as tar from 'tar';
 import { Readable } from 'stream';
+import { UsersImporter } from '../users/users.importer';
 
 @Injectable()
 export class ImportService {
-  constructor(private settingsImporter: SettingsImporter) {}
+  constructor(
+    private settingsImporter: SettingsImporter,
+    private usersImporter: UsersImporter,
+  ) {}
 
   async import(
     data: Buffer,
@@ -110,6 +114,7 @@ export class ImportService {
   ): Promise<[boolean, string[]]> {
     const importers: Record<string, Importer> = {
       [DataType.Settings]: this.settingsImporter,
+      [DataType.Users]: this.usersImporter,
     };
     let success;
     const errors: string[] = [];

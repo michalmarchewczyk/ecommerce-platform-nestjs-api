@@ -5,12 +5,13 @@ import { User } from './models/user.entity';
 import { ParseError } from '../errors/parse.error';
 import { UsersService } from './users.service';
 import { Role } from './models/role.enum';
+import { IdMap } from '../import-export/models/id-map.type';
 
 @Injectable()
 export class UsersImporter implements Importer {
   constructor(private usersService: UsersService) {}
 
-  async import(users: Collection): Promise<boolean> {
+  async import(users: Collection): Promise<IdMap> {
     const parsedUsers = this.parseUsers(users);
     for (const user of parsedUsers) {
       // TODO: handle conflicts
@@ -22,7 +23,7 @@ export class UsersImporter implements Importer {
       );
       await this.usersService.updateUser(id, { role: user.role });
     }
-    return true;
+    return {};
   }
 
   private parseUsers(users: Collection) {

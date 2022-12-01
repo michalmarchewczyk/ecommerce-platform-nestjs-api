@@ -10,12 +10,14 @@ import * as path from 'path';
 import * as tar from 'tar';
 import { Readable } from 'stream';
 import { UsersExporter } from '../users/users.exporter';
+import { AttributeTypesExporter } from '../catalog/attribute-types/attribute-types.exporter';
 
 @Injectable()
 export class ExportService {
   constructor(
     private settingExporter: SettingsExporter,
     private usersExporter: UsersExporter,
+    private attributeTypesExporter: AttributeTypesExporter,
   ) {}
 
   async export(
@@ -39,6 +41,7 @@ export class ExportService {
     const exporters: Record<string, Exporter<any>> = {
       [DataType.Settings]: this.settingExporter,
       [DataType.Users]: this.usersExporter,
+      [DataType.AttributeTypes]: this.attributeTypesExporter,
     };
     return await exporters[type].export();
   }

@@ -5,12 +5,13 @@ import { Setting } from './models/setting.entity';
 import { SettingType } from './models/setting-type.enum';
 import { ParseError } from '../errors/parse.error';
 import { Importer } from '../import-export/models/importer.interface';
+import { IdMap } from '../import-export/models/id-map.type';
 
 @Injectable()
 export class SettingsImporter implements Importer {
   constructor(private settingsService: SettingsService) {}
 
-  async import(settings: Collection): Promise<boolean> {
+  async import(settings: Collection): Promise<IdMap> {
     const parsedSettings = this.parseSettings(settings);
     for (const setting of parsedSettings) {
       if (setting.builtin) {
@@ -29,7 +30,7 @@ export class SettingsImporter implements Importer {
       }
       // TODO: handle conflicts
     }
-    return true;
+    return {};
   }
 
   private parseSettings(settings: Collection) {

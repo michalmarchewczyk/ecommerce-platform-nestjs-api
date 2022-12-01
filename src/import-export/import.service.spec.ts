@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ImportService } from './import.service';
 import { SettingsImporter } from '../settings/settings.importer';
+import { UsersImporter } from '../users/users.importer';
+import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-types.importer';
 
 describe('ImportService', () => {
   let service: ImportService;
@@ -14,6 +16,14 @@ describe('ImportService', () => {
           useValue: {
             import: jest.fn(() => true),
           },
+        },
+        {
+          provide: UsersImporter,
+          useValue: {},
+        },
+        {
+          provide: AttributeTypesImporter,
+          useValue: {},
         },
       ],
     }).compile();

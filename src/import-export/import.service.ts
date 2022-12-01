@@ -10,12 +10,17 @@ import * as path from 'path';
 import * as tar from 'tar';
 import { Readable } from 'stream';
 import { UsersImporter } from '../users/users.importer';
+import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-types.importer';
+import { IdMap } from './models/id-map.type';
 
 @Injectable()
 export class ImportService {
+  private idMaps: Record<string, IdMap> = {};
+
   constructor(
     private settingsImporter: SettingsImporter,
     private usersImporter: UsersImporter,
+    private attributeTypesImporter: AttributeTypesImporter,
   ) {}
 
   async import(
@@ -35,11 +40,12 @@ export class ImportService {
     const errors: string[] = [];
     for (const key of Object.keys(collections)) {
       if (this.checkDataType(key)) {
-        const [success, error] = await this.importCollection(
+        const [idMap, error] = await this.importCollection(
           key,
           collections[key],
         );
-        imports[key] = success;
+        this.idMaps[key] = idMap ?? {};
+        imports[key] = !!idMap;
         errors.push(...error);
       }
     }
@@ -111,19 +117,20 @@ export class ImportService {
   private async importCollection(
     type: DataType,
     data: Collection,
-  ): Promise<[boolean, string[]]> {
+  ): Promise<[IdMap | null, string[]]> {
     const importers: Record<string, Importer> = {
       [DataType.Settings]: this.settingsImporter,
       [DataType.Users]: this.usersImporter,
+      [DataType.AttributeTypes]: this.attributeTypesImporter,
     };
-    let success;
+    let idMap: IdMap | null;
     const errors: string[] = [];
     try {
-      success = await importers[type].import(data);
+      idMap = await importers[type].import(data);
     } catch (e: any) {
-      success = false;
+      idMap = null;
       errors.push(e.message);
     }
-    return [success, errors];
+    return [idMap, errors];
   }
 }

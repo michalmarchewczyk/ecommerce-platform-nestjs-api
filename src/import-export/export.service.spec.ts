@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ExportService } from './export.service';
 import { SettingsExporter } from '../settings/settings.exporter';
 import { DataType } from './models/data-type.enum';
+import { UsersExporter } from '../users/users.exporter';
+import { AttributeTypesExporter } from '../catalog/attribute-types/attribute-types.exporter';
 
 describe('ExportService', () => {
   let service: ExportService;
@@ -15,6 +17,14 @@ describe('ExportService', () => {
           useValue: {
             export: jest.fn(async () => ['test']),
           },
+        },
+        {
+          provide: UsersExporter,
+          useValue: {},
+        },
+        {
+          provide: AttributeTypesExporter,
+          useValue: {},
         },
       ],
     }).compile();

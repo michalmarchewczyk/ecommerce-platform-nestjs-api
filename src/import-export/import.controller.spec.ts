@@ -3,6 +3,8 @@ import { ImportController } from './import.controller';
 import { ImportService } from './import.service';
 import { SettingsImporter } from '../settings/settings.importer';
 import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
+import { UsersImporter } from '../users/users.importer';
+import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-types.importer';
 
 describe('ImportController', () => {
   let controller: ImportController;
@@ -17,6 +19,14 @@ describe('ImportController', () => {
           useValue: {
             import: jest.fn(() => true),
           },
+        },
+        {
+          provide: UsersImporter,
+          useValue: {},
+        },
+        {
+          provide: AttributeTypesImporter,
+          useValue: {},
         },
       ],
     }).compile();

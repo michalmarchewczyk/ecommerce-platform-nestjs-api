@@ -12,6 +12,8 @@ import { Readable } from 'stream';
 import { UsersImporter } from '../users/users.importer';
 import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-types.importer';
 import { IdMap } from './models/id-map.type';
+import { dataTypeDependencies } from './models/data-type-dependencies.data';
+import { GenericError } from '../errors/generic.error';
 
 @Injectable()
 export class ImportService {
@@ -23,13 +25,7 @@ export class ImportService {
     private attributeTypesImporter: AttributeTypesImporter,
   ) {}
 
-  async import(
-    data: Buffer,
-    filetype: string,
-  ): Promise<{
-    imports: Record<string, boolean>;
-    errors: string[];
-  }> {
+  async import(data: Buffer, filetype: string) {
     let collections: Record<string, Collection> = {};
     if (filetype === 'application/json') {
       collections = await this.parseJson(data.toString());
@@ -38,6 +34,7 @@ export class ImportService {
     }
     const imports: Record<string, boolean> = {};
     const errors: string[] = [];
+    this.checkDataTypeDependencies(Object.keys(collections));
     for (const key of Object.keys(collections)) {
       if (this.checkDataType(key)) {
         const [idMap, error] = await this.importCollection(
@@ -50,6 +47,20 @@ export class ImportService {
       }
     }
     return { imports, errors };
+  }
+
+  private checkDataTypeDependencies(data: string[]) {
+    for (const type of data) {
+      const dependencies = dataTypeDependencies.find((d) => d[0] === type)?.[1];
+      if (!dependencies) {
+        throw new GenericError(`"${type}" is not recognized data type`);
+      }
+      for (const dependency of dependencies) {
+        if (!data.includes(dependency)) {
+          throw new GenericError(`"${type}" depends on "${dependency}"`);
+        }
+      }
+    }
   }
 
   private async parseJson(data: string): Promise<Record<string, Collection>> {
@@ -123,12 +134,11 @@ export class ImportService {
       [DataType.Users]: this.usersImporter,
       [DataType.AttributeTypes]: this.attributeTypesImporter,
     };
-    let idMap: IdMap | null;
+    let idMap: IdMap | null = null;
     const errors: string[] = [];
     try {
       idMap = await importers[type].import(data);
     } catch (e: any) {
-      idMap = null;
       errors.push(e.message);
     }
     return [idMap, errors];

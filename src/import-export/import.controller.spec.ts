@@ -6,6 +6,7 @@ import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
 import { UsersImporter } from '../users/users.importer';
 import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-types.importer';
 import { GenericError } from '../errors/generic.error';
+import { ProductsImporter } from '../catalog/products/products.importer';
 
 describe('ImportController', () => {
   let controller: ImportController;
@@ -29,6 +30,10 @@ describe('ImportController', () => {
           provide: AttributeTypesImporter,
           useValue: {},
         },
+        {
+          provide: ProductsImporter,
+          useValue: {},
+        },
       ],
     }).compile();
 
@@ -45,7 +50,10 @@ describe('ImportController', () => {
       const result = await controller.import(
         generateFileMetadata('{"settings": ["test"]}', 'application/json'),
       );
-      expect(settingsImporter.import).toHaveBeenCalledWith(['test']);
+      expect(settingsImporter.import).toHaveBeenCalledWith(
+        ['test'],
+        expect.any(Object),
+      );
       expect(result).toEqual({
         imports: {
           settings: true,
@@ -74,7 +82,10 @@ describe('ImportController', () => {
       const result = await controller.import(
         generateFileMetadata('{"settings": ["test"]}', 'application/json'),
       );
-      expect(settingsImporter.import).toHaveBeenCalledWith(['test']);
+      expect(settingsImporter.import).toHaveBeenCalledWith(
+        ['test'],
+        expect.any(Object),
+      );
       expect(result).toEqual({
         imports: {
           settings: false,

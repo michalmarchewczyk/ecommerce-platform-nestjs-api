@@ -14,6 +14,7 @@ import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-typ
 import { IdMap } from './models/id-map.type';
 import { dataTypeDependencies } from './models/data-type-dependencies.data';
 import { GenericError } from '../errors/generic.error';
+import { ProductsImporter } from '../catalog/products/products.importer';
 
 @Injectable()
 export class ImportService {
@@ -23,9 +24,11 @@ export class ImportService {
     private settingsImporter: SettingsImporter,
     private usersImporter: UsersImporter,
     private attributeTypesImporter: AttributeTypesImporter,
+    private productsImporter: ProductsImporter,
   ) {}
 
   async import(data: Buffer, filetype: string) {
+    this.idMaps = {};
     let collections: Record<string, Collection> = {};
     if (filetype === 'application/json') {
       collections = await this.parseJson(data.toString());
@@ -35,7 +38,10 @@ export class ImportService {
     const imports: Record<string, boolean> = {};
     const errors: string[] = [];
     this.checkDataTypeDependencies(Object.keys(collections));
-    for (const key of Object.keys(collections)) {
+    const keys = dataTypeDependencies
+      .map((d) => d[0])
+      .filter((k) => k in collections);
+    for (const key of keys) {
       if (this.checkDataType(key)) {
         const [idMap, error] = await this.importCollection(
           key,
@@ -133,11 +139,12 @@ export class ImportService {
       [DataType.Settings]: this.settingsImporter,
       [DataType.Users]: this.usersImporter,
       [DataType.AttributeTypes]: this.attributeTypesImporter,
+      [DataType.Products]: this.productsImporter,
     };
     let idMap: IdMap | null = null;
     const errors: string[] = [];
     try {
-      idMap = await importers[type].import(data);
+      idMap = await importers[type].import(data, this.idMaps);
     } catch (e: any) {
       errors.push(e.message);
     }

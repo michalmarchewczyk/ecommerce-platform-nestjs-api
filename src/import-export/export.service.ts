@@ -12,6 +12,7 @@ import { UsersExporter } from '../users/users.exporter';
 import { AttributeTypesExporter } from '../catalog/attribute-types/attribute-types.exporter';
 import { dataTypeDependencies } from './models/data-type-dependencies.data';
 import { GenericError } from '../errors/generic.error';
+import { ProductsExporter } from '../catalog/products/products.exporter';
 
 @Injectable()
 export class ExportService {
@@ -19,6 +20,7 @@ export class ExportService {
     private settingExporter: SettingsExporter,
     private usersExporter: UsersExporter,
     private attributeTypesExporter: AttributeTypesExporter,
+    private productsExporter: ProductsExporter,
   ) {}
 
   async export(data: DataType[], format: 'json' | 'csv') {
@@ -55,6 +57,7 @@ export class ExportService {
       [DataType.Settings]: this.settingExporter,
       [DataType.Users]: this.usersExporter,
       [DataType.AttributeTypes]: this.attributeTypesExporter,
+      [DataType.Products]: this.productsExporter,
     };
     return await exporters[type].export();
   }

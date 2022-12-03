@@ -5,10 +5,10 @@ import { ExportService } from './export.service';
 import { ImportService } from './import.service';
 import { SettingsModule } from '../settings/settings.module';
 import { UsersModule } from '../users/users.module';
-import { AttributeTypesModule } from '../catalog/attribute-types/attribute-types.module';
+import { CatalogModule } from '../catalog/catalog.module';
 
 @Module({
-  imports: [SettingsModule, UsersModule, AttributeTypesModule],
+  imports: [SettingsModule, UsersModule, CatalogModule],
   controllers: [ExportController, ImportController],
   providers: [ExportService, ImportService],
 })

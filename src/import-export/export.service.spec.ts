@@ -4,6 +4,7 @@ import { SettingsExporter } from '../settings/settings.exporter';
 import { DataType } from './models/data-type.enum';
 import { UsersExporter } from '../users/users.exporter';
 import { AttributeTypesExporter } from '../catalog/attribute-types/attribute-types.exporter';
+import { ProductsExporter } from '../catalog/products/products.exporter';
 
 describe('ExportService', () => {
   let service: ExportService;
@@ -24,6 +25,10 @@ describe('ExportService', () => {
         },
         {
           provide: AttributeTypesExporter,
+          useValue: {},
+        },
+        {
+          provide: ProductsExporter,
           useValue: {},
         },
       ],

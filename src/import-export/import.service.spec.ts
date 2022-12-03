@@ -4,6 +4,7 @@ import { SettingsImporter } from '../settings/settings.importer';
 import { UsersImporter } from '../users/users.importer';
 import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-types.importer';
 import { GenericError } from '../errors/generic.error';
+import { ProductsImporter } from '../catalog/products/products.importer';
 
 describe('ImportService', () => {
   let service: ImportService;
@@ -26,6 +27,10 @@ describe('ImportService', () => {
           provide: AttributeTypesImporter,
           useValue: {},
         },
+        {
+          provide: ProductsImporter,
+          useValue: {},
+        },
       ],
     }).compile();
 
@@ -43,7 +48,10 @@ describe('ImportService', () => {
         Buffer.from('{"settings": ["test"]}', 'utf-8'),
         'application/json',
       );
-      expect(settingsImporter.import).toHaveBeenCalledWith(['test']);
+      expect(settingsImporter.import).toHaveBeenCalledWith(
+        ['test'],
+        expect.any(Object),
+      );
       expect(result).toEqual({
         imports: {
           settings: true,
@@ -74,7 +82,10 @@ describe('ImportService', () => {
         Buffer.from('{"settings": ["test"]}', 'utf-8'),
         'application/json',
       );
-      expect(settingsImporter.import).toHaveBeenCalledWith(['test']);
+      expect(settingsImporter.import).toHaveBeenCalledWith(
+        ['test'],
+        expect.any(Object),
+      );
       expect(result).toEqual({
         imports: {
           settings: false,

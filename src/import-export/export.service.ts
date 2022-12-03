@@ -12,6 +12,13 @@ import { checkDataTypeDependencies } from './data-type.utils';
 
 @Injectable()
 export class ExportService {
+  private exporters: Record<string, Exporter<any>> = {
+    [DataType.Settings]: this.settingExporter,
+    [DataType.Users]: this.usersExporter,
+    [DataType.AttributeTypes]: this.attributeTypesExporter,
+    [DataType.Products]: this.productsExporter,
+  };
+
   constructor(
     private jsonSerializer: JsonSerializer,
     private zipSerializer: ZipSerializer,
@@ -37,12 +44,6 @@ export class ExportService {
   }
 
   private async exportCollection(type: DataType) {
-    const exporters: Record<string, Exporter<any>> = {
-      [DataType.Settings]: this.settingExporter,
-      [DataType.Users]: this.usersExporter,
-      [DataType.AttributeTypes]: this.attributeTypesExporter,
-      [DataType.Products]: this.productsExporter,
-    };
-    return await exporters[type].export();
+    return await this.exporters[type].export();
   }
 }

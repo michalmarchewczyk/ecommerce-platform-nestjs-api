@@ -53,15 +53,17 @@ describe('ImportController', () => {
       const settingsImporter = controller['importService']['settingsImporter'];
       const result = await controller.import(
         generateFileMetadata('{"settings": ["test"]}', 'application/json'),
+        {},
       );
       expect(settingsImporter.import).toHaveBeenCalledWith(
         ['test'],
         expect.any(Object),
       );
       expect(result).toEqual({
-        imports: {
-          settings: true,
+        added: {
+          settings: 0,
         },
+        deleted: {},
         errors: [],
       });
     });
@@ -71,6 +73,7 @@ describe('ImportController', () => {
       await expect(
         controller.import(
           generateFileMetadata('{"unknown": ["test"]}', 'application/json'),
+          {},
         ),
       ).rejects.toThrow(
         new GenericError('"unknown" is not recognized data type'),
@@ -85,15 +88,17 @@ describe('ImportController', () => {
       });
       const result = await controller.import(
         generateFileMetadata('{"settings": ["test"]}', 'application/json'),
+        {},
       );
       expect(settingsImporter.import).toHaveBeenCalledWith(
         ['test'],
         expect.any(Object),
       );
       expect(result).toEqual({
-        imports: {
-          settings: false,
+        added: {
+          settings: 0,
         },
+        deleted: {},
         errors: ['test error'],
       });
     });

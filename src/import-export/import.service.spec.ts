@@ -57,8 +57,9 @@ describe('ImportService', () => {
         expect.any(Object),
       );
       expect(result).toEqual({
-        imports: {
-          settings: true,
+        deleted: {},
+        added: {
+          settings: 0,
         },
         errors: [],
       });
@@ -91,9 +92,10 @@ describe('ImportService', () => {
         expect.any(Object),
       );
       expect(result).toEqual({
-        imports: {
-          settings: false,
+        added: {
+          settings: 0,
         },
+        deleted: {},
         errors: ['test error'],
       });
     });

@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   FileTypeValidator,
   ParseFilePipe,
@@ -19,6 +20,7 @@ import { ImportService } from './import.service';
 import { fileBodySchema } from '../local-files/models/file-body.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
+import { ImportDto } from './dto/import.dto';
 
 @ApiTags('import-export')
 @Controller('import')
@@ -47,7 +49,13 @@ export class ImportController {
       }),
     )
     file: Express.Multer.File,
+    @Body() data: ImportDto,
   ) {
-    return await this.importService.import(file.buffer, file.mimetype);
+    return await this.importService.import(
+      file.buffer,
+      file.mimetype,
+      data.clear === 'true',
+      data.noImport === 'true',
+    );
   }
 }

@@ -14,6 +14,12 @@ import { checkDataType, checkDataTypeDependencies } from './data-type.utils';
 
 @Injectable()
 export class ImportService {
+  private importers: Record<string, Importer> = {
+    [DataType.Settings]: this.settingsImporter,
+    [DataType.Users]: this.usersImporter,
+    [DataType.AttributeTypes]: this.attributeTypesImporter,
+    [DataType.Products]: this.productsImporter,
+  };
   private idMaps: Record<string, IdMap> = {};
 
   constructor(
@@ -25,7 +31,12 @@ export class ImportService {
     private productsImporter: ProductsImporter,
   ) {}
 
-  async import(data: Buffer, filetype: string) {
+  async import(
+    data: Buffer,
+    filetype: string,
+    clear = false,
+    noImport = false,
+  ) {
     this.idMaps = {};
     let collections: Record<string, Collection> = {};
     if (filetype === 'application/json') {
@@ -33,7 +44,8 @@ export class ImportService {
     } else if (filetype === 'application/gzip') {
       collections = await this.zipSerializer.parse(data);
     }
-    const imports: Record<string, boolean> = {};
+    const imported: Record<string, number> = {};
+    const cleared: Record<string, number> = {};
     const errors: string[] = [];
     checkDataTypeDependencies(Object.keys(collections));
     const keys = dataTypeDependencies
@@ -41,33 +53,36 @@ export class ImportService {
       .filter((k) => k in collections);
     for (const key of keys) {
       if (checkDataType(key)) {
-        const [idMap, error] = await this.importCollection(
-          key,
-          collections[key],
-        );
-        this.idMaps[key] = idMap ?? {};
-        imports[key] = !!idMap;
-        if (error) {
-          errors.push(error);
+        if (clear) {
+          cleared[key] = await this.clearCollection(key);
+        }
+        if (!noImport) {
+          const [idMap, error] = await this.importCollection(
+            key,
+            collections[key],
+          );
+          this.idMaps[key] = idMap ?? {};
+          imported[key] = Object.values(idMap ?? {}).length;
+          if (error) {
+            errors.push(error);
+          }
         }
       }
     }
-    return { imports, errors };
+    return { deleted: cleared, added: imported, errors };
   }
 
   private async importCollection(type: DataType, data: Collection) {
-    const importers: Record<string, Importer> = {
-      [DataType.Settings]: this.settingsImporter,
-      [DataType.Users]: this.usersImporter,
-      [DataType.AttributeTypes]: this.attributeTypesImporter,
-      [DataType.Products]: this.productsImporter,
-    };
     let idMap: IdMap | null = null;
     try {
-      idMap = await importers[type].import(data, this.idMaps);
+      idMap = await this.importers[type].import(data, this.idMaps);
     } catch (e: any) {
       return [null, e.message] as [null, string];
     }
     return [idMap, null] as [IdMap, null];
+  }
+
+  private async clearCollection(type: DataType) {
+    return await this.importers[type].clear();
   }
 }

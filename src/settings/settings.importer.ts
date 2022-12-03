@@ -33,6 +33,10 @@ export class SettingsImporter implements Importer {
     return {};
   }
 
+  async clear() {
+    return 0;
+  }
+
   private parseSettings(settings: Collection) {
     const parsedSettings: Setting[] = [];
     for (const setting of settings) {

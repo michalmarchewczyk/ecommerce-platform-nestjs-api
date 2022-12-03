@@ -25,6 +25,10 @@ export class ProductsImporter implements Importer {
     return idMap;
   }
 
+  async clear() {
+    return 0;
+  }
+
   private parseProducts(products: Collection, attributeTypesIdMap: IdMap) {
     const parsedProducts: Product[] = [];
     for (const product of products) {
@@ -39,6 +43,7 @@ export class ProductsImporter implements Importer {
   ) {
     const parsedProduct = new Product();
     try {
+      parsedProduct.id = product.id as number;
       parsedProduct.name = product.name as string;
       parsedProduct.description = product.description as string;
       parsedProduct.price = product.price as number;

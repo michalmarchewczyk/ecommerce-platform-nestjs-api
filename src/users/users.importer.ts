@@ -26,6 +26,10 @@ export class UsersImporter implements Importer {
     return {};
   }
 
+  async clear() {
+    return 0;
+  }
+
   private parseUsers(users: Collection) {
     const parsedUsers: User[] = [];
     for (const user of users) {

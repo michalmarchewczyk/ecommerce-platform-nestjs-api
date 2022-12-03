@@ -22,6 +22,10 @@ export class AttributeTypesImporter implements Importer {
     return idMap;
   }
 
+  async clear() {
+    return 0;
+  }
+
   private parseAttributeTypes(attributeTypes: Collection) {
     const parsedAttributeTypes: AttributeType[] = [];
     for (const attributeType of attributeTypes) {

@@ -5,6 +5,7 @@ import { SettingsImporter } from '../settings/settings.importer';
 import { generateFileMetadata } from '../../test/utils/generate-file-metadata';
 import { UsersImporter } from '../users/users.importer';
 import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-types.importer';
+import { GenericError } from '../errors/generic.error';
 
 describe('ImportController', () => {
   let controller: ImportController;
@@ -53,16 +54,16 @@ describe('ImportController', () => {
       });
     });
 
-    it('should ignore unknown data types', async () => {
+    it('should throw error on unrecognized data types', async () => {
       const settingsImporter = controller['importService']['settingsImporter'];
-      const result = await controller.import(
-        generateFileMetadata('{"unknown": ["test"]}', 'application/json'),
+      await expect(
+        controller.import(
+          generateFileMetadata('{"unknown": ["test"]}', 'application/json'),
+        ),
+      ).rejects.toThrow(
+        new GenericError('"unknown" is not recognized data type'),
       );
       expect(settingsImporter.import).not.toHaveBeenCalled();
-      expect(result).toEqual({
-        imports: {},
-        errors: [],
-      });
     });
 
     it('should return errors', async () => {

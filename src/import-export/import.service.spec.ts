@@ -3,6 +3,7 @@ import { ImportService } from './import.service';
 import { SettingsImporter } from '../settings/settings.importer';
 import { UsersImporter } from '../users/users.importer';
 import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-types.importer';
+import { GenericError } from '../errors/generic.error';
 
 describe('ImportService', () => {
   let service: ImportService;
@@ -51,17 +52,17 @@ describe('ImportService', () => {
       });
     });
 
-    it('should ignore unknown data types', async () => {
+    it('should throw error on unrecognized data types', async () => {
       const settingsImporter = service['settingsImporter'];
-      const result = await service.import(
-        Buffer.from('{"unknown": ["test"]}', 'utf-8'),
-        'application/json',
+      await expect(
+        service.import(
+          Buffer.from('{"unknown": ["test"]}', 'utf-8'),
+          'application/json',
+        ),
+      ).rejects.toThrow(
+        new GenericError('"unknown" is not recognized data type'),
       );
       expect(settingsImporter.import).not.toHaveBeenCalled();
-      expect(result).toEqual({
-        imports: {},
-        errors: [],
-      });
     });
 
     it('should return errors', async () => {

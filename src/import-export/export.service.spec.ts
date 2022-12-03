@@ -5,6 +5,8 @@ import { DataType } from './models/data-type.enum';
 import { UsersExporter } from '../users/users.exporter';
 import { AttributeTypesExporter } from '../catalog/attribute-types/attribute-types.exporter';
 import { ProductsExporter } from '../catalog/products/products.exporter';
+import { JsonSerializer } from './json-serializer.service';
+import { ZipSerializer } from './zip-serializer.service';
 
 describe('ExportService', () => {
   let service: ExportService;
@@ -13,6 +15,8 @@ describe('ExportService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ExportService,
+        JsonSerializer,
+        ZipSerializer,
         {
           provide: SettingsExporter,
           useValue: {

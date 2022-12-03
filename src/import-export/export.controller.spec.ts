@@ -6,6 +6,8 @@ import { DataType } from './models/data-type.enum';
 import { UsersExporter } from '../users/users.exporter';
 import { AttributeTypesExporter } from '../catalog/attribute-types/attribute-types.exporter';
 import { ProductsExporter } from '../catalog/products/products.exporter';
+import { JsonSerializer } from './json-serializer.service';
+import { ZipSerializer } from './zip-serializer.service';
 
 describe('ExportController', () => {
   let controller: ExportController;
@@ -15,6 +17,8 @@ describe('ExportController', () => {
       controllers: [ExportController],
       providers: [
         ExportService,
+        JsonSerializer,
+        ZipSerializer,
         {
           provide: SettingsExporter,
           useValue: {

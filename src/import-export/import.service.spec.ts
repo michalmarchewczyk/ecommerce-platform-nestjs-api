@@ -5,6 +5,8 @@ import { UsersImporter } from '../users/users.importer';
 import { AttributeTypesImporter } from '../catalog/attribute-types/attribute-types.importer';
 import { GenericError } from '../errors/generic.error';
 import { ProductsImporter } from '../catalog/products/products.importer';
+import { JsonSerializer } from './json-serializer.service';
+import { ZipSerializer } from './zip-serializer.service';
 
 describe('ImportService', () => {
   let service: ImportService;
@@ -13,6 +15,8 @@ describe('ImportService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ImportService,
+        JsonSerializer,
+        ZipSerializer,
         {
           provide: SettingsImporter,
           useValue: {

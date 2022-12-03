@@ -6,10 +6,12 @@ import { ImportService } from './import.service';
 import { SettingsModule } from '../settings/settings.module';
 import { UsersModule } from '../users/users.module';
 import { CatalogModule } from '../catalog/catalog.module';
+import { JsonSerializer } from './json-serializer.service';
+import { ZipSerializer } from './zip-serializer.service';
 
 @Module({
   imports: [SettingsModule, UsersModule, CatalogModule],
   controllers: [ExportController, ImportController],
-  providers: [ExportService, ImportService],
+  providers: [ExportService, ImportService, JsonSerializer, ZipSerializer],
 })
 export class ImportExportModule {}

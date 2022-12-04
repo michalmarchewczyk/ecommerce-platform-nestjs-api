@@ -9,6 +9,7 @@ import { ProductsExporter } from '../catalog/products/products.exporter';
 import { JsonSerializer } from './json-serializer.service';
 import { ZipSerializer } from './zip-serializer.service';
 import { checkDataTypeDependencies } from './data-type.utils';
+import { CategoriesExporter } from '../catalog/categories/categories.exporter';
 
 @Injectable()
 export class ExportService {
@@ -17,6 +18,7 @@ export class ExportService {
     [DataType.Users]: this.usersExporter,
     [DataType.AttributeTypes]: this.attributeTypesExporter,
     [DataType.Products]: this.productsExporter,
+    [DataType.Categories]: this.categoriesExporter,
   };
 
   constructor(
@@ -26,6 +28,7 @@ export class ExportService {
     private usersExporter: UsersExporter,
     private attributeTypesExporter: AttributeTypesExporter,
     private productsExporter: ProductsExporter,
+    private categoriesExporter: CategoriesExporter,
   ) {}
 
   async export(data: DataType[], format: 'json' | 'csv') {

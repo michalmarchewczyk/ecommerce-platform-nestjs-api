@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Category } from './models/category.entity';
 import { CategoryGroup } from './models/category-group.entity';
 import { ProductsModule } from '../products/products.module';
+import { CategoriesExporter } from './categories.exporter';
+import { CategoriesImporter } from './categories.importer';
 
 @Module({
   imports: [
@@ -12,6 +14,7 @@ import { ProductsModule } from '../products/products.module';
     ProductsModule,
   ],
   controllers: [CategoriesController],
-  providers: [CategoriesService],
+  providers: [CategoriesService, CategoriesExporter, CategoriesImporter],
+  exports: [CategoriesExporter, CategoriesImporter],
 })
 export class CategoriesModule {}

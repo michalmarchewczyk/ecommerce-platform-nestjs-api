@@ -8,6 +8,7 @@ import { AttributeTypesExporter } from '../catalog/attribute-types/attribute-typ
 import { ProductsExporter } from '../catalog/products/products.exporter';
 import { JsonSerializer } from './json-serializer.service';
 import { ZipSerializer } from './zip-serializer.service';
+import { CategoriesExporter } from '../catalog/categories/categories.exporter';
 
 describe('ExportController', () => {
   let controller: ExportController;
@@ -35,6 +36,10 @@ describe('ExportController', () => {
         },
         {
           provide: ProductsExporter,
+          useValue: {},
+        },
+        {
+          provide: CategoriesExporter,
           useValue: {},
         },
       ],

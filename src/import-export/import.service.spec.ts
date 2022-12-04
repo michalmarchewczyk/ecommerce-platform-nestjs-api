@@ -7,6 +7,7 @@ import { GenericError } from '../errors/generic.error';
 import { ProductsImporter } from '../catalog/products/products.importer';
 import { JsonSerializer } from './json-serializer.service';
 import { ZipSerializer } from './zip-serializer.service';
+import { CategoriesImporter } from '../catalog/categories/categories.importer';
 
 describe('ImportService', () => {
   let service: ImportService;
@@ -34,6 +35,10 @@ describe('ImportService', () => {
         },
         {
           provide: ProductsImporter,
+          useValue: {},
+        },
+        {
+          provide: CategoriesImporter,
           useValue: {},
         },
       ],

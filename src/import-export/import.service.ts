@@ -52,20 +52,25 @@ export class ImportService {
       .map((d) => d[0])
       .filter((k) => k in collections);
     for (const key of keys) {
-      if (checkDataType(key)) {
-        if (clear) {
-          cleared[key] = await this.clearCollection(key);
+      if (!checkDataType(key)) {
+        continue;
+      }
+      if (clear) {
+        const [deleted, error] = await this.clearCollection(key);
+        cleared[key] = deleted;
+        if (error) {
+          errors.push(error);
         }
-        if (!noImport) {
-          const [idMap, error] = await this.importCollection(
-            key,
-            collections[key],
-          );
-          this.idMaps[key] = idMap ?? {};
-          imported[key] = Object.values(idMap ?? {}).length;
-          if (error) {
-            errors.push(error);
-          }
+      }
+      if (!noImport) {
+        const [idMap, error] = await this.importCollection(
+          key,
+          collections[key],
+        );
+        this.idMaps[key] = idMap ?? {};
+        imported[key] = Object.values(idMap ?? {}).length;
+        if (error) {
+          errors.push(error);
         }
       }
     }
@@ -83,6 +88,10 @@ export class ImportService {
   }
 
   private async clearCollection(type: DataType) {
-    return await this.importers[type].clear();
+    try {
+      return [await this.importers[type].clear(), null] as [number, null];
+    } catch (e: any) {
+      return [0, e.message] as [number, string];
+    }
   }
 }

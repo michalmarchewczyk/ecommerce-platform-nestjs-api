@@ -13,28 +13,30 @@ export class SettingsImporter implements Importer {
 
   async import(settings: Collection): Promise<IdMap> {
     const parsedSettings = this.parseSettings(settings);
+    const idMap: IdMap = {};
     for (const setting of parsedSettings) {
-      if (setting.builtin) {
-        try {
-          const { id } = await this.settingsService.getSettingByName(
-            setting.name,
-          );
-          await this.settingsService.updateSetting(id, {
-            value: setting.value,
-          });
-        } catch (e) {
-          await this.settingsService.createSetting(setting);
-        }
+      const found = await this.settingsService.findSettingByName(setting.name);
+      if (setting.builtin && found) {
+        await this.settingsService.updateSetting(found.id, {
+          value: setting.value,
+        });
       } else {
-        await this.settingsService.createSetting(setting);
+        const { id: newId } = await this.settingsService.createSetting(setting);
+        idMap[newId] = newId;
       }
       // TODO: handle conflicts
     }
-    return {};
+    return idMap;
   }
 
   async clear() {
-    return 0;
+    const settings = await this.settingsService.getSettings();
+    let deleted = 0;
+    for (const setting of settings) {
+      await this.settingsService.deleteSetting(setting.id, true);
+      deleted += 1;
+    }
+    return deleted;
   }
 
   private parseSettings(settings: Collection) {

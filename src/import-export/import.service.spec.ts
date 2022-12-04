@@ -20,7 +20,8 @@ describe('ImportService', () => {
         {
           provide: SettingsImporter,
           useValue: {
-            import: jest.fn(() => true),
+            import: jest.fn(() => ({ '1': 1 })),
+            clear: jest.fn(() => 0),
           },
         },
         {
@@ -51,15 +52,19 @@ describe('ImportService', () => {
       const result = await service.import(
         Buffer.from('{"settings": ["test"]}', 'utf-8'),
         'application/json',
+        true,
       );
       expect(settingsImporter.import).toHaveBeenCalledWith(
         ['test'],
         expect.any(Object),
       );
+      expect(settingsImporter.clear).toHaveBeenCalled();
       expect(result).toEqual({
-        deleted: {},
-        added: {
+        deleted: {
           settings: 0,
+        },
+        added: {
+          settings: 1,
         },
         errors: [],
       });
@@ -76,6 +81,7 @@ describe('ImportService', () => {
         new GenericError('"unknown" is not recognized data type'),
       );
       expect(settingsImporter.import).not.toHaveBeenCalled();
+      expect(settingsImporter.clear).not.toHaveBeenCalled();
     });
 
     it('should return errors', async () => {
@@ -91,6 +97,7 @@ describe('ImportService', () => {
         ['test'],
         expect.any(Object),
       );
+      expect(settingsImporter.clear).not.toHaveBeenCalled();
       expect(result).toEqual({
         added: {
           settings: 0,

@@ -12,6 +12,7 @@ import { ZipSerializer } from './zip-serializer.service';
 import { JsonSerializer } from './json-serializer.service';
 import { checkDataType, checkDataTypeDependencies } from './data-type.utils';
 import { CategoriesImporter } from '../catalog/categories/categories.importer';
+import { WishlistsImporter } from '../wishlists/wishlists.importer';
 
 @Injectable()
 export class ImportService {
@@ -21,6 +22,7 @@ export class ImportService {
     [DataType.AttributeTypes]: this.attributeTypesImporter,
     [DataType.Products]: this.productsImporter,
     [DataType.Categories]: this.categoriesImporter,
+    [DataType.Wishlists]: this.wishlistsImporter,
   };
   private idMaps: Record<string, IdMap> = {};
 
@@ -32,6 +34,7 @@ export class ImportService {
     private attributeTypesImporter: AttributeTypesImporter,
     private productsImporter: ProductsImporter,
     private categoriesImporter: CategoriesImporter,
+    private wishlistsImporter: WishlistsImporter,
   ) {}
 
   async import(

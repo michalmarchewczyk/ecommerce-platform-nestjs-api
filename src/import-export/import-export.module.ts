@@ -8,9 +8,10 @@ import { UsersModule } from '../users/users.module';
 import { CatalogModule } from '../catalog/catalog.module';
 import { JsonSerializer } from './json-serializer.service';
 import { ZipSerializer } from './zip-serializer.service';
+import { WishlistsModule } from '../wishlists/wishlists.module';
 
 @Module({
-  imports: [SettingsModule, UsersModule, CatalogModule],
+  imports: [SettingsModule, UsersModule, CatalogModule, WishlistsModule],
   controllers: [ExportController, ImportController],
   providers: [ExportService, ImportService, JsonSerializer, ZipSerializer],
 })

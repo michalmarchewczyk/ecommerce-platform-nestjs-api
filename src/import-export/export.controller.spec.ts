@@ -9,6 +9,7 @@ import { ProductsExporter } from '../catalog/products/products.exporter';
 import { JsonSerializer } from './json-serializer.service';
 import { ZipSerializer } from './zip-serializer.service';
 import { CategoriesExporter } from '../catalog/categories/categories.exporter';
+import { WishlistsExporter } from '../wishlists/wishlists.exporter';
 
 describe('ExportController', () => {
   let controller: ExportController;
@@ -40,6 +41,10 @@ describe('ExportController', () => {
         },
         {
           provide: CategoriesExporter,
+          useValue: {},
+        },
+        {
+          provide: WishlistsExporter,
           useValue: {},
         },
       ],

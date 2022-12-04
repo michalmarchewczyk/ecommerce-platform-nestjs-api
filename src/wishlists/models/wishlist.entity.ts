@@ -25,7 +25,10 @@ export class Wishlist {
   @Column()
   name: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   user: User;
 
   @ManyToMany(() => Product, {

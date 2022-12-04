@@ -19,14 +19,21 @@ export class ProductsImporter implements Importer {
     const parsedProducts = this.parseProducts(products, idMaps.attributeTypes);
     const idMap: IdMap = {};
     for (const product of parsedProducts) {
-      const { id: newId } = await this.productsService.createProduct(product);
+      const { id, ...createDto } = product;
+      const { id: newId } = await this.productsService.createProduct(createDto);
       idMap[product.id] = newId;
     }
     return idMap;
   }
 
   async clear() {
-    return 0;
+    const products = await this.productsService.getProducts();
+    let deleted = 0;
+    for (const product of products) {
+      await this.productsService.deleteProduct(product.id);
+      deleted += 1;
+    }
+    return deleted;
   }
 
   private parseProducts(products: Collection, attributeTypesIdMap: IdMap) {
@@ -49,9 +56,12 @@ export class ProductsImporter implements Importer {
       parsedProduct.price = product.price as number;
       parsedProduct.stock = product.stock as number;
       parsedProduct.visible = product.visible as boolean;
-      parsedProduct.attributes = (
-        JSON.parse(product.attributes as string) as Collection
-      ).map((a) => this.parseAttribute(a, attributeTypesIdMap));
+      if (typeof product.attributes === 'string') {
+        product.attributes = JSON.parse(product.attributes);
+      }
+      parsedProduct.attributes = (product.attributes as Collection).map((a) =>
+        this.parseAttribute(a, attributeTypesIdMap),
+      );
     } catch (e) {
       throw new ParseError('product');
     }

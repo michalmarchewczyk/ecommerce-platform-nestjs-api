@@ -23,7 +23,13 @@ export class AttributeTypesImporter implements Importer {
   }
 
   async clear() {
-    return 0;
+    const attributeTypes = await this.attributeTypesService.getAttributeTypes();
+    let deleted = 0;
+    for (const attributeType of attributeTypes) {
+      await this.attributeTypesService.deleteAttributeType(attributeType.id);
+      deleted += 1;
+    }
+    return deleted;
   }
 
   private parseAttributeTypes(attributeTypes: Collection) {

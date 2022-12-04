@@ -15,15 +15,19 @@ export class UsersImporter implements Importer {
     const parsedUsers = this.parseUsers(users);
     const idMap: IdMap = {};
     for (const user of parsedUsers) {
-      // TODO: handle conflicts
-      const { id: newId } = await this.usersService.addUser(
-        user.email,
-        '',
-        user.firstName,
-        user.lastName,
-      );
-      await this.usersService.updateUser(newId, { role: user.role });
-      idMap[user.id] = newId;
+      const found = await this.usersService.findUserByEmail(user.email);
+      if (found) {
+        idMap[user.id] = found.id;
+      } else {
+        const { id: newId } = await this.usersService.addUser(
+          user.email,
+          '',
+          user.firstName,
+          user.lastName,
+        );
+        await this.usersService.updateUser(newId, { role: user.role });
+        idMap[user.id] = newId;
+      }
     }
     return idMap;
   }

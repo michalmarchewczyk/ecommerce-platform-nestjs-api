@@ -13,21 +13,32 @@ export class UsersImporter implements Importer {
 
   async import(users: Collection): Promise<IdMap> {
     const parsedUsers = this.parseUsers(users);
+    const idMap: IdMap = {};
     for (const user of parsedUsers) {
       // TODO: handle conflicts
-      const { id } = await this.usersService.addUser(
+      const { id: newId } = await this.usersService.addUser(
         user.email,
         '',
         user.firstName,
         user.lastName,
       );
-      await this.usersService.updateUser(id, { role: user.role });
+      await this.usersService.updateUser(newId, { role: user.role });
+      idMap[user.id] = newId;
     }
-    return {};
+    return idMap;
   }
 
   async clear() {
-    return 0;
+    const users = await this.usersService.getUsers();
+    let deleted = 0;
+    for (const user of users) {
+      if (user.role === Role.Admin) {
+        continue;
+      }
+      await this.usersService.deleteUser(user.id);
+      deleted += 1;
+    }
+    return deleted;
   }
 
   private parseUsers(users: Collection) {
@@ -41,6 +52,7 @@ export class UsersImporter implements Importer {
   private parseUser(user: Collection[number]) {
     const parsedUser = new User();
     try {
+      parsedUser.id = user.id as number;
       parsedUser.email = user.email as string;
       parsedUser.role = user.role as Role;
       parsedUser.firstName = user.firstName as string;

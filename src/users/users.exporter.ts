@@ -18,6 +18,7 @@ export class UsersExporter implements Exporter<User> {
 
   private prepareUser(user: User) {
     const preparedUser = new User();
+    preparedUser.id = user.id;
     preparedUser.email = user.email;
     preparedUser.role = user.role;
     preparedUser.firstName = user.firstName;

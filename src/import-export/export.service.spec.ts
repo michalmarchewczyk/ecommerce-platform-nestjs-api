@@ -9,6 +9,7 @@ import { JsonSerializer } from './json-serializer.service';
 import { ZipSerializer } from './zip-serializer.service';
 import { CategoriesExporter } from '../catalog/categories/categories.exporter';
 import { WishlistsExporter } from '../wishlists/wishlists.exporter';
+import { DeliveryMethodsExporter } from '../sales/delivery-methods/delivery-methods.exporter';
 
 describe('ExportService', () => {
   let service: ExportService;
@@ -43,6 +44,10 @@ describe('ExportService', () => {
         },
         {
           provide: WishlistsExporter,
+          useValue: {},
+        },
+        {
+          provide: DeliveryMethodsExporter,
           useValue: {},
         },
       ],

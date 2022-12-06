@@ -12,6 +12,7 @@ import { ZipSerializer } from './zip-serializer.service';
 import { CategoriesImporter } from '../catalog/categories/categories.importer';
 import { WishlistsImporter } from '../wishlists/wishlists.importer';
 import { DeliveryMethodsImporter } from '../sales/delivery-methods/delivery-methods.importer';
+import { PaymentMethodsImporter } from '../sales/payment-methods/payment-methods.importer';
 
 describe('ImportController', () => {
   let controller: ImportController;
@@ -52,6 +53,10 @@ describe('ImportController', () => {
         },
         {
           provide: DeliveryMethodsImporter,
+          useValue: {},
+        },
+        {
+          provide: PaymentMethodsImporter,
           useValue: {},
         },
       ],

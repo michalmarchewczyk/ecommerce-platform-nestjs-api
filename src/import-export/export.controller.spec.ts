@@ -13,6 +13,7 @@ import { WishlistsExporter } from '../wishlists/wishlists.exporter';
 import { DeliveryMethodsExporter } from '../sales/delivery-methods/delivery-methods.exporter';
 import { PaymentMethodsExporter } from '../sales/payment-methods/payment-methods.exporter';
 import { OrdersExporter } from '../sales/orders/orders.exporter';
+import { ReturnsExporter } from '../sales/returns/returns.exporter';
 
 describe('ExportController', () => {
   let controller: ExportController;
@@ -60,6 +61,10 @@ describe('ExportController', () => {
         },
         {
           provide: OrdersExporter,
+          useValue: {},
+        },
+        {
+          provide: ReturnsExporter,
           useValue: {},
         },
       ],

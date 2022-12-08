@@ -16,6 +16,7 @@ import { WishlistsImporter } from '../wishlists/wishlists.importer';
 import { DeliveryMethodsImporter } from '../sales/delivery-methods/delivery-methods.importer';
 import { PaymentMethodsImporter } from '../sales/payment-methods/payment-methods.importer';
 import { OrdersImporter } from '../sales/orders/orders.importer';
+import { ReturnsImporter } from '../sales/returns/returns.importer';
 
 @Injectable()
 export class ImportService {
@@ -29,6 +30,7 @@ export class ImportService {
     [DataType.DeliveryMethods]: this.deliveryMethodsImporter,
     [DataType.PaymentMethods]: this.paymentMethodsImporter,
     [DataType.Orders]: this.ordersImporter,
+    [DataType.Returns]: this.returnsImporter,
   };
   private idMaps: Record<string, IdMap> = {};
 
@@ -44,6 +46,7 @@ export class ImportService {
     private deliveryMethodsImporter: DeliveryMethodsImporter,
     private paymentMethodsImporter: PaymentMethodsImporter,
     private ordersImporter: OrdersImporter,
+    private returnsImporter: ReturnsImporter,
   ) {}
 
   async import(

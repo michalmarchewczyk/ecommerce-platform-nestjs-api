@@ -14,6 +14,7 @@ import { WishlistsExporter } from '../wishlists/wishlists.exporter';
 import { DeliveryMethodsExporter } from '../sales/delivery-methods/delivery-methods.exporter';
 import { PaymentMethodsExporter } from '../sales/payment-methods/payment-methods.exporter';
 import { OrdersExporter } from '../sales/orders/orders.exporter';
+import { ReturnsExporter } from '../sales/returns/returns.exporter';
 
 @Injectable()
 export class ExportService {
@@ -27,6 +28,7 @@ export class ExportService {
     [DataType.DeliveryMethods]: this.deliveryMethodsExporter,
     [DataType.PaymentMethods]: this.paymentMethodsExporter,
     [DataType.Orders]: this.ordersExporter,
+    [DataType.Returns]: this.returnsExporter,
   };
 
   constructor(
@@ -41,6 +43,7 @@ export class ExportService {
     private deliveryMethodsExporter: DeliveryMethodsExporter,
     private paymentMethodsExporter: PaymentMethodsExporter,
     private ordersExporter: OrdersExporter,
+    private returnsExporter: ReturnsExporter,
   ) {}
 
   async export(data: DataType[], format: 'json' | 'csv') {

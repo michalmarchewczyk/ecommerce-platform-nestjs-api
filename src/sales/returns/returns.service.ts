@@ -48,21 +48,38 @@ export class ReturnsService {
     return !!foundReturn;
   }
 
-  async createReturn(returnDto: ReturnCreateDto): Promise<Return> {
+  async createReturn(
+    returnDto: ReturnCreateDto,
+    ignoreSubscribers = false,
+  ): Promise<Return> {
     const newReturn = new Return();
     const order = await this.ordersService.getOrder(returnDto.orderId);
     try {
       newReturn.order = order;
       newReturn.message = returnDto.message;
-      return await this.returnsRepository.save(newReturn);
+      return await this.returnsRepository.save(newReturn, {
+        listeners: !ignoreSubscribers,
+      });
     } catch (e) {
       throw new ConflictError('return');
     }
   }
 
-  async updateReturn(id: number, returnDto: ReturnUpdateDto): Promise<Return> {
+  async updateReturn(
+    id: number,
+    returnDto: ReturnUpdateDto,
+    ignoreSubscribers = false,
+  ): Promise<Return> {
     const foundReturn = await this.getReturn(id);
     Object.assign(foundReturn, returnDto);
-    return this.returnsRepository.save(foundReturn);
+    return this.returnsRepository.save(foundReturn, {
+      listeners: !ignoreSubscribers,
+    });
+  }
+
+  async deleteReturn(id: number): Promise<boolean> {
+    await this.getReturn(id);
+    await this.returnsRepository.delete({ id });
+    return true;
   }
 }

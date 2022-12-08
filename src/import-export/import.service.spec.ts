@@ -12,6 +12,7 @@ import { WishlistsImporter } from '../wishlists/wishlists.importer';
 import { DeliveryMethodsImporter } from '../sales/delivery-methods/delivery-methods.importer';
 import { PaymentMethodsImporter } from '../sales/payment-methods/payment-methods.importer';
 import { OrdersImporter } from '../sales/orders/orders.importer';
+import { ReturnsImporter } from '../sales/returns/returns.importer';
 
 describe('ImportService', () => {
   let service: ImportService;
@@ -59,6 +60,10 @@ describe('ImportService', () => {
         },
         {
           provide: OrdersImporter,
+          useValue: {},
+        },
+        {
+          provide: ReturnsImporter,
           useValue: {},
         },
       ],

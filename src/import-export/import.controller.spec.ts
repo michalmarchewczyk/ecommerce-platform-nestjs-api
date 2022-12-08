@@ -14,6 +14,7 @@ import { WishlistsImporter } from '../wishlists/wishlists.importer';
 import { DeliveryMethodsImporter } from '../sales/delivery-methods/delivery-methods.importer';
 import { PaymentMethodsImporter } from '../sales/payment-methods/payment-methods.importer';
 import { OrdersImporter } from '../sales/orders/orders.importer';
+import { ReturnsImporter } from '../sales/returns/returns.importer';
 
 describe('ImportController', () => {
   let controller: ImportController;
@@ -62,6 +63,10 @@ describe('ImportController', () => {
         },
         {
           provide: OrdersImporter,
+          useValue: {},
+        },
+        {
+          provide: ReturnsImporter,
           useValue: {},
         },
       ],

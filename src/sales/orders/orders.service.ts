@@ -24,9 +24,16 @@ export class OrdersService {
     private readonly paymentMethodsService: PaymentMethodsService,
   ) {}
 
-  async getOrders(): Promise<Order[]> {
+  async getOrders(withUser = false, withProducts = false): Promise<Order[]> {
     return this.ordersRepository.find({
-      relations: ['items', 'delivery', 'payment', 'return'],
+      relations: [
+        ...(withUser ? ['user'] : []),
+        'items',
+        ...(withProducts ? ['items.product'] : []),
+        'delivery',
+        'payment',
+        'return',
+      ],
     });
   }
 
@@ -59,6 +66,7 @@ export class OrdersService {
   async createOrder(
     userId: number | null,
     orderData: OrderCreateDto,
+    ignoreSubscribers = false,
   ): Promise<Order> {
     const order = new Order();
     if (userId) {
@@ -91,10 +99,14 @@ export class OrdersService {
     Object.assign(payment, orderData.payment);
     order.payment = payment;
     order.payment.method = paymentMethod;
-    return this.ordersRepository.save(order);
+    return this.ordersRepository.save(order, { listeners: !ignoreSubscribers });
   }
 
-  async updateOrder(id: number, orderData: OrderUpdateDto): Promise<Order> {
+  async updateOrder(
+    id: number,
+    orderData: OrderUpdateDto,
+    ignoreSubscribers = false,
+  ): Promise<Order> {
     const order = await this.getOrder(id);
     if (orderData.items) {
       order.items = [];
@@ -123,6 +135,12 @@ export class OrdersService {
     }
     const { delivery, payment, items, ...toAssign } = orderData;
     Object.assign(order, toAssign);
-    return this.ordersRepository.save(order);
+    return this.ordersRepository.save(order, { listeners: !ignoreSubscribers });
+  }
+
+  async deleteOrder(id: number): Promise<void> {
+    await this.getOrder(id);
+    await this.ordersRepository.delete({ id });
+    return;
   }
 }

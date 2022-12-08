@@ -11,6 +11,7 @@ import { CategoriesExporter } from '../catalog/categories/categories.exporter';
 import { WishlistsExporter } from '../wishlists/wishlists.exporter';
 import { DeliveryMethodsExporter } from '../sales/delivery-methods/delivery-methods.exporter';
 import { PaymentMethodsExporter } from '../sales/payment-methods/payment-methods.exporter';
+import { OrdersExporter } from '../sales/orders/orders.exporter';
 
 describe('ExportService', () => {
   let service: ExportService;
@@ -53,6 +54,10 @@ describe('ExportService', () => {
         },
         {
           provide: PaymentMethodsExporter,
+          useValue: {},
+        },
+        {
+          provide: OrdersExporter,
           useValue: {},
         },
       ],

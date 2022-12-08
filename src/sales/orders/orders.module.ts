@@ -11,6 +11,8 @@ import { OrdersSubscriber } from './orders.subscriber';
 import { CatalogModule } from '../../catalog/catalog.module';
 import { DeliveryMethodsModule } from '../delivery-methods/delivery-methods.module';
 import { PaymentMethodsModule } from '../payment-methods/payment-methods.module';
+import { OrdersExporter } from './orders.exporter';
+import { OrdersImporter } from './orders.importer';
 
 @Module({
   imports: [
@@ -20,8 +22,8 @@ import { PaymentMethodsModule } from '../payment-methods/payment-methods.module'
     DeliveryMethodsModule,
     PaymentMethodsModule,
   ],
-  providers: [OrdersService, OrdersSubscriber],
+  providers: [OrdersService, OrdersSubscriber, OrdersExporter, OrdersImporter],
   controllers: [OrdersController],
-  exports: [OrdersService],
+  exports: [OrdersService, OrdersExporter, OrdersImporter],
 })
 export class OrdersModule {}

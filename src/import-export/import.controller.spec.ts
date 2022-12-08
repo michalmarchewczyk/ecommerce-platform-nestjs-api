@@ -13,6 +13,7 @@ import { CategoriesImporter } from '../catalog/categories/categories.importer';
 import { WishlistsImporter } from '../wishlists/wishlists.importer';
 import { DeliveryMethodsImporter } from '../sales/delivery-methods/delivery-methods.importer';
 import { PaymentMethodsImporter } from '../sales/payment-methods/payment-methods.importer';
+import { OrdersImporter } from '../sales/orders/orders.importer';
 
 describe('ImportController', () => {
   let controller: ImportController;
@@ -57,6 +58,10 @@ describe('ImportController', () => {
         },
         {
           provide: PaymentMethodsImporter,
+          useValue: {},
+        },
+        {
+          provide: OrdersImporter,
           useValue: {},
         },
       ],

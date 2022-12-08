@@ -69,27 +69,25 @@ export class ImportService {
     const keys = dataTypeDependencies
       .map((d) => d[0])
       .filter((k) => k in collections);
-    for (const key of keys) {
-      if (!checkDataType(key)) {
+    for (const key of [...keys].reverse()) {
+      if (!clear || !checkDataType(key)) {
         continue;
       }
-      if (clear) {
-        const [deleted, error] = await this.clearCollection(key);
-        cleared[key] = deleted;
-        if (error) {
-          errors.push(error);
-        }
+      const [deleted, error] = await this.clearCollection(key);
+      cleared[key] = deleted;
+      if (error) {
+        errors.push(error);
       }
-      if (!noImport) {
-        const [idMap, error] = await this.importCollection(
-          key,
-          collections[key],
-        );
-        this.idMaps[key] = idMap ?? {};
-        imported[key] = Object.values(idMap ?? {}).length;
-        if (error) {
-          errors.push(error);
-        }
+    }
+    for (const key of keys) {
+      if (noImport || !checkDataType(key)) {
+        continue;
+      }
+      const [idMap, error] = await this.importCollection(key, collections[key]);
+      this.idMaps[key] = idMap ?? {};
+      imported[key] = Object.values(idMap ?? {}).length;
+      if (error) {
+        errors.push(error);
       }
     }
     return { deleted: cleared, added: imported, errors };

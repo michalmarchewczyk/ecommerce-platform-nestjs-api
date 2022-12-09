@@ -13,6 +13,7 @@ import { DeliveryMethodsImporter } from '../sales/delivery-methods/delivery-meth
 import { PaymentMethodsImporter } from '../sales/payment-methods/payment-methods.importer';
 import { OrdersImporter } from '../sales/orders/orders.importer';
 import { ReturnsImporter } from '../sales/returns/returns.importer';
+import { ProductPhotosImporter } from '../catalog/products/product-photos/product-photos.importer';
 
 describe('ImportService', () => {
   let service: ImportService;
@@ -64,6 +65,10 @@ describe('ImportService', () => {
         },
         {
           provide: ReturnsImporter,
+          useValue: {},
+        },
+        {
+          provide: ProductPhotosImporter,
           useValue: {},
         },
       ],

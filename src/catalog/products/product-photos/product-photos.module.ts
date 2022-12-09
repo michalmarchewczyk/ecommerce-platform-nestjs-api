@@ -7,6 +7,8 @@ import { LocalFilesModule } from '../../../local-files/local-files.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Product } from '../models/product.entity';
 import { ProductPhoto } from './models/product-photo.entity';
+import { ProductPhotosExporter } from './product-photos.exporter';
+import { ProductPhotosImporter } from './product-photos.importer';
 
 @Module({
   imports: [
@@ -20,7 +22,12 @@ import { ProductPhoto } from './models/product-photo.entity';
     }),
     LocalFilesModule,
   ],
-  providers: [ProductPhotosService],
+  providers: [
+    ProductPhotosService,
+    ProductPhotosExporter,
+    ProductPhotosImporter,
+  ],
   controllers: [ProductPhotosController],
+  exports: [ProductPhotosExporter, ProductPhotosImporter],
 })
 export class ProductPhotosModule {}

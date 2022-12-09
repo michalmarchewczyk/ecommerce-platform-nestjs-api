@@ -25,8 +25,32 @@ export class ZipSerializer implements FileSerializer {
     const collections: Record<string, Collection> = {};
     for (const filename of filenames) {
       const filePath = path.join(os.tmpdir(), filename);
-      const csv = await fs.readFile(filePath, { encoding: 'utf-8' });
-      collections[filename.split('.')[0]] = await this.parseCsv(csv);
+      if (path.extname(filePath) === '.csv') {
+        const csv = await fs.readFile(filePath, { encoding: 'utf-8' });
+        collections[filename.split('.')[0]] = await this.parseCsv(csv);
+      }
+    }
+    for (const filename of filenames) {
+      if (filename.startsWith('photos/')) {
+        const foundPhoto = collections['productPhotos'].find((photo) =>
+          (photo.path as string).includes('/' + path.basename(filename)),
+        );
+        if (!foundPhoto || !foundPhoto.path) {
+          continue;
+        }
+        await fs.copyFile(
+          path.join(os.tmpdir(), filename),
+          path.join(
+            process.cwd(),
+            'uploads',
+            path.basename(filename).replace(path.extname(filename), ''),
+          ),
+        );
+        foundPhoto.path = (foundPhoto.path as string).replace(
+          path.extname(foundPhoto.path as string),
+          '',
+        );
+      }
     }
     return collections;
   }
@@ -60,7 +84,10 @@ export class ZipSerializer implements FileSerializer {
       .fromString(csv);
   }
 
-  async serialize(data: Record<string, any>): Promise<StreamableFile> {
+  async serialize(
+    data: Record<string, any>,
+    photoPaths?: string[],
+  ): Promise<StreamableFile> {
     const fields = Object.keys(data);
     const files: string[] = [];
     for (const field of fields) {
@@ -69,6 +96,19 @@ export class ZipSerializer implements FileSerializer {
         const filePath = path.join(os.tmpdir(), `${field}.csv`);
         await fs.writeFile(filePath, parsed);
         files.push(`${field}.csv`);
+      }
+    }
+    if (photoPaths) {
+      await fs.mkdir(path.join(os.tmpdir(), 'photos'), { recursive: true });
+      for (const photoPath of photoPaths) {
+        await fs.copyFile(
+          path.join(
+            process.cwd(),
+            photoPath.replace(path.extname(photoPath), ''),
+          ),
+          path.join(os.tmpdir(), 'photos', path.basename(photoPath)),
+        );
+        files.push(path.join('photos', path.basename(photoPath)));
       }
     }
     const stream = tar.create({ gzip: true, cwd: os.tmpdir() }, files);

@@ -14,6 +14,7 @@ import { DeliveryMethodsExporter } from '../sales/delivery-methods/delivery-meth
 import { PaymentMethodsExporter } from '../sales/payment-methods/payment-methods.exporter';
 import { OrdersExporter } from '../sales/orders/orders.exporter';
 import { ReturnsExporter } from '../sales/returns/returns.exporter';
+import { ProductPhotosExporter } from '../catalog/products/product-photos/product-photos.exporter';
 
 describe('ExportController', () => {
   let controller: ExportController;
@@ -65,6 +66,10 @@ describe('ExportController', () => {
         },
         {
           provide: ReturnsExporter,
+          useValue: {},
+        },
+        {
+          provide: ProductPhotosExporter,
           useValue: {},
         },
       ],

@@ -15,6 +15,7 @@ import { DeliveryMethodsExporter } from '../sales/delivery-methods/delivery-meth
 import { PaymentMethodsExporter } from '../sales/payment-methods/payment-methods.exporter';
 import { OrdersExporter } from '../sales/orders/orders.exporter';
 import { ReturnsExporter } from '../sales/returns/returns.exporter';
+import { ProductPhotosExporter } from '../catalog/products/product-photos/product-photos.exporter';
 
 @Injectable()
 export class ExportService {
@@ -23,6 +24,7 @@ export class ExportService {
     [DataType.Users]: this.usersExporter,
     [DataType.AttributeTypes]: this.attributeTypesExporter,
     [DataType.Products]: this.productsExporter,
+    [DataType.ProductPhotos]: this.productPhotosExporter,
     [DataType.Categories]: this.categoriesExporter,
     [DataType.Wishlists]: this.wishlistsExporter,
     [DataType.DeliveryMethods]: this.deliveryMethodsExporter,
@@ -38,6 +40,7 @@ export class ExportService {
     private usersExporter: UsersExporter,
     private attributeTypesExporter: AttributeTypesExporter,
     private productsExporter: ProductsExporter,
+    private productPhotosExporter: ProductPhotosExporter,
     private categoriesExporter: CategoriesExporter,
     private wishlistsExporter: WishlistsExporter,
     private deliveryMethodsExporter: DeliveryMethodsExporter,
@@ -53,9 +56,15 @@ export class ExportService {
       toExport[key] = await this.exportCollection(key);
     }
     if (format === 'json') {
+      if (data.includes(DataType.ProductPhotos)) {
+        throw new GenericError('Cannot export product photos in JSON format');
+      }
       return await this.jsonSerializer.serialize(toExport);
     } else if (format === 'csv') {
-      return await this.zipSerializer.serialize(toExport);
+      const photoPaths = data.includes(DataType.ProductPhotos)
+        ? toExport[DataType.ProductPhotos].map((photo) => photo.path)
+        : undefined;
+      return await this.zipSerializer.serialize(toExport, photoPaths);
     } else {
       throw new GenericError('could not serialize export output');
     }

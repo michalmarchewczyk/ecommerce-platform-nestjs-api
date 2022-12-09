@@ -17,6 +17,7 @@ import { DeliveryMethodsImporter } from '../sales/delivery-methods/delivery-meth
 import { PaymentMethodsImporter } from '../sales/payment-methods/payment-methods.importer';
 import { OrdersImporter } from '../sales/orders/orders.importer';
 import { ReturnsImporter } from '../sales/returns/returns.importer';
+import { ProductPhotosImporter } from '../catalog/products/product-photos/product-photos.importer';
 
 @Injectable()
 export class ImportService {
@@ -25,6 +26,7 @@ export class ImportService {
     [DataType.Users]: this.usersImporter,
     [DataType.AttributeTypes]: this.attributeTypesImporter,
     [DataType.Products]: this.productsImporter,
+    [DataType.ProductPhotos]: this.productPhotosImporter,
     [DataType.Categories]: this.categoriesImporter,
     [DataType.Wishlists]: this.wishlistsImporter,
     [DataType.DeliveryMethods]: this.deliveryMethodsImporter,
@@ -41,6 +43,7 @@ export class ImportService {
     private usersImporter: UsersImporter,
     private attributeTypesImporter: AttributeTypesImporter,
     private productsImporter: ProductsImporter,
+    private productPhotosImporter: ProductPhotosImporter,
     private categoriesImporter: CategoriesImporter,
     private wishlistsImporter: WishlistsImporter,
     private deliveryMethodsImporter: DeliveryMethodsImporter,

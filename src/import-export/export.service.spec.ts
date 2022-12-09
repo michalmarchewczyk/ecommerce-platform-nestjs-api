@@ -13,6 +13,7 @@ import { DeliveryMethodsExporter } from '../sales/delivery-methods/delivery-meth
 import { PaymentMethodsExporter } from '../sales/payment-methods/payment-methods.exporter';
 import { OrdersExporter } from '../sales/orders/orders.exporter';
 import { ReturnsExporter } from '../sales/returns/returns.exporter';
+import { ProductPhotosExporter } from '../catalog/products/product-photos/product-photos.exporter';
 
 describe('ExportService', () => {
   let service: ExportService;
@@ -63,6 +64,10 @@ describe('ExportService', () => {
         },
         {
           provide: ReturnsExporter,
+          useValue: {},
+        },
+        {
+          provide: ProductPhotosExporter,
           useValue: {},
         },
       ],

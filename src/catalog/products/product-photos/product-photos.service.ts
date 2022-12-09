@@ -15,6 +15,12 @@ export class ProductPhotosService {
     private localFilesService: LocalFilesService,
   ) {}
 
+  async getProductPhotos(): Promise<ProductPhoto[]> {
+    return this.productPhotosRepository.find({
+      relations: ['product'],
+    });
+  }
+
   async getProductPhoto(
     productId: number,
     photoId: number,
@@ -26,12 +32,29 @@ export class ProductPhotosService {
     if (!productPhoto) {
       throw new NotFoundError('product photo', 'id', photoId.toString());
     }
-
     const filepath = thumbnail ? productPhoto.thumbnailPath : productPhoto.path;
-
     const mimeType = thumbnail ? 'image/jpeg' : productPhoto.mimeType;
-
     return await this.localFilesService.getPhoto(filepath, mimeType);
+  }
+
+  async createProductPhoto(
+    id: number,
+    path: string,
+    mimeType: string,
+  ): Promise<ProductPhoto> {
+    const product = await this.productsRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundError('product', 'id', id.toString());
+    }
+    const photo = new ProductPhoto();
+    photo.path = path;
+    photo.mimeType = mimeType;
+    photo.thumbnailPath = await this.localFilesService.createPhotoThumbnail(
+      photo.path,
+    );
+    product.photos.push(photo);
+    await this.productsRepository.save(product);
+    return photo;
   }
 
   async addProductPhoto(

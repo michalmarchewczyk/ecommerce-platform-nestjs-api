@@ -17,6 +17,11 @@ import { ProductsImporter } from './products.importer';
   ],
   controllers: [ProductsController],
   providers: [ProductsService, ProductsExporter, ProductsImporter],
-  exports: [ProductsService, ProductsExporter, ProductsImporter],
+  exports: [
+    ProductsService,
+    ProductsExporter,
+    ProductsImporter,
+    ProductPhotosModule,
+  ],
 })
 export class ProductsModule {}

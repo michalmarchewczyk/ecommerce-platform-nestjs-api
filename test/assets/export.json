@@ -1,0 +1,420 @@
+{
+  "users": [
+    {
+      "id": 101,
+      "email": "admin@example.local",
+      "role": "admin",
+      "firstName": null,
+      "lastName": null
+    },
+    {
+      "id": 102,
+      "email": "customer@example.local",
+      "role": "customer",
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    {
+      "id": 103,
+      "email": "manager@example.local",
+      "role": "manager",
+      "firstName": null,
+      "lastName": null
+    },
+    {
+      "id": 104,
+      "email": "sales@example.local",
+      "role": "sales",
+      "firstName": null,
+      "lastName": null
+    },
+    {
+      "id": 105,
+      "email": "disabled@example.local",
+      "role": "disabled",
+      "firstName": null,
+      "lastName": null
+    }
+  ],
+  "settings": [
+    {
+      "builtin": true,
+      "name": "Currency",
+      "description": "The currency to use for all prices",
+      "defaultValue": "USD",
+      "value": "USD",
+      "type": "currencyCode"
+    },
+    {
+      "builtin": true,
+      "name": "Countries",
+      "description": "Possible countries for delivery",
+      "defaultValue": "US,CA",
+      "value": "US,CA",
+      "type": "countriesList"
+    },
+    {
+      "builtin": true,
+      "name": "Convert images to JPEG",
+      "description": "Automatically convert uploaded images to JPEG format (recommended)",
+      "defaultValue": "true",
+      "value": "true",
+      "type": "boolean"
+    },
+    {
+      "builtin": false,
+      "name": "Custom setting",
+      "description": "Some custom setting",
+      "defaultValue": "abc",
+      "value": "abcde",
+      "type": "string"
+    },
+    {
+      "builtin": true,
+      "name": "Product ratings",
+      "description": "Allow users to leave product ratings",
+      "defaultValue": "true",
+      "value": "true",
+      "type": "boolean"
+    },
+    {
+      "builtin": true,
+      "name": "Product rating photos",
+      "description": "Allow users to upload photos for product ratings",
+      "defaultValue": "true",
+      "value": "true",
+      "type": "boolean"
+    },
+    {
+      "builtin": true,
+      "name": "Thumbnail size",
+      "description": "Size of automatically generated thumbnails (in pixels, [SIZE]x[SIZE])",
+      "defaultValue": "400",
+      "value": "200",
+      "type": "number"
+    }
+  ],
+  "attributeTypes": [
+    {
+      "id": 1,
+      "name": "Maker",
+      "valueType": "string"
+    },
+    {
+      "id": 2,
+      "name": "Year of production",
+      "valueType": "number"
+    },
+    {
+      "id": 3,
+      "name": "New",
+      "valueType": "boolean"
+    },
+    {
+      "id": 4,
+      "name": "Color",
+      "valueType": "color"
+    }
+  ],
+  "products": [
+    {
+      "id": 2,
+      "name": "Test product 2",
+      "description": "Test description 2",
+      "price": 20,
+      "stock": 20,
+      "visible": true,
+      "attributes": [
+        {
+          "value": "#ff0000",
+          "typeId": 4
+        },
+        {
+          "value": "2018",
+          "typeId": 2
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Test product 1",
+      "description": "Test description 1",
+      "price": 1,
+      "stock": 1,
+      "visible": true,
+      "attributes": [
+        {
+          "value": "true",
+          "typeId": 3
+        },
+        {
+          "value": "2020",
+          "typeId": 2
+        },
+        {
+          "value": "Samsung",
+          "typeId": 1
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Test product 3",
+      "description": "Test description 3",
+      "price": 30,
+      "stock": 290,
+      "visible": false,
+      "attributes": []
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Category A",
+      "description": "Test category description",
+      "slug": null,
+      "groups": [],
+      "products": [
+        {
+          "id": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Category A1",
+      "description": "Test category description",
+      "slug": null,
+      "parentCategoryId": 1,
+      "groups": [],
+      "products": []
+    },
+    {
+      "id": 3,
+      "name": "Category A2",
+      "description": "Test category description",
+      "slug": null,
+      "parentCategoryId": 1,
+      "groups": [],
+      "products": []
+    },
+    {
+      "id": 4,
+      "name": "Category B",
+      "description": "Test category description",
+      "slug": null,
+      "groups": [
+        {
+          "name": "main"
+        },
+        {
+          "name": "footer"
+        }
+      ],
+      "products": []
+    },
+    {
+      "id": 5,
+      "name": "Category C",
+      "description": "Test category description",
+      "slug": "test-category-slug",
+      "groups": [],
+      "products": [
+        {
+          "id": 1
+        },
+        {
+          "id": 2
+        },
+        {
+          "id": 3
+        }
+      ]
+    }
+  ],
+  "wishlists": [
+    {
+      "id": 1,
+      "name": "Wishlist 1",
+      "userId": 101,
+      "products": [
+        {
+          "id": 1
+        },
+        {
+          "id": 2
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Wishlist 2",
+      "userId": 102,
+      "products": [
+        {
+          "id": 2
+        },
+        {
+          "id": 3
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Wishlist 3",
+      "userId": 102,
+      "products": [
+        {
+          "id": 3
+        }
+      ]
+    }
+  ],
+  "deliveryMethods": [
+    {
+      "id": 1,
+      "name": "Delivery Method A",
+      "description": "Test delivery method description",
+      "price": 1
+    },
+    {
+      "id": 2,
+      "name": "Delivery Method B",
+      "description": "Test delivery method description 2",
+      "price": 22
+    },
+    {
+      "id": 3,
+      "name": "Delivery Method C",
+      "description": "Test delivery method description 3",
+      "price": 333
+    }
+  ],
+  "paymentMethods": [
+    {
+      "id": 1,
+      "name": "Payment Method A",
+      "description": "Test payment method description",
+      "price": 0
+    },
+    {
+      "id": 2,
+      "name": "Payment Method B",
+      "description": "Test payment method description",
+      "price": 20
+    },
+    {
+      "id": 3,
+      "name": "Payment Method C",
+      "description": "Test payment method description",
+      "price": 30
+    }
+  ],
+  "orders": [
+    {
+      "id": 76,
+      "created": "2022-12-08T23:13:34.639Z",
+      "updated": "2022-12-08T23:13:34.639Z",
+      "userId": 101,
+      "status": "delivered",
+      "fullName": "John Doe",
+      "contactPhone": "+48 123 456 789",
+      "contactEmail": "customer@example.local",
+      "message": null,
+      "delivery": {
+        "methodId": 1,
+        "deliveryStatus": "",
+        "address": "Test address",
+        "city": "Test city",
+        "postalCode": null,
+        "country": "US"
+      },
+      "payment": {
+        "methodId": 2,
+        "paymentStatus": ""
+      },
+      "items": [
+        {
+          "productId": 2,
+          "quantity": 4,
+          "price": 20
+        },
+        {
+          "productId": 1,
+          "quantity": 2,
+          "price": 1
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "created": "2022-12-08T23:15:11.339Z",
+      "updated": "2022-12-08T23:15:29.318Z",
+      "userId": 101,
+      "status": "refunded",
+      "fullName": "John Doe",
+      "contactPhone": "+48 123 456 789",
+      "contactEmail": "customer@example.local",
+      "message": null,
+      "delivery": {
+        "methodId": 1,
+        "deliveryStatus": "",
+        "address": "Test address 2",
+        "city": "Test city 2",
+        "postalCode": null,
+        "country": "PL"
+      },
+      "payment": {
+        "methodId": 1,
+        "paymentStatus": ""
+      },
+      "items": [
+        {
+          "productId": 1,
+          "quantity": 1,
+          "price": 1
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "created": "2022-12-08T23:13:58.797Z",
+      "updated": "2022-12-08T23:13:58.797Z",
+      "userId": 101,
+      "status": "pending",
+      "fullName": "John Doe",
+      "contactPhone": "+48 123 456 789",
+      "contactEmail": "customer@example.local",
+      "message": null,
+      "delivery": {
+        "methodId": 2,
+        "deliveryStatus": "",
+        "address": "Test address 2",
+        "city": "Test city 2",
+        "postalCode": null,
+        "country": "PL"
+      },
+      "payment": {
+        "methodId": 3,
+        "paymentStatus": ""
+      },
+      "items": [
+        {
+          "productId": 3,
+          "quantity": 10,
+          "price": 30
+        }
+      ]
+    }
+  ],
+  "returns": [
+    {
+      "id": 31,
+      "created": "2022-12-08T23:15:29.256Z",
+      "updated": "2022-12-08T23:15:29.256Z",
+      "message": "Test return message",
+      "status": "accepted",
+      "orderId": 78
+    }
+  ]
+}

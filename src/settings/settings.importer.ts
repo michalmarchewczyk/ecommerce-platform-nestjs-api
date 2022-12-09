@@ -16,15 +16,15 @@ export class SettingsImporter implements Importer {
     const idMap: IdMap = {};
     for (const setting of parsedSettings) {
       const found = await this.settingsService.findSettingByName(setting.name);
-      if (setting.builtin && found) {
+      if (found) {
         await this.settingsService.updateSetting(found.id, {
           value: setting.value,
         });
+        idMap[setting.id] = found.id;
       } else {
         const { id: newId } = await this.settingsService.createSetting(setting);
         idMap[newId] = newId;
       }
-      // TODO: handle conflicts
     }
     return idMap;
   }

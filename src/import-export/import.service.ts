@@ -18,11 +18,13 @@ import { PaymentMethodsImporter } from '../sales/payment-methods/payment-methods
 import { OrdersImporter } from '../sales/orders/orders.importer';
 import { ReturnsImporter } from '../sales/returns/returns.importer';
 import { ProductPhotosImporter } from '../catalog/products/product-photos/product-photos.importer';
+import { PagesImporter } from '../pages/pages.importer';
 
 @Injectable()
 export class ImportService {
   private importers: Record<string, Importer> = {
     [DataType.Settings]: this.settingsImporter,
+    [DataType.Pages]: this.pagesImporter,
     [DataType.Users]: this.usersImporter,
     [DataType.AttributeTypes]: this.attributeTypesImporter,
     [DataType.Products]: this.productsImporter,
@@ -40,6 +42,7 @@ export class ImportService {
     private jsonSerializer: JsonSerializer,
     private zipSerializer: ZipSerializer,
     private settingsImporter: SettingsImporter,
+    private pagesImporter: PagesImporter,
     private usersImporter: UsersImporter,
     private attributeTypesImporter: AttributeTypesImporter,
     private productsImporter: ProductsImporter,

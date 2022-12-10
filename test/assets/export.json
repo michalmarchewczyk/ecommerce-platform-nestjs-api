@@ -18,22 +18,22 @@
       "id": 103,
       "email": "manager@example.local",
       "role": "manager",
-      "firstName": null,
-      "lastName": null
+      "firstName": "",
+      "lastName": ""
     },
     {
       "id": 104,
       "email": "sales@example.local",
       "role": "sales",
-      "firstName": null,
-      "lastName": null
+      "firstName": "",
+      "lastName": ""
     },
     {
       "id": 105,
       "email": "disabled@example.local",
       "role": "disabled",
-      "firstName": null,
-      "lastName": null
+      "firstName": "",
+      "lastName": ""
     }
   ],
   "settings": [
@@ -94,6 +94,30 @@
       "type": "number"
     }
   ],
+  "pages": [
+    {
+      "id": 1,
+      "title": "Page 1",
+      "content": "Test content 1",
+      "slug": "test-slug",
+      "groups": [
+        {
+          "name": "Test group"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Page 2",
+      "content": "Test content 2",
+      "slug": "test-slug",
+      "groups": [
+        {
+          "name": "Test group"
+        }
+      ]
+    }
+  ],
   "attributeTypes": [
     {
       "id": 1,
@@ -119,24 +143,6 @@
   "products": [
     {
       "id": 1,
-      "name": "Test product 2",
-      "description": "Test description 2",
-      "price": 20,
-      "stock": 20,
-      "visible": true,
-      "attributes": [
-        {
-          "value": "#ff0000",
-          "typeId": 4
-        },
-        {
-          "value": "2018",
-          "typeId": 2
-        }
-      ]
-    },
-    {
-      "id": 2,
       "name": "Test product 1",
       "description": "Test description 1",
       "price": 1,
@@ -158,6 +164,24 @@
       ]
     },
     {
+      "id": 2,
+      "name": "Test product 2",
+      "description": "Test description 2",
+      "price": 20,
+      "stock": 20,
+      "visible": true,
+      "attributes": [
+        {
+          "value": "#ff0000",
+          "typeId": 4
+        },
+        {
+          "value": "2018",
+          "typeId": 2
+        }
+      ]
+    },
+    {
       "id": 3,
       "name": "Test product 3",
       "description": "Test description 3",
@@ -169,10 +193,10 @@
   ],
   "categories": [
     {
-      "id": 4,
+      "id": 3,
       "name": "Category B",
       "description": "Test category description",
-      "slug": null,
+      "slug": "",
       "groups": [
         {
           "name": "footer"
@@ -184,7 +208,28 @@
       "products": []
     },
     {
+      "id": 2,
+      "name": "Category A2",
+      "description": "Test category description",
+      "slug": "",
+      "parentCategoryId": 5,
+      "groups": [],
+      "products": []
+    },
+    {
       "id": 5,
+      "name": "Category A",
+      "description": "Test category description",
+      "slug": "",
+      "groups": [],
+      "products": [
+        {
+          "id": 1
+        }
+      ]
+    },
+    {
+      "id": 4,
       "name": "Category C",
       "description": "Test category description",
       "slug": "test-category-slug",
@@ -194,58 +239,24 @@
           "id": 3
         },
         {
-          "id": 1
+          "id": 2
         },
         {
-          "id": 2
+          "id": 1
         }
       ]
     },
     {
       "id": 1,
-      "name": "Category A",
-      "description": "Test category description",
-      "slug": null,
-      "groups": [],
-      "products": [
-        {
-          "id": 2
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "name": "Category A2",
-      "description": "Test category description",
-      "slug": null,
-      "parentCategoryId": 1,
-      "groups": [],
-      "products": []
-    },
-    {
-      "id": 2,
       "name": "Category A1",
       "description": "Test category description",
-      "slug": null,
-      "parentCategoryId": 1,
+      "slug": "",
+      "parentCategoryId": 5,
       "groups": [],
       "products": []
     }
   ],
   "wishlists": [
-    {
-      "id": 2,
-      "name": "Wishlist 2",
-      "userId": 102,
-      "products": [
-        {
-          "id": 1
-        },
-        {
-          "id": 3
-        }
-      ]
-    },
     {
       "id": 1,
       "name": "Wishlist 1",
@@ -260,12 +271,25 @@
       ]
     },
     {
-      "id": 3,
+      "id": 2,
       "name": "Wishlist 3",
       "userId": 102,
       "products": [
         {
           "id": 3
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Wishlist 2",
+      "userId": 102,
+      "products": [
+        {
+          "id": 3
+        },
+        {
+          "id": 2
         }
       ]
     }
@@ -313,14 +337,14 @@
   "orders": [
     {
       "id": 1,
-      "created": "2022-12-10T13:49:58.804Z",
-      "updated": "2022-12-10T13:49:58.827Z",
+      "created": "2022-12-10T21:18:55.329Z",
+      "updated": "2022-12-10T21:18:55.413Z",
       "userId": 101,
       "status": "delivered",
       "fullName": "John Doe",
       "contactPhone": "+48 123 456 789",
       "contactEmail": "customer@example.local",
-      "message": null,
+      "message": "",
       "delivery": {
         "methodId": 1,
         "deliveryStatus": "",
@@ -336,26 +360,26 @@
       "items": [
         {
           "productId": 1,
-          "quantity": 4,
-          "price": 20
+          "quantity": 2,
+          "price": 1
         },
         {
           "productId": 2,
-          "quantity": 2,
-          "price": 1
+          "quantity": 4,
+          "price": 20
         }
       ]
     },
     {
       "id": 2,
-      "created": "2022-12-10T13:49:58.836Z",
-      "updated": "2022-12-10T13:49:58.857Z",
+      "created": "2022-12-10T21:18:55.440Z",
+      "updated": "2022-12-10T21:18:55.493Z",
       "userId": 101,
       "status": "refunded",
       "fullName": "John Doe",
       "contactPhone": "+48 123 456 789",
       "contactEmail": "customer@example.local",
-      "message": null,
+      "message": "",
       "delivery": {
         "methodId": 1,
         "deliveryStatus": "",
@@ -370,7 +394,7 @@
       },
       "items": [
         {
-          "productId": 2,
+          "productId": 1,
           "quantity": 1,
           "price": 1
         }
@@ -378,14 +402,14 @@
     },
     {
       "id": 3,
-      "created": "2022-12-10T13:49:58.867Z",
-      "updated": "2022-12-10T13:49:58.867Z",
+      "created": "2022-12-10T21:18:55.501Z",
+      "updated": "2022-12-10T21:18:55.501Z",
       "userId": 101,
       "status": "pending",
       "fullName": "John Doe",
       "contactPhone": "+48 123 456 789",
       "contactEmail": "customer@example.local",
-      "message": null,
+      "message": "",
       "delivery": {
         "methodId": 2,
         "deliveryStatus": "",
@@ -410,8 +434,8 @@
   "returns": [
     {
       "id": 1,
-      "created": "2022-12-10T13:49:58.898Z",
-      "updated": "2022-12-10T13:49:58.919Z",
+      "created": "2022-12-10T21:18:55.529Z",
+      "updated": "2022-12-10T21:18:55.550Z",
       "message": "Test return message",
       "status": "accepted",
       "orderId": 2

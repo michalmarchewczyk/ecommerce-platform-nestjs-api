@@ -16,6 +16,7 @@ import { PaymentMethodsImporter } from '../sales/payment-methods/payment-methods
 import { OrdersImporter } from '../sales/orders/orders.importer';
 import { ReturnsImporter } from '../sales/returns/returns.importer';
 import { ProductPhotosImporter } from '../catalog/products/product-photos/product-photos.importer';
+import { PagesImporter } from '../pages/pages.importer';
 
 describe('ImportController', () => {
   let controller: ImportController;
@@ -72,6 +73,10 @@ describe('ImportController', () => {
         },
         {
           provide: ProductPhotosImporter,
+          useValue: {},
+        },
+        {
+          provide: PagesImporter,
           useValue: {},
         },
       ],

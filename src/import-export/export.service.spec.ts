@@ -14,6 +14,7 @@ import { PaymentMethodsExporter } from '../sales/payment-methods/payment-methods
 import { OrdersExporter } from '../sales/orders/orders.exporter';
 import { ReturnsExporter } from '../sales/returns/returns.exporter';
 import { ProductPhotosExporter } from '../catalog/products/product-photos/product-photos.exporter';
+import { PagesExporter } from '../pages/pages.exporter';
 
 describe('ExportService', () => {
   let service: ExportService;
@@ -68,6 +69,10 @@ describe('ExportService', () => {
         },
         {
           provide: ProductPhotosExporter,
+          useValue: {},
+        },
+        {
+          provide: PagesExporter,
           useValue: {},
         },
       ],

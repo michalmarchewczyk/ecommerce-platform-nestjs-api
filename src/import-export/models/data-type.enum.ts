@@ -1,5 +1,6 @@
 export enum DataType {
   Settings = 'settings',
+  Pages = 'pages',
   Users = 'users',
   AttributeTypes = 'attributeTypes',
   Products = 'products',

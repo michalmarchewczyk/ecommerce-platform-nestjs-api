@@ -1,0 +1,12 @@
+{
+  "settings": [
+    {
+      "builtin": true,
+      "name": "Currency",
+      "description": "The currency to use for all prices",
+      "defaultValue": "USD",
+      "value": "123",
+      "type": "currencyCode"
+    }
+  ]
+}

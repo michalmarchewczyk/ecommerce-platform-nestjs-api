@@ -14,12 +14,15 @@ export class OrderDelivery {
   id: number;
 
   @OneToOne(() => Order, (order) => order.delivery, {
+    onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
   })
   order: Order;
 
   @ManyToOne(() => DeliveryMethod, {
     eager: true,
+    onDelete: 'CASCADE',
+    orphanedRowAction: 'delete',
   })
   method: DeliveryMethod;
 

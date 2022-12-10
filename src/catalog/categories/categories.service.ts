@@ -20,9 +20,9 @@ export class CategoriesService {
     private productsService: ProductsService,
   ) {}
 
-  async getCategories(): Promise<Category[]> {
+  async getCategories(withProducts = false): Promise<Category[]> {
     return this.categoriesRepository.find({
-      relations: ['parentCategory'],
+      relations: ['parentCategory', ...(withProducts ? ['products'] : [])],
     });
   }
 

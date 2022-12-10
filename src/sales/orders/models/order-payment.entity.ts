@@ -14,12 +14,15 @@ export class OrderPayment {
   id: number;
 
   @OneToOne(() => Order, (order) => order.payment, {
+    onDelete: 'CASCADE',
     orphanedRowAction: 'delete',
   })
   order: Order;
 
   @ManyToOne(() => PaymentMethod, {
     eager: true,
+    onDelete: 'CASCADE',
+    orphanedRowAction: 'delete',
   })
   method: PaymentMethod;
 

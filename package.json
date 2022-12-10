@@ -1,6 +1,6 @@
 {
   "name": "ecommerce-platform-nestjs-api",
-  "version": "1.4.0-3",
+  "version": "1.4.0-4",
   "description": "REST API for the E-commerce Platform project.",
   "author": "Michał Marchewczyk",
   "license": "MIT",
@@ -36,6 +36,7 @@
     "express-session": "^1.17.3",
     "joi": "^17.6.0",
     "json2csv": "^5.0.7",
+    "mime-types": "^2.1.35",
     "multer": "^1.4.5-lts.1",
     "nestjs-redoc": "github:michalmarchewczyk/nestjs-redoc",
     "passport": "^0.6.0",
@@ -59,6 +60,7 @@
     "@types/express-session": "^1.17.5",
     "@types/jest": "28.1.4",
     "@types/json2csv": "^5.0.3",
+    "@types/mime-types": "^2.1.1",
     "@types/multer": "^1.4.7",
     "@types/node": "^18.0.3",
     "@types/passport-local": "^1.0.34",

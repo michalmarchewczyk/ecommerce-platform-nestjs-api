@@ -42,8 +42,12 @@ export class SettingsService implements OnModuleInit {
     return setting;
   }
 
+  async findSettingByName(name: string): Promise<Setting | null> {
+    return await this.settingsRepository.findOne({ where: { name } });
+  }
+
   async getSettingValueByName(name: string): Promise<string> {
-    const setting = await this.settingsRepository.findOne({ where: { name } });
+    const setting = await this.findSettingByName(name);
     if (!setting) {
       throw new NotFoundError('setting', 'name', name);
     }
@@ -111,9 +115,9 @@ export class SettingsService implements OnModuleInit {
     });
   }
 
-  async deleteSetting(id: number): Promise<boolean> {
+  async deleteSetting(id: number, ignoreBuiltin = false): Promise<boolean> {
     const setting = await this.settingsRepository.findOne({ where: { id } });
-    if (!setting || setting.builtin) {
+    if (!setting || (setting.builtin && !ignoreBuiltin)) {
       throw new NotFoundError('setting', 'id', id.toString());
     }
     await this.settingsRepository.delete({ id });

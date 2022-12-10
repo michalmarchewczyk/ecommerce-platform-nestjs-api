@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -32,5 +33,6 @@ export class Page {
     eager: true,
     onDelete: 'CASCADE',
   })
+  @JoinTable()
   groups: PageGroup[];
 }

@@ -12,7 +12,7 @@ export class PageUpdateDto {
   @IsString()
   @IsNotEmpty()
   @IsOptional()
-  title: string;
+  title?: string;
 
   @IsString()
   @IsNotEmpty()

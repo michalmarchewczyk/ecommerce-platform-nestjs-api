@@ -90,6 +90,21 @@ describe('Import/ExportController (e2e)', () => {
       });
     });
 
+    it('should return error when import data is invalid', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/import')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/export-bad.json');
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        deleted: {},
+        added: {
+          settings: 0,
+        },
+        errors: ['setting value is not of type currencyCode'],
+      });
+    });
+
     it('should clear database without importing', async () => {
       const response = await request(app.getHttpServer())
         .post('/import')
@@ -131,6 +146,7 @@ describe('Import/ExportController (e2e)', () => {
           orders: 3,
           paymentMethods: 3,
           products: 3,
+          productPhotos: 2,
           returns: 1,
           settings: expect.any(Number),
           users: expect.any(Number),
@@ -139,9 +155,43 @@ describe('Import/ExportController (e2e)', () => {
         errors: [],
       });
     });
+
+    it('should clear database from csv', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/import')
+        .set('Cookie', cookieHeader)
+        .field('clear', 'true')
+        .field('noImport', 'true')
+        .attach('file', './test/assets/export.tar.gz');
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        deleted: {
+          attributeTypes: 4,
+          categories: 5,
+          deliveryMethods: 3,
+          orders: 3,
+          paymentMethods: 3,
+          products: 3,
+          productPhotos: 2,
+          returns: 1,
+          settings: expect.any(Number),
+          users: expect.any(Number),
+          wishlists: 3,
+        },
+        added: {},
+        errors: [],
+      });
+    });
   });
 
   describe('/export (GET)', () => {
+    beforeAll(async () => {
+      await request(app.getHttpServer())
+        .post('/import')
+        .set('Cookie', cookieHeader)
+        .attach('file', './test/assets/export.tar.gz');
+    });
+
     it('should export data', async () => {
       const response = await request(app.getHttpServer())
         .get('/export')
@@ -170,6 +220,38 @@ describe('Import/ExportController (e2e)', () => {
       }
     });
 
+    it('should return error when trying to export photos in json format', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/export')
+        .set('Cookie', cookieHeader)
+        .send({
+          data: ['attributeTypes', 'products', 'productPhotos'],
+          format: 'json',
+        });
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        statusCode: 400,
+        message: ['Cannot export product photos in JSON format'],
+        error: 'Bad Request',
+      });
+    });
+
+    it('should return error when trying to export data without its dependencies', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/export')
+        .set('Cookie', cookieHeader)
+        .send({
+          data: ['products'],
+          format: 'json',
+        });
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        statusCode: 400,
+        message: ['"products" depends on "attributeTypes"'],
+        error: 'Bad Request',
+      });
+    });
+
     it('should export data as csv', async () => {
       const response = await request(app.getHttpServer())
         .get('/export')
@@ -180,6 +262,7 @@ describe('Import/ExportController (e2e)', () => {
             'settings',
             'attributeTypes',
             'products',
+            'productPhotos',
             'categories',
             'wishlists',
             'deliveryMethods',

@@ -14,7 +14,7 @@ export class WishlistsImporter implements Importer {
 
   async import(
     wishlists: Collection,
-    idMaps: Record<string, IdMap> = {},
+    idMaps: Record<string, IdMap>,
   ): Promise<IdMap> {
     const parsedWishlists = this.parseWishlists(
       wishlists,

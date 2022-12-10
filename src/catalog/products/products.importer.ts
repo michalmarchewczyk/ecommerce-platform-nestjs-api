@@ -14,7 +14,7 @@ export class ProductsImporter implements Importer {
 
   async import(
     products: Collection,
-    idMaps: Record<string, IdMap> = {},
+    idMaps: Record<string, IdMap>,
   ): Promise<IdMap> {
     const parsedProducts = this.parseProducts(products, idMaps.attributeTypes);
     const idMap: IdMap = {};

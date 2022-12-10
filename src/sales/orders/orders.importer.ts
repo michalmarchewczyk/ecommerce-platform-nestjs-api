@@ -17,7 +17,7 @@ export class OrdersImporter implements Importer {
 
   async import(
     orders: Collection,
-    idMaps: Record<string, IdMap> = {},
+    idMaps: Record<string, IdMap>,
   ): Promise<IdMap> {
     const parsedOrders = this.parseOrders(orders, idMaps);
     const idMap: IdMap = {};
@@ -44,7 +44,7 @@ export class OrdersImporter implements Importer {
     return deleted;
   }
 
-  private parseOrders(orders: Collection, idMaps: Record<string, IdMap> = {}) {
+  private parseOrders(orders: Collection, idMaps: Record<string, IdMap>) {
     const parsedOrders: Order[] = [];
     for (const order of orders) {
       parsedOrders.push(this.parseOrder(order, idMaps));
@@ -59,7 +59,7 @@ export class OrdersImporter implements Importer {
       deliveryMethods: deliveryMethodsIdMap,
       paymentMethods: paymentMethodsIdMap,
       products: productsIdMap,
-    }: Record<string, IdMap> = {},
+    }: Record<string, IdMap>,
   ) {
     const parsedOrder = new OrderCreateDto() as any;
     try {

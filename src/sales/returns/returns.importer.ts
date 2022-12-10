@@ -14,7 +14,7 @@ export class ReturnsImporter implements Importer {
 
   async import(
     returns: Collection,
-    idMaps: Record<string, IdMap> = {},
+    idMaps: Record<string, IdMap>,
   ): Promise<IdMap> {
     const parsedReturns = this.parseReturns(returns, idMaps.orders);
     const idMap: IdMap = {};

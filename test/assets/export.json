@@ -118,7 +118,7 @@
   ],
   "products": [
     {
-      "id": 2,
+      "id": 1,
       "name": "Test product 2",
       "description": "Test description 2",
       "price": 20,
@@ -136,7 +136,7 @@
       ]
     },
     {
-      "id": 1,
+      "id": 2,
       "name": "Test product 1",
       "description": "Test description 1",
       "price": 1,
@@ -169,46 +169,16 @@
   ],
   "categories": [
     {
-      "id": 1,
-      "name": "Category A",
-      "description": "Test category description",
-      "slug": null,
-      "groups": [],
-      "products": [
-        {
-          "id": 1
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Category A1",
-      "description": "Test category description",
-      "slug": null,
-      "parentCategoryId": 1,
-      "groups": [],
-      "products": []
-    },
-    {
-      "id": 3,
-      "name": "Category A2",
-      "description": "Test category description",
-      "slug": null,
-      "parentCategoryId": 1,
-      "groups": [],
-      "products": []
-    },
-    {
       "id": 4,
       "name": "Category B",
       "description": "Test category description",
       "slug": null,
       "groups": [
         {
-          "name": "main"
+          "name": "footer"
         },
         {
-          "name": "footer"
+          "name": "main"
         }
       ],
       "products": []
@@ -221,18 +191,61 @@
       "groups": [],
       "products": [
         {
+          "id": 3
+        },
+        {
           "id": 1
         },
         {
           "id": 2
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Category A",
+      "description": "Test category description",
+      "slug": null,
+      "groups": [],
+      "products": [
+        {
+          "id": 2
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Category A2",
+      "description": "Test category description",
+      "slug": null,
+      "parentCategoryId": 1,
+      "groups": [],
+      "products": []
+    },
+    {
+      "id": 2,
+      "name": "Category A1",
+      "description": "Test category description",
+      "slug": null,
+      "parentCategoryId": 1,
+      "groups": [],
+      "products": []
+    }
+  ],
+  "wishlists": [
+    {
+      "id": 2,
+      "name": "Wishlist 2",
+      "userId": 102,
+      "products": [
+        {
+          "id": 1
         },
         {
           "id": 3
         }
       ]
-    }
-  ],
-  "wishlists": [
+    },
     {
       "id": 1,
       "name": "Wishlist 1",
@@ -243,19 +256,6 @@
         },
         {
           "id": 2
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Wishlist 2",
-      "userId": 102,
-      "products": [
-        {
-          "id": 2
-        },
-        {
-          "id": 3
         }
       ]
     },
@@ -312,9 +312,9 @@
   ],
   "orders": [
     {
-      "id": 76,
-      "created": "2022-12-08T23:13:34.639Z",
-      "updated": "2022-12-08T23:13:34.639Z",
+      "id": 1,
+      "created": "2022-12-10T13:49:58.804Z",
+      "updated": "2022-12-10T13:49:58.827Z",
       "userId": 101,
       "status": "delivered",
       "fullName": "John Doe",
@@ -335,21 +335,21 @@
       },
       "items": [
         {
-          "productId": 2,
+          "productId": 1,
           "quantity": 4,
           "price": 20
         },
         {
-          "productId": 1,
+          "productId": 2,
           "quantity": 2,
           "price": 1
         }
       ]
     },
     {
-      "id": 78,
-      "created": "2022-12-08T23:15:11.339Z",
-      "updated": "2022-12-08T23:15:29.318Z",
+      "id": 2,
+      "created": "2022-12-10T13:49:58.836Z",
+      "updated": "2022-12-10T13:49:58.857Z",
       "userId": 101,
       "status": "refunded",
       "fullName": "John Doe",
@@ -370,16 +370,16 @@
       },
       "items": [
         {
-          "productId": 1,
+          "productId": 2,
           "quantity": 1,
           "price": 1
         }
       ]
     },
     {
-      "id": 77,
-      "created": "2022-12-08T23:13:58.797Z",
-      "updated": "2022-12-08T23:13:58.797Z",
+      "id": 3,
+      "created": "2022-12-10T13:49:58.867Z",
+      "updated": "2022-12-10T13:49:58.867Z",
       "userId": 101,
       "status": "pending",
       "fullName": "John Doe",
@@ -409,12 +409,12 @@
   ],
   "returns": [
     {
-      "id": 31,
-      "created": "2022-12-08T23:15:29.256Z",
-      "updated": "2022-12-08T23:15:29.256Z",
+      "id": 1,
+      "created": "2022-12-10T13:49:58.898Z",
+      "updated": "2022-12-10T13:49:58.919Z",
       "message": "Test return message",
       "status": "accepted",
-      "orderId": 78
+      "orderId": 2
     }
   ]
 }

@@ -55,8 +55,8 @@ export class ImportService {
   async import(
     data: Buffer,
     filetype: string,
-    clear = false,
-    noImport = false,
+    clear: boolean,
+    noImport: boolean,
   ) {
     this.idMaps = {};
     let collections: Record<string, Collection> = {};

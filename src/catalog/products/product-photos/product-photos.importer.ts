@@ -13,7 +13,7 @@ export class ProductPhotosImporter implements Importer {
 
   async import(
     productPhotos: Collection,
-    idMaps: Record<string, IdMap> = {},
+    idMaps: Record<string, IdMap>,
   ): Promise<IdMap> {
     const parsedProductPhotos = this.parseProductPhotos(
       productPhotos,

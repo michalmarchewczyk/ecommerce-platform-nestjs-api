@@ -2,6 +2,7 @@ import { DataType } from './data-type.enum';
 
 const dataTypeDependencies: [DataType, DataType[]][] = [
   [DataType.Settings, []],
+  [DataType.Pages, []],
   [DataType.Users, []],
   [DataType.AttributeTypes, []],
   [DataType.Products, [DataType.AttributeTypes]],

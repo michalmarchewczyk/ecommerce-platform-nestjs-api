@@ -10,10 +10,12 @@ import { JsonSerializer } from './json-serializer.service';
 import { ZipSerializer } from './zip-serializer.service';
 import { WishlistsModule } from '../wishlists/wishlists.module';
 import { SalesModule } from '../sales/sales.module';
+import { PagesModule } from '../pages/pages.module';
 
 @Module({
   imports: [
     SettingsModule,
+    PagesModule,
     UsersModule,
     CatalogModule,
     WishlistsModule,

@@ -16,11 +16,13 @@ import { PaymentMethodsExporter } from '../sales/payment-methods/payment-methods
 import { OrdersExporter } from '../sales/orders/orders.exporter';
 import { ReturnsExporter } from '../sales/returns/returns.exporter';
 import { ProductPhotosExporter } from '../catalog/products/product-photos/product-photos.exporter';
+import { PagesExporter } from '../pages/pages.exporter';
 
 @Injectable()
 export class ExportService {
   private exporters: Record<string, Exporter<any>> = {
     [DataType.Settings]: this.settingExporter,
+    [DataType.Pages]: this.pagesExporter,
     [DataType.Users]: this.usersExporter,
     [DataType.AttributeTypes]: this.attributeTypesExporter,
     [DataType.Products]: this.productsExporter,
@@ -37,6 +39,7 @@ export class ExportService {
     private jsonSerializer: JsonSerializer,
     private zipSerializer: ZipSerializer,
     private settingExporter: SettingsExporter,
+    private pagesExporter: PagesExporter,
     private usersExporter: UsersExporter,
     private attributeTypesExporter: AttributeTypesExporter,
     private productsExporter: ProductsExporter,

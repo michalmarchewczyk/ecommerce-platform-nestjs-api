@@ -52,6 +52,9 @@ export class PagesImporter implements Importer {
       parsedPage.title = page.title as string;
       parsedPage.content = page.content as string;
       parsedPage.slug = page.slug as string;
+      if (typeof page.groups === 'string') {
+        page.groups = JSON.parse(page.groups);
+      }
       parsedPage.groups = (page.groups as Collection).map((group) =>
         this.parsePageGroup(group),
       );

@@ -26,6 +26,7 @@ import { SalesModule } from './sales/sales.module';
 import { FeaturesEnabledGuard } from './settings/guards/features-enabled.guard';
 import { ImportExportModule } from './import-export/import-export.module';
 import { PagesModule } from './pages/pages.module';
+import { CartsModule } from './carts/carts.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { PagesModule } from './pages/pages.module';
     WishlistsModule,
     ImportExportModule,
     PagesModule,
+    CartsModule,
   ],
   controllers: [],
   providers: [

@@ -88,6 +88,7 @@ describe('ImportService', () => {
         Buffer.from('{"settings": ["test"]}', 'utf-8'),
         'application/json',
         true,
+        false,
       );
       expect(settingsImporter.import).toHaveBeenCalledWith(
         ['test'],
@@ -111,6 +112,8 @@ describe('ImportService', () => {
         service.import(
           Buffer.from('{"unknown": ["test"]}', 'utf-8'),
           'application/json',
+          false,
+          false,
         ),
       ).rejects.toThrow(
         new GenericError('"unknown" is not recognized data type'),
@@ -127,6 +130,8 @@ describe('ImportService', () => {
       const result = await service.import(
         Buffer.from('{"settings": ["test"]}', 'utf-8'),
         'application/json',
+        false,
+        false,
       );
       expect(settingsImporter.import).toHaveBeenCalledWith(
         ['test'],

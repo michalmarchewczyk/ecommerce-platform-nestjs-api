@@ -34,10 +34,12 @@ export class CartsService {
     if (user) {
       const cart = new Cart();
       cart.user = user;
+      cart.products = [];
       return await this.cartsRepository.save(cart);
     } else {
       const cart = new Cart();
       cart.sessionId = sessionId;
+      cart.products = [];
       return await this.cartsRepository.save(cart);
     }
   }

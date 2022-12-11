@@ -12,7 +12,7 @@ import { setupRbacTests } from './utils/setup-rbac-tests';
 import { Wishlist } from '../src/wishlists/models/wishlist.entity';
 import { WishlistCreateDto } from '../src/wishlists/dto/wishlist-create.dto';
 
-describe.only('WishlistsController (e2e)', () => {
+describe('WishlistsController (e2e)', () => {
   let app: INestApplication;
   let testUsers: TestUsersService;
   let cookieHeader: string;

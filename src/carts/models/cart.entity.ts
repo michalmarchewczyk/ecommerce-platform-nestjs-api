@@ -6,6 +6,7 @@ import {
   ManyToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/models/user.entity';
 import { Product } from '../../catalog/products/models/product.entity';
@@ -14,6 +15,9 @@ import { Product } from '../../catalog/products/models/product.entity';
 export class Cart {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @UpdateDateColumn()
+  updated: Date;
 
   @OneToOne(() => User, { nullable: true, orphanedRowAction: 'delete' })
   @JoinColumn()

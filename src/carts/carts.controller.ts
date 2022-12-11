@@ -14,7 +14,7 @@ export class CartsController {
   @Get('my')
   @ApiOkResponse({ type: Cart, description: 'Current user/session cart' })
   async getCart(
-    @ReqUser() user: User,
+    @ReqUser() user: User | null,
     @Session() session: Record<string, any>,
   ) {
     session.cart = true;
@@ -24,7 +24,7 @@ export class CartsController {
   @Put('my')
   @ApiOkResponse({ type: Cart, description: 'Updated cart' })
   async updateCart(
-    @ReqUser() user: User,
+    @ReqUser() user: User | null,
     @Session() session: Record<string, any>,
     @Body() body: CartDto,
   ) {

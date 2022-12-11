@@ -13,7 +13,7 @@ export class CartsService {
     private productsService: ProductsService,
   ) {}
 
-  async getCart(user?: User, sessionId?: string) {
+  async getCart(user: User | null, sessionId?: string) {
     let cart: Cart | null = null;
     if (user?.id) {
       cart = await this.cartsRepository.findOne({
@@ -30,7 +30,7 @@ export class CartsService {
     return cart;
   }
 
-  private async createCart(user?: User, sessionId?: string) {
+  private async createCart(user: User | null, sessionId?: string) {
     if (user) {
       const cart = new Cart();
       cart.user = user;
@@ -42,7 +42,7 @@ export class CartsService {
     }
   }
 
-  async updateCart(updateData: CartDto, user?: User, sessionId?: string) {
+  async updateCart(updateData: CartDto, user: User | null, sessionId?: string) {
     const cart = await this.getCart(user, sessionId);
     cart.products = [];
     for (const productId of updateData.productIds) {

@@ -73,6 +73,12 @@ export class ProductPhotosService {
       file.path,
     );
     product.photos.push(photo);
+    await this.productsRepository.save(product);
+    if (product.photosOrder) {
+      product.photosOrder = [...product.photosOrder.split(','), photo.id].join(
+        ',',
+      );
+    }
     return this.productsRepository.save(product);
   }
 
@@ -82,6 +88,13 @@ export class ProductPhotosService {
       throw new NotFoundError('product', 'id', id.toString());
     }
     product.photos = product.photos.filter((p) => p.id !== photoId);
+    await this.productsRepository.save(product);
+    if (product.photosOrder) {
+      product.photosOrder = product.photosOrder
+        .split(',')
+        .filter((p) => p !== photoId.toString())
+        .join(',');
+    }
     return this.productsRepository.save(product);
   }
 }

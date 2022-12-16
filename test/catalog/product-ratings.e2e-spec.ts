@@ -80,6 +80,7 @@ describe('ProductRatingsController (e2e)', () => {
       expect(response.body).toContainEqual({
         ...expected,
         photos: [expect.any(Object)],
+        user: expect.any(Object),
       });
     });
 
@@ -96,6 +97,7 @@ describe('ProductRatingsController (e2e)', () => {
       expect(response.body).toContainEqual({
         ...expected,
         photos: [],
+        user: expect.any(Object),
       });
       await settings.updateSetting(settingId ?? -1, { value: 'true' });
     });

@@ -20,6 +20,7 @@ export class ProductRatingsService {
   async getProductRatings(productId: number): Promise<ProductRating[]> {
     const rating = await this.productRatingsRepository.find({
       where: { product: { id: productId } },
+      relations: ['user'],
     });
     if (
       (await this.settingsService.getSettingValueByName(

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import {
   ApiForbiddenResponse,
   ApiTags,
@@ -18,7 +18,7 @@ import { ExportDto } from './dto/export.dto';
 export class ExportController {
   constructor(private exportService: ExportService) {}
 
-  @Get('')
+  @Post('')
   async export(
     @Res({ passthrough: true }) res: Response,
     @Body() data: ExportDto,

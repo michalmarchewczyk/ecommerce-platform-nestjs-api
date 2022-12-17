@@ -32,7 +32,7 @@ describe('Import/ExportController (e2e)', () => {
       () => testUsersRBAC,
       [
         ['/import (POST)', [Role.Admin]],
-        ['/export (GET)', [Role.Admin]],
+        ['/export (POST)', [Role.Admin]],
       ],
     ),
   );

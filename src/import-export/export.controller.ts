@@ -1,6 +1,8 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import {
+  ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiProduces,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -9,6 +11,7 @@ import { Role } from '../users/models/role.enum';
 import { ExportService } from './export.service';
 import { Response } from 'express';
 import { ExportDto } from './dto/export.dto';
+import { fileResponseSchema } from '../local-files/models/file-response.schema';
 
 @ApiTags('import-export')
 @Controller('export')
@@ -19,6 +22,11 @@ export class ExportController {
   constructor(private exportService: ExportService) {}
 
   @Post('')
+  @ApiCreatedResponse({
+    schema: fileResponseSchema,
+    description: 'Product photo with given id',
+  })
+  @ApiProduces('application/json', 'application/gzip')
   async export(
     @Res({ passthrough: true }) res: Response,
     @Body() data: ExportDto,

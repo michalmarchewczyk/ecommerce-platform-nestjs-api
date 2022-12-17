@@ -10,6 +10,7 @@ import {
 import {
   ApiBody,
   ApiConsumes,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -21,6 +22,7 @@ import { fileBodySchema } from '../local-files/models/file-body.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { ImportDto } from './dto/import.dto';
+import { ImportStatus } from './models/import-status.interface';
 
 @ApiTags('import-export')
 @Controller('import')
@@ -38,6 +40,10 @@ export class ImportController {
       storage: multer.memoryStorage(),
     }),
   )
+  @ApiCreatedResponse({
+    type: ImportStatus,
+    description: 'Import status',
+  })
   async import(
     @UploadedFile(
       new ParseFilePipe({

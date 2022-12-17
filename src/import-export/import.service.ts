@@ -19,6 +19,7 @@ import { OrdersImporter } from '../sales/orders/orders.importer';
 import { ReturnsImporter } from '../sales/returns/returns.importer';
 import { ProductPhotosImporter } from '../catalog/products/product-photos/product-photos.importer';
 import { PagesImporter } from '../pages/pages.importer';
+import { ImportStatus } from './models/import-status.interface';
 
 @Injectable()
 export class ImportService {
@@ -60,7 +61,7 @@ export class ImportService {
     filetype: string,
     clear: boolean,
     noImport: boolean,
-  ) {
+  ): Promise<ImportStatus> {
     this.idMaps = {};
     let collections: Record<string, Collection> = {};
     if (filetype === 'application/json') {

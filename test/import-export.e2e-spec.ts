@@ -188,7 +188,7 @@ describe('Import/ExportController (e2e)', () => {
     });
   });
 
-  describe('/export (GET)', () => {
+  describe('/export (POST)', () => {
     beforeAll(async () => {
       await request(app.getHttpServer())
         .post('/import')
@@ -198,7 +198,7 @@ describe('Import/ExportController (e2e)', () => {
 
     it('should export data', async () => {
       const response = await request(app.getHttpServer())
-        .get('/export')
+        .post('/export')
         .set('Cookie', cookieHeader)
         .send({
           data: [
@@ -216,7 +216,7 @@ describe('Import/ExportController (e2e)', () => {
           ],
           format: 'json',
         });
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(201);
       for (const key in exportJson) {
         expect(Array.isArray(response.body[key])).toBe(true);
         expect(response.body[key].length).toBeGreaterThanOrEqual(
@@ -227,7 +227,7 @@ describe('Import/ExportController (e2e)', () => {
 
     it('should return error when trying to export photos in json format', async () => {
       const response = await request(app.getHttpServer())
-        .get('/export')
+        .post('/export')
         .set('Cookie', cookieHeader)
         .send({
           data: ['attributeTypes', 'products', 'productPhotos'],
@@ -243,7 +243,7 @@ describe('Import/ExportController (e2e)', () => {
 
     it('should return error when trying to export data without its dependencies', async () => {
       const response = await request(app.getHttpServer())
-        .get('/export')
+        .post('/export')
         .set('Cookie', cookieHeader)
         .send({
           data: ['products'],
@@ -259,7 +259,7 @@ describe('Import/ExportController (e2e)', () => {
 
     it('should export data as csv', async () => {
       const response = await request(app.getHttpServer())
-        .get('/export')
+        .post('/export')
         .set('Cookie', cookieHeader)
         .send({
           data: [
@@ -277,7 +277,7 @@ describe('Import/ExportController (e2e)', () => {
           ],
           format: 'csv',
         });
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(201);
       expect(response.headers['content-type']).toBe('application/gzip');
     });
   });

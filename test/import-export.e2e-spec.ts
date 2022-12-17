@@ -216,7 +216,7 @@ describe('Import/ExportController (e2e)', () => {
           ],
           format: 'json',
         });
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(201);
       for (const key in exportJson) {
         expect(Array.isArray(response.body[key])).toBe(true);
         expect(response.body[key].length).toBeGreaterThanOrEqual(
@@ -277,7 +277,7 @@ describe('Import/ExportController (e2e)', () => {
           ],
           format: 'csv',
         });
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(201);
       expect(response.headers['content-type']).toBe('application/gzip');
     });
   });

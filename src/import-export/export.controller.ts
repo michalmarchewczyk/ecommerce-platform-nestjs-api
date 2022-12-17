@@ -24,7 +24,7 @@ export class ExportController {
   @Post('')
   @ApiCreatedResponse({
     schema: fileResponseSchema,
-    description: 'Product photo with given id',
+    description: 'Exported data',
   })
   @ApiProduces('application/json', 'application/gzip')
   async export(

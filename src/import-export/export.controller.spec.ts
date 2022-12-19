@@ -106,7 +106,7 @@ describe('ExportController', () => {
       });
       expect(res.header).toHaveBeenCalledWith(
         'Content-Disposition',
-        `attachment; filename="export-${new Date().toISOString()}.json"`,
+        expect.stringContaining('export_'),
       );
     });
   });

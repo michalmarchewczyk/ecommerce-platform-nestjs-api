@@ -39,6 +39,7 @@ export class ExportController {
       'Content-Disposition',
       `attachment; filename="export-${new Date().toISOString()}.${ext}"`,
     );
+    res.header('Access-Control-Expose-Headers', 'Content-Disposition');
     return await this.exportService.export(data.data, data.format);
   }
 }

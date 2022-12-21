@@ -6,7 +6,6 @@ export class PageCreateDto {
   title: string;
 
   @IsString()
-  @IsNotEmpty()
   @IsOptional()
   slug?: string;
 

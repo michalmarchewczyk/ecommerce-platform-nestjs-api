@@ -15,7 +15,6 @@ export class PageUpdateDto {
   title?: string;
 
   @IsString()
-  @IsNotEmpty()
   @IsOptional()
   slug?: string;
 

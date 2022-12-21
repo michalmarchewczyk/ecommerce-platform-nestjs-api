@@ -18,7 +18,6 @@ import {
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../users/models/role.enum';
 import { ImportService } from './import.service';
-import { fileBodySchema } from '../local-files/models/file-body.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { ImportDto } from './dto/import.dto';
@@ -33,7 +32,25 @@ export class ImportController {
   constructor(private importService: ImportService) {}
 
   @Post('')
-  @ApiBody({ schema: fileBodySchema })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        clear: {
+          type: 'string',
+          nullable: true,
+        },
+        noImport: {
+          type: 'string',
+          nullable: true,
+        },
+      },
+    },
+  })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {

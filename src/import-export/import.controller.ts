@@ -66,7 +66,7 @@ export class ImportController {
       new ParseFilePipe({
         validators: [
           new FileTypeValidator({
-            fileType: /(^application\/json$)|(^application\/gzip$)/,
+            fileType: /(^application\/json$)|(^application\/(x-)?gzip$)/,
           }),
         ],
       }),

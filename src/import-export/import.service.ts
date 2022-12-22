@@ -66,7 +66,10 @@ export class ImportService {
     let collections: Record<string, Collection> = {};
     if (filetype === 'application/json') {
       collections = await this.jsonSerializer.parse(data);
-    } else if (filetype === 'application/gzip') {
+    } else if (
+      filetype === 'application/gzip' ||
+      filetype === 'application/x-gzip'
+    ) {
       collections = await this.zipSerializer.parse(data);
     }
     const imported: Record<string, number> = {};

@@ -34,6 +34,7 @@ export class LocalFilesService {
       return { path: file.path, mimeType: file.mimetype };
     }
     const buffer = await sharp(file.path)
+      .flatten({ background: '#ffffff' })
       .jpeg({ quality: 95, mozjpeg: true })
       .toBuffer();
     await sharp(buffer).toFile(file.path);

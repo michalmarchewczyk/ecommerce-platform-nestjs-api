@@ -36,7 +36,9 @@ export class CategoriesService {
       relations: [
         'parentCategory',
         ...(children ? ['childCategories'] : []),
-        ...(products ? ['products'] : []),
+        ...(products
+          ? ['products', 'products.attributes', 'products.attributes.type']
+          : []),
       ],
     });
     if (!category) {

@@ -19,12 +19,16 @@ export class ProductsService {
     private attributeTypesService: AttributeTypesService,
   ) {}
 
-  async getProducts(): Promise<Product[]> {
-    return this.productsRepository.find();
+  async getProducts(withHidden?: boolean): Promise<Product[]> {
+    return this.productsRepository.find({
+      where: { visible: !withHidden ? true : undefined },
+    });
   }
 
-  async getProduct(id: number): Promise<Product> {
-    const product = await this.productsRepository.findOne({ where: { id } });
+  async getProduct(id: number, withHidden?: boolean): Promise<Product> {
+    const product = await this.productsRepository.findOne({
+      where: { id, visible: !withHidden ? true : undefined },
+    });
     if (!product) {
       throw new NotFoundError('product', 'id', id.toString());
     }
@@ -41,7 +45,7 @@ export class ProductsService {
     id: number,
     productData: ProductUpdateDto,
   ): Promise<Product> {
-    const product = await this.getProduct(id);
+    const product = await this.getProduct(id, true);
     if (productData.photosOrder) {
       await this.checkProductPhotosOrder(product, productData.photosOrder);
     }
@@ -62,7 +66,7 @@ export class ProductsService {
   }
 
   async deleteProduct(id: number): Promise<boolean> {
-    await this.getProduct(id);
+    await this.getProduct(id, true);
     await this.productsRepository.delete({ id });
     return true;
   }
@@ -102,7 +106,7 @@ export class ProductsService {
     id: number,
     attributes: AttributeDto[],
   ): Promise<Product> {
-    const product = await this.getProduct(id);
+    const product = await this.getProduct(id, true);
     const attributesToSave = [];
     for (const attribute of attributes) {
       const attributeType = await this.attributeTypesService.getAttributeType(

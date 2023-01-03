@@ -102,13 +102,19 @@ export class CategoriesService {
     return true;
   }
 
-  async getCategoryProducts(id: number): Promise<Product[]> {
+  async getCategoryProducts(
+    id: number,
+    withHidden?: boolean,
+  ): Promise<Product[]> {
     const category = await this.getCategory(id, false, true);
+    if (!withHidden) {
+      return category.products.filter((product) => product.visible);
+    }
     return category.products;
   }
 
   async addCategoryProduct(id: number, productId: number): Promise<Product> {
-    const product = await this.productsService.getProduct(productId);
+    const product = await this.productsService.getProduct(productId, true);
     const category = await this.getCategory(id, false, true);
     category.products.push(product);
     await this.categoriesRepository.save(category);
@@ -116,7 +122,7 @@ export class CategoriesService {
   }
 
   async deleteCategoryProduct(id: number, productId: number): Promise<boolean> {
-    const product = await this.productsService.getProduct(productId);
+    const product = await this.productsService.getProduct(productId, true);
     const category = await this.getCategory(id, false, true);
     if (!category.products.some((p) => p.id === product.id)) {
       throw new NotRelatedError('category', 'product');

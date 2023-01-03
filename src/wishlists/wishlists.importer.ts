@@ -24,10 +24,14 @@ export class WishlistsImporter implements Importer {
     const idMap: IdMap = {};
     for (const wishlist of parsedWishlists) {
       const { id, user, products, ...createDto } = wishlist;
-      const { id: newId } = await this.wishlistsService.createWishlist(user, {
-        ...createDto,
-        productIds: products.map(({ id }) => id),
-      });
+      const { id: newId } = await this.wishlistsService.createWishlist(
+        user,
+        {
+          ...createDto,
+          productIds: products.map(({ id }) => id),
+        },
+        true,
+      );
       idMap[wishlist.id] = newId;
     }
     return idMap;

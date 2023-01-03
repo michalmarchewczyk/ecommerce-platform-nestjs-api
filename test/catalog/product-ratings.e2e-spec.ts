@@ -46,6 +46,7 @@ describe('ProductRatingsController (e2e)', () => {
     cookieHeader = response.headers['set-cookie'];
 
     const productData = generate(ProductCreateDto);
+    productData.visible = true;
     testProduct = (
       await request(app.getHttpServer())
         .post('/products')

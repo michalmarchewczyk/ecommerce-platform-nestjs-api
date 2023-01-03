@@ -62,6 +62,7 @@ describe('ProductsController', () => {
         ...generate(ProductCreateDto, true),
         id: 1,
         attributes: [],
+        visible: true,
       };
       mockProductsRepository.save(product);
       expect(await controller.getProduct(1)).toEqual({

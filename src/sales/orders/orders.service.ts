@@ -12,6 +12,8 @@ import { DeliveryMethodsService } from '../delivery-methods/delivery-methods.ser
 import { PaymentMethodsService } from '../payment-methods/payment-methods.service';
 import { OrderPayment } from './models/order-payment.entity';
 import { NotFoundError } from '../../errors/not-found.error';
+import { Role } from '../../users/models/role.enum';
+import { OrderItemDto } from './dto/order-item.dto';
 
 @Injectable()
 export class OrdersService {
@@ -72,15 +74,7 @@ export class OrdersService {
     if (userId) {
       order.user = await this.usersService.getUser(userId);
     }
-    order.items = [];
-    for (const item of orderData.items) {
-      const product = await this.productsService.getProduct(item.productId);
-      order.items.push({
-        product,
-        quantity: item.quantity,
-        price: product.price,
-      } as OrderItem);
-    }
+    order.items = await this.getItems(order, orderData.items);
     order.fullName = orderData.fullName;
     order.contactEmail = orderData.contactEmail;
     order.contactPhone = orderData.contactPhone;
@@ -102,6 +96,23 @@ export class OrdersService {
     return this.ordersRepository.save(order, { listeners: !ignoreSubscribers });
   }
 
+  private async getItems(order: Order, items: OrderItemDto[]) {
+    const res = [];
+    for (const item of items) {
+      const product = await this.productsService.getProduct(
+        item.productId,
+        order.user &&
+          [Role.Admin, Role.Manager, Role.Sales].includes(order.user.role),
+      );
+      res.push({
+        product,
+        quantity: item.quantity,
+        price: product.price,
+      } as OrderItem);
+    }
+    return res;
+  }
+
   async updateOrder(
     id: number,
     orderData: OrderUpdateDto,
@@ -109,15 +120,7 @@ export class OrdersService {
   ): Promise<Order> {
     const order = await this.getOrder(id);
     if (orderData.items) {
-      order.items = [];
-      for (const item of orderData.items) {
-        const product = await this.productsService.getProduct(item.productId);
-        order.items.push({
-          product,
-          quantity: item.quantity,
-          price: product.price,
-        } as OrderItem);
-      }
+      order.items = await this.getItems(order, orderData.items);
     }
     if (orderData.delivery) {
       const deliveryMethod = await this.deliveryMethodsService.getMethod(

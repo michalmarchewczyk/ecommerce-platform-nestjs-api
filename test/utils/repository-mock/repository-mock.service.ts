@@ -164,7 +164,7 @@ export class RepositoryMockService<T extends { [key: string]: any }> {
         if (!this.matchObject(obj?.[key], match?.[key])) {
           return false;
         }
-      } else if (obj?.[key] !== match?.[key]) {
+      } else if (obj?.[key] !== match?.[key] && match?.[key] !== undefined) {
         return false;
       }
     }

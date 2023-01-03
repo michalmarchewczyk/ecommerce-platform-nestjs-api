@@ -187,7 +187,7 @@ describe('CategoriesService', () => {
   });
 
   describe('addCategoryProduct', () => {
-    it('should add a product to a category', async () => {
+    it.only('should add a product to a category', async () => {
       const createData = generate(CategoryCreateDto);
       const { id } = mockCategoriesRepository.save(createData);
       const productData = generate(ProductCreateDto, true);

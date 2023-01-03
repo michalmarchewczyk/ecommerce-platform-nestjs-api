@@ -25,6 +25,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { ReqUser } from '../../auth/decorators/user.decorator';
+import { User } from '../../users/models/user.entity';
 
 @ApiTags('products')
 @Controller('products')
@@ -33,14 +35,23 @@ export class ProductsController {
 
   @Get()
   @ApiOkResponse({ type: [Product], description: 'List of all products' })
-  getProducts(): Promise<Product[]> {
+  getProducts(@ReqUser() user?: User): Promise<Product[]> {
+    if (user && [Role.Admin, Role.Manager, Role.Sales].includes(user?.role)) {
+      return this.productsService.getProducts(true);
+    }
     return this.productsService.getProducts();
   }
 
   @Get('/:id')
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiOkResponse({ type: Product, description: 'Product with given id' })
-  async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
+  async getProduct(
+    @Param('id', ParseIntPipe) id: number,
+    @ReqUser() user?: User,
+  ): Promise<Product> {
+    if (user && [Role.Admin, Role.Manager, Role.Sales].includes(user?.role)) {
+      return this.productsService.getProduct(id, true);
+    }
     return await this.productsService.getProduct(id);
   }
 

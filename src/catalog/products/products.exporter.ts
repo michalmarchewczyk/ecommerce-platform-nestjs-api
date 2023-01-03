@@ -9,7 +9,7 @@ export class ProductsExporter implements Exporter<Product> {
   constructor(private productsService: ProductsService) {}
 
   async export(): Promise<Product[]> {
-    const products = await this.productsService.getProducts();
+    const products = await this.productsService.getProducts(true);
     const preparedProducts: Product[] = [];
     for (const product of products) {
       preparedProducts.push(this.prepareProduct(product));

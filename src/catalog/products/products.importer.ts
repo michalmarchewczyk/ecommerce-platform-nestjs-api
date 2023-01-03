@@ -27,7 +27,7 @@ export class ProductsImporter implements Importer {
   }
 
   async clear() {
-    const products = await this.productsService.getProducts();
+    const products = await this.productsService.getProducts(true);
     let deleted = 0;
     for (const product of products) {
       await this.productsService.deleteProduct(product.id);

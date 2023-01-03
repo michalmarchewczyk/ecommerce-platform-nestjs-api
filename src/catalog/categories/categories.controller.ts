@@ -26,6 +26,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CategoryGroup } from './models/category-group.entity';
+import { User } from '../../users/models/user.entity';
+import { ReqUser } from '../../auth/decorators/user.decorator';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -93,7 +95,11 @@ export class CategoriesController {
   @ApiOkResponse({ type: [Product], description: 'Category products' })
   async getCategoryProducts(
     @Param('id', ParseIntPipe) id: number,
+    @ReqUser() user?: User,
   ): Promise<Product[]> {
+    if (user && [Role.Admin, Role.Manager, Role.Sales].includes(user?.role)) {
+      return await this.categoriesService.getCategoryProducts(id, true);
+    }
     return await this.categoriesService.getCategoryProducts(id);
   }
 

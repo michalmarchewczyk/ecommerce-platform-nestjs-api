@@ -7,6 +7,7 @@ import { WishlistCreateDto } from './dto/wishlist-create.dto';
 import { WishlistUpdateDto } from './dto/wishlist-update.dto';
 import { NotFoundError } from '../errors/not-found.error';
 import { ProductsService } from '../catalog/products/products.service';
+import { Role } from '../users/models/role.enum';
 
 @Injectable()
 export class WishlistsService {
@@ -42,13 +43,18 @@ export class WishlistsService {
   async createWishlist(
     user: User,
     createData: WishlistCreateDto,
+    withHidden?: boolean,
   ): Promise<Wishlist> {
     const wishlist = new Wishlist();
     wishlist.user = user;
     wishlist.name = createData.name;
     wishlist.products = [];
     for (const productId of createData.productIds) {
-      const product = await this.productsService.getProduct(productId);
+      const product = await this.productsService.getProduct(
+        productId,
+        [Role.Admin, Role.Manager, Role.Sales].includes(user.role) ||
+          withHidden,
+      );
       wishlist.products.push(product);
     }
     return this.wishlistsRepository.save(wishlist);
@@ -63,7 +69,10 @@ export class WishlistsService {
     wishlist.name = updateData.name ?? wishlist.name;
     wishlist.products = [];
     for (const productId of updateData.productIds ?? []) {
-      const product = await this.productsService.getProduct(productId);
+      const product = await this.productsService.getProduct(
+        productId,
+        [Role.Admin, Role.Manager, Role.Sales].includes(user.role),
+      );
       wishlist.products.push(product);
     }
     return this.wishlistsRepository.save(wishlist);

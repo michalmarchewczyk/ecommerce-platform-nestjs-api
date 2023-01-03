@@ -46,6 +46,7 @@ describe('CartsController (e2e)', () => {
     cookieHeaderSession = response2.headers['set-cookie'];
 
     const productData = generate(ProductCreateDto);
+    productData.visible = true;
     testProduct = (
       await request(app.getHttpServer())
         .post('/products')

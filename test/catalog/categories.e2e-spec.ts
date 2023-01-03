@@ -54,6 +54,7 @@ describe('CategoriesController (e2e)', () => {
     ).body;
 
     const productData = generate(ProductCreateDto);
+    productData.visible = true;
     testProduct = (
       await request(app.getHttpServer())
         .post('/products')

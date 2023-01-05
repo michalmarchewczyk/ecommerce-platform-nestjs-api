@@ -56,6 +56,22 @@ describe('SettingsController', () => {
     });
   });
 
+  describe('getSettingValueByName', () => {
+    it('should return a setting value with given name', async () => {
+      const setting = { ...generate(SettingCreateDto, true), id: 1 };
+      mockSettingsRepository.save(setting);
+      expect(await controller.getSettingValueByName(setting.name)).toBe(
+        setting.value,
+      );
+    });
+
+    it('should throw error if setting not found', async () => {
+      await expect(controller.getSettingValueByName('12345')).rejects.toThrow(
+        NotFoundError,
+      );
+    });
+  });
+
   describe('createSetting', () => {
     it('should create setting', async () => {
       const createData = generate(SettingCreateDto, true);

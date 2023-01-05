@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -35,11 +36,21 @@ export class SettingsController {
     return this.settingsService.getSettings();
   }
 
-  @Get('/:id')
+  @Get('/:id(\\d+)')
   @ApiOkResponse({ type: Setting, description: 'Setting with given id' })
   @ApiNotFoundResponse({ description: 'Setting not found' })
-  async getSetting(@Param('id') id: number): Promise<Setting> {
+  async getSetting(@Param('id', ParseIntPipe) id: number): Promise<Setting> {
     return this.settingsService.getSetting(id);
+  }
+
+  @Get('/:name/value')
+  @ApiOkResponse({
+    type: String,
+    description: 'Value of the setting with given name',
+  })
+  @ApiNotFoundResponse({ description: 'Setting not found' })
+  async getSettingValueByName(@Param('name') name: string): Promise<string> {
+    return this.settingsService.getSettingValueByName(name);
   }
 
   @Post()

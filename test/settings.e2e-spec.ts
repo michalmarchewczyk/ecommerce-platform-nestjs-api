@@ -90,6 +90,28 @@ describe('SettingsController (e2e)', () => {
     });
   });
 
+  describe('/settings/:name/value (GET)', () => {
+    it('should return setting value by name', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/settings/${testSetting.name}/value`)
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(200);
+      expect(response.text).toEqual(testSetting.value);
+    });
+
+    it('should return error if setting not found', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/settings/12345/value')
+        .set('Cookie', cookieHeader);
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        statusCode: 404,
+        message: ['setting with name=12345 not found'],
+        error: 'Not Found',
+      });
+    });
+  });
+
   describe('/settings (POST)', () => {
     it('should create setting', async () => {
       const createData = generate(SettingCreateDto, true);
@@ -283,6 +305,10 @@ describe('SettingsController (e2e)', () => {
         ['/settings (POST)', [Role.Admin]],
         [
           '/settings/:id (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
+        ],
+        [
+          '/settings/:name/value (GET)',
           [Role.Admin, Role.Manager, Role.Sales, Role.Customer, Role.Disabled],
         ],
         ['/settings/:id (PATCH)', [Role.Admin]],

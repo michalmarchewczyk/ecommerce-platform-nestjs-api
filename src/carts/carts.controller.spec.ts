@@ -35,13 +35,13 @@ describe('CartsController', () => {
     it('should create users cart if it does not exist', async () => {
       const cart = await controller.getCart({ id: 1 } as User, {});
       expect(cart).toBeDefined();
-      expect(cart.products).toEqual([]);
+      expect(cart.items).toEqual([]);
     });
 
     it('should create session cart if it does not exist', async () => {
       const cart = await controller.getCart(null, { id: '123456789' });
       expect(cart).toBeDefined();
-      expect(cart.products).toEqual([]);
+      expect(cart.items).toEqual([]);
     });
 
     it('should return users cart if it exists', async () => {
@@ -63,11 +63,16 @@ describe('CartsController', () => {
       await controller.updateCart(
         { id: 3 } as User,
         {},
-        { productIds: [1, 2] },
+        {
+          items: [
+            { productId: 1, quantity: 1 },
+            { productId: 2, quantity: 2 },
+          ],
+        },
       );
-      expect(cart.products).toEqual([
-        { id: 1, name: 'product 1' },
-        { id: 2, name: 'product 2' },
+      expect(cart.items).toEqual([
+        { quantity: 1, product: { id: 1, name: 'product 1' } },
+        { quantity: 2, product: { id: 2, name: 'product 2' } },
       ]);
     });
 
@@ -76,11 +81,16 @@ describe('CartsController', () => {
       await controller.updateCart(
         null,
         { id: '123' },
-        { productIds: [10, 20] },
+        {
+          items: [
+            { productId: 10, quantity: 10 },
+            { productId: 20, quantity: 20 },
+          ],
+        },
       );
-      expect(cart.products).toEqual([
-        { id: 10, name: 'product 10' },
-        { id: 20, name: 'product 20' },
+      expect(cart.items).toEqual([
+        { quantity: 10, product: { id: 10, name: 'product 10' } },
+        { quantity: 20, product: { id: 20, name: 'product 20' } },
       ]);
     });
   });

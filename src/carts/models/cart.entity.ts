@@ -2,14 +2,13 @@ import {
   Column,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/models/user.entity';
-import { Product } from '../../catalog/products/models/product.entity';
+import { CartItem } from './cart-item.entity';
 
 @Entity('carts')
 export class Cart {
@@ -26,10 +25,9 @@ export class Cart {
   @Column({ nullable: true })
   sessionId?: string;
 
-  @ManyToMany(() => Product, {
+  @OneToMany(() => CartItem, (item) => item.cart, {
+    cascade: true,
     eager: true,
-    onDelete: 'CASCADE',
   })
-  @JoinTable()
-  products: Product[];
+  items: CartItem[];
 }

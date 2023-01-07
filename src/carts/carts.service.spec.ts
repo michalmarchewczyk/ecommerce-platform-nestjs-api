@@ -33,13 +33,13 @@ describe('CartsService', () => {
     it('should create users cart if it does not exist', async () => {
       const cart = await service.getCart({ id: 1 } as User);
       expect(cart).toBeDefined();
-      expect(cart.products).toEqual([]);
+      expect(cart.items).toEqual([]);
     });
 
     it('should create session cart if it does not exist', async () => {
       const cart = await service.getCart(null, '123456789');
       expect(cart).toBeDefined();
-      expect(cart.products).toEqual([]);
+      expect(cart.items).toEqual([]);
     });
 
     it('should return users cart if it exists', async () => {
@@ -58,19 +58,36 @@ describe('CartsService', () => {
   describe('updateCart', () => {
     it('should update users cart', async () => {
       const cart = await service.getCart({ id: 3 } as User);
-      await service.updateCart({ productIds: [1, 2] }, { id: 3 } as User);
-      expect(cart.products).toEqual([
-        { id: 1, name: 'product 1' },
-        { id: 2, name: 'product 2' },
+      await service.updateCart(
+        {
+          items: [
+            { productId: 1, quantity: 1 },
+            { productId: 2, quantity: 2 },
+          ],
+        },
+        { id: 3 } as User,
+      );
+      expect(cart.items).toEqual([
+        { quantity: 1, product: { id: 1, name: 'product 1' } },
+        { quantity: 2, product: { id: 2, name: 'product 2' } },
       ]);
     });
 
     it('should update session cart', async () => {
       const cart = await service.getCart(null, '123');
-      await service.updateCart({ productIds: [10, 20] }, null, '123');
-      expect(cart.products).toEqual([
-        { id: 10, name: 'product 10' },
-        { id: 20, name: 'product 20' },
+      await service.updateCart(
+        {
+          items: [
+            { productId: 10, quantity: 10 },
+            { productId: 20, quantity: 20 },
+          ],
+        },
+        null,
+        '123',
+      );
+      expect(cart.items).toEqual([
+        { quantity: 10, product: { id: 10, name: 'product 10' } },
+        { quantity: 20, product: { id: 20, name: 'product 20' } },
       ]);
     });
   });

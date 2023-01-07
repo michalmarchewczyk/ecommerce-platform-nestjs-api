@@ -70,7 +70,7 @@ describe('CartsController (e2e)', () => {
         sessionId: null,
         user: expect.any(Object),
         updated: expect.any(String),
-        products: [],
+        items: [],
       });
     });
 
@@ -83,7 +83,7 @@ describe('CartsController (e2e)', () => {
         id: expect.any(Number),
         sessionId: expect.any(String),
         updated: expect.any(String),
-        products: [],
+        items: [],
       });
     });
   });
@@ -94,14 +94,17 @@ describe('CartsController (e2e)', () => {
         .put('/carts/my')
         .set('Cookie', cookieHeaderUser)
         .send({
-          productIds: [testProduct.id],
+          items: [{ quantity: 2, productId: testProduct.id }],
         });
       expect(response.status).toBe(200);
       const response2 = await request(app.getHttpServer())
         .get('/carts/my')
         .set('Cookie', cookieHeaderUser);
-      expect(response2.body.products).toHaveLength(1);
-      expect(response2.body.products[0]).toMatchObject(testProduct);
+      expect(response2.body.items).toHaveLength(1);
+      expect(response2.body.items[0]).toMatchObject({
+        quantity: 2,
+        product: testProduct,
+      });
     });
 
     it('should update session cart with products', async () => {
@@ -109,14 +112,17 @@ describe('CartsController (e2e)', () => {
         .put('/carts/my')
         .set('Cookie', cookieHeaderSession)
         .send({
-          productIds: [testProduct.id],
+          items: [{ quantity: 1, productId: testProduct.id }],
         });
       expect(response.status).toBe(200);
       const response2 = await request(app.getHttpServer())
         .get('/carts/my')
         .set('Cookie', cookieHeaderSession);
-      expect(response2.body.products).toHaveLength(1);
-      expect(response2.body.products[0]).toMatchObject(testProduct);
+      expect(response2.body.items).toHaveLength(1);
+      expect(response2.body.items[0]).toMatchObject({
+        quantity: 1,
+        product: testProduct,
+      });
     });
   });
 

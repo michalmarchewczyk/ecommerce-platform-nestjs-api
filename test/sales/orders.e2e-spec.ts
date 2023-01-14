@@ -115,6 +115,41 @@ describe.only('OrdersController (e2e)', () => {
     });
   });
 
+  describe('/orders/my (GET)', () => {
+    it('should return current user orders', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          ...testUsers.getCredentials(Role.Customer),
+        });
+      const cookieHeader = response.headers['set-cookie'];
+      const createData = generate(OrderCreateDto);
+      createData.items = [{ productId: testProduct.id, quantity: 1 }];
+      createData.delivery = generate(OrderDeliveryDto);
+      createData.delivery.methodId = testDeliveryMethod.id;
+      createData.payment = generate(OrderPaymentDto);
+      createData.payment.methodId = testPaymentMethod.id;
+      const response2 = await request(app.getHttpServer())
+        .post('/orders')
+        .set('Cookie', cookieHeader)
+        .send(createData);
+      const response3 = await request(app.getHttpServer())
+        .get(`/orders/my`)
+        .set('Cookie', cookieHeader);
+      expect(response3.status).toBe(200);
+      const { products, user, delivery, payment, ...expected } = response2.body;
+      expect(response3.body).toContainEqual({
+        ...expected,
+        status: 'pending',
+        items: [expect.any(Object)],
+        user: expect.any(Object),
+        delivery: expect.any(Object),
+        payment: expect.any(Object),
+        return: null,
+      });
+    });
+  });
+
   describe('/orders/:id (GET)', () => {
     it('should return order with given id', async () => {
       const response = await request(app.getHttpServer())
@@ -155,7 +190,7 @@ describe.only('OrdersController (e2e)', () => {
         .get(`/orders/${id}`)
         .set('Cookie', cookieHeader);
       expect(response3.status).toBe(200);
-      const { products, user, delivery, payment, ...expected } = response3.body;
+      const { products, user, delivery, payment, ...expected } = response2.body;
       expect(response3.body).toEqual({
         ...expected,
         status: 'pending',
@@ -163,6 +198,7 @@ describe.only('OrdersController (e2e)', () => {
         user: expect.any(Object),
         delivery: expect.any(Object),
         payment: expect.any(Object),
+        return: null,
       });
     });
 
@@ -515,6 +551,10 @@ describe.only('OrdersController (e2e)', () => {
       () => testUsers,
       [
         ['/orders (GET)', [Role.Admin, Role.Manager, Role.Sales]],
+        [
+          '/orders/my (GET)',
+          [Role.Admin, Role.Manager, Role.Sales, Role.Customer],
+        ],
         ['/orders/:id (GET)', [Role.Admin, Role.Manager, Role.Sales]],
         [
           '/orders (POST)',

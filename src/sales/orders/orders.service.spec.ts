@@ -92,6 +92,24 @@ describe('OrdersService', () => {
     });
   });
 
+  describe('getUserOrders', () => {
+    it('should return an array of user orders', async () => {
+      const ordersData = generate(OrderCreateDto, false, 4);
+      const ordersData2 = generate(OrderCreateDto, false, 4);
+      mockOrdersRepository.save(
+        ordersData.map((order) => ({ ...order, user: { id: 1 } })),
+      );
+      mockOrdersRepository.save(
+        ordersData2.map((order) => ({ ...order, user: { id: 2 } })),
+      );
+      const orders = await service.getUserOrders(1);
+      expect(orders).toHaveLength(4);
+      expect(orders).toEqual(
+        mockOrdersRepository.entities.filter((e) => e.user?.id === 1),
+      );
+    });
+  });
+
   describe('getOrder', () => {
     it('should return an order with given id', async () => {
       const createData = generate(OrderCreateDto, false);

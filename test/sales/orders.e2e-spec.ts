@@ -539,7 +539,9 @@ describe.only('OrdersController (e2e)', () => {
       expect(response.body).toEqual({
         statusCode: 400,
         error: 'Bad Request',
-        message: ['status must be a valid enum value'],
+        message: [
+          'status must be one of the following values: pending, failed, confirmed, open, cancelled, delivered, refunded',
+        ],
       });
     });
   });

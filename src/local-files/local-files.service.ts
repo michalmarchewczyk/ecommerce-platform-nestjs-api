@@ -16,8 +16,8 @@ export class LocalFilesService {
       disposition: 'inline',
     });
 
-    res.setErrorHandler((err, response) => {
-      response.send('ERROR');
+    res.setErrorHandler(() => {
+      return;
     });
 
     return res;

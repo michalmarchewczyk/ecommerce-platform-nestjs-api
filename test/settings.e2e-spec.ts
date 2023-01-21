@@ -138,7 +138,9 @@ describe('SettingsController (e2e)', () => {
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
         statusCode: 400,
-        message: ['type must be a valid enum value'],
+        message: [
+          'type must be one of the following values: boolean, number, string, currencyCode, currenciesList, country, countriesList',
+        ],
         error: 'Bad Request',
       });
     });

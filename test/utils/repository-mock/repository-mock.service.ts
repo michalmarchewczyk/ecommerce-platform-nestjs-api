@@ -28,7 +28,7 @@ export class RepositoryMockService<T extends { [key: string]: any }> {
   private currentId = 1;
   private readonly primaryName: string;
 
-  static getProvider<U>(entity: {
+  static getProvider<U extends { [key: string]: any }>(entity: {
     new (): U;
   }): ValueProvider<RepositoryMockService<U>> {
     return {

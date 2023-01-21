@@ -82,7 +82,11 @@ export class DtoGeneratorService {
   public generate<T>(dto: { new (): T }, full?: boolean, count?: 1): T;
   public generate<T>(dto: { new (): T }, full?: boolean, count?: number): T[];
 
-  public generate<T>(dto: { new (): T }, full = false, count = 1): T | T[] {
+  public generate<T extends { [key: string]: any }>(
+    dto: { new (): T },
+    full = false,
+    count = 1,
+  ): T | T[] {
     if (count !== 1) {
       const entities: T[] = [];
       for (let i = 0; i < count; i++) {

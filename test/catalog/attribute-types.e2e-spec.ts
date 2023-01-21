@@ -93,7 +93,7 @@ describe('AttributeTypesController (e2e)', () => {
         statusCode: 400,
         message: [
           'name should not be empty',
-          'valueType must be a valid enum value',
+          'valueType must be one of the following values: string, number, boolean, color',
         ],
         error: 'Bad Request',
       });
@@ -134,7 +134,7 @@ describe('AttributeTypesController (e2e)', () => {
         statusCode: 400,
         message: [
           'name should not be empty',
-          'valueType must be a valid enum value',
+          'valueType must be one of the following values: string, number, boolean, color',
         ],
         error: 'Bad Request',
       });

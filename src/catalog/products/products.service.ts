@@ -38,6 +38,7 @@ export class ProductsService {
   async createProduct(productData: ProductCreateDto): Promise<Product> {
     const product = new Product();
     Object.assign(product, productData);
+    product.photosOrder = '';
     return this.productsRepository.save(product);
   }
 

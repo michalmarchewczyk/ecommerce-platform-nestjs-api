@@ -113,7 +113,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
-        photosOrder: null,
+        photosOrder: '',
       });
     });
 
@@ -335,7 +335,7 @@ describe('ProductsController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
-        photosOrder: null,
+        photosOrder: '',
         attributes: [
           {
             id: expect.any(Number),

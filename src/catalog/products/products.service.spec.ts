@@ -67,7 +67,7 @@ describe('ProductsService', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
-        photosOrder: null,
+        photosOrder: '',
       });
     });
   });
@@ -85,7 +85,7 @@ describe('ProductsService', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
-        photosOrder: null,
+        photosOrder: '',
       });
       expect(
         mockProductsRepository.entities.some((p) => p.name === createData.name),
@@ -167,7 +167,7 @@ describe('ProductsService', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
-        photosOrder: null,
+        photosOrder: '',
       });
       expect(
         mockProductsRepository.entities.find((p) => p.id === id)?.attributes,

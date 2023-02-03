@@ -45,7 +45,10 @@ export class RepositoryMockService<T extends { [key: string]: any }> {
       const options = column.options;
       let def;
       if ('mode' in column) {
-        def = column.options.default ? () => column.options.default : null;
+        def =
+          typeof column.options.default !== 'undefined'
+            ? () => column.options.default
+            : null;
       } else {
         def = column.relationType.endsWith('many') ? () => [] : null;
       }

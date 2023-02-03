@@ -65,7 +65,7 @@ describe('ProductPhotosController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
-        photosOrder: null,
+        photosOrder: expect.any(String),
         attributes: [],
         photos: [
           {
@@ -108,7 +108,7 @@ describe('ProductPhotosController (e2e)', () => {
         visible: true,
         created: expect.any(String),
         updated: expect.any(String),
-        photosOrder: null,
+        photosOrder: expect.any(String),
         attributes: [],
         photos: [
           {

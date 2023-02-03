@@ -78,6 +78,8 @@ export class ProductPhotosService {
       product.photosOrder = [...product.photosOrder.split(','), photo.id].join(
         ',',
       );
+    } else {
+      product.photosOrder = photo.id?.toString();
     }
     return this.productsRepository.save(product);
   }

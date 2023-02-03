@@ -50,7 +50,7 @@ export class Product {
   })
   photos: ProductPhoto[];
 
-  @Column()
+  @Column({ default: '' })
   photosOrder: string;
 
   @OneToMany(() => ProductRating, (rating) => rating.product, {

@@ -79,7 +79,7 @@ export class ProductPhotosService {
         ',',
       );
     } else {
-      product.photosOrder = photo.id.toString();
+      product.photosOrder = photo.id?.toString();
     }
     return this.productsRepository.save(product);
   }

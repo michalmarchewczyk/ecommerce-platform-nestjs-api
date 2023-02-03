@@ -71,7 +71,7 @@ describe('ProductsController', () => {
         created: expect.any(Date),
         updated: expect.any(Date),
         ratings: [],
-        photosOrder: null,
+        photosOrder: '',
       });
     });
 
@@ -92,7 +92,7 @@ describe('ProductsController', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
-        photosOrder: null,
+        photosOrder: '',
       });
     });
   });
@@ -173,7 +173,7 @@ describe('ProductsController', () => {
         attributes: expectedAttributes,
         created: expect.any(Date),
         updated: expect.any(Date),
-        photosOrder: null,
+        photosOrder: '',
       });
     });
 

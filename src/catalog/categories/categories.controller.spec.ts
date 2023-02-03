@@ -205,7 +205,7 @@ describe('CategoriesController', () => {
         ratings: [],
         created: expect.any(Date),
         updated: expect.any(Date),
-        photosOrder: null,
+        photosOrder: '',
       });
       expect(
         mockCategoriesRepository.entities.find((c) => c.id === id)?.products,

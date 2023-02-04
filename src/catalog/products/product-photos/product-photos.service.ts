@@ -54,6 +54,14 @@ export class ProductPhotosService {
     );
     product.photos.push(photo);
     await this.productsRepository.save(product);
+    if (product.photosOrder) {
+      product.photosOrder = [...product.photosOrder.split(','), photo.id].join(
+        ',',
+      );
+    } else {
+      product.photosOrder = photo.id?.toString();
+    }
+    await this.productsRepository.save(product);
     return photo;
   }
 

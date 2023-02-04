@@ -57,6 +57,9 @@ export class ZipSerializer implements FileSerializer {
 
   private async parseCsv(csv: string) {
     const parser: Record<string, any> = {};
+    if (!csv) {
+      return [];
+    }
     const headers = (
       await csvtojson({
         output: 'csv',
@@ -95,6 +98,10 @@ export class ZipSerializer implements FileSerializer {
         const parsed = json2csv.parse(data[field]);
         const filePath = path.join(os.tmpdir(), `${field}.csv`);
         await fs.writeFile(filePath, parsed);
+        files.push(`${field}.csv`);
+      } else {
+        const filePath = path.join(os.tmpdir(), `${field}.csv`);
+        await fs.writeFile(filePath, '');
         files.push(`${field}.csv`);
       }
     }

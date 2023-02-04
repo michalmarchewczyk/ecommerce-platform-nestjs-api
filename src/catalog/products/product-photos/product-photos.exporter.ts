@@ -10,6 +10,16 @@ export class ProductPhotosExporter implements Exporter<ProductPhoto> {
 
   async export(): Promise<ProductPhoto[]> {
     const productPhotos = await this.productPhotosService.getProductPhotos();
+    productPhotos.sort((a, b) => {
+      if (a.product.id !== b.product.id) {
+        return a.product.id - b.product.id;
+      }
+      const photosOrder = a.product.photosOrder.split(',');
+      return (
+        photosOrder.indexOf(a.id.toString()) -
+        photosOrder.indexOf(b.id.toString())
+      );
+    });
     const preparedProductPhotos: ProductPhoto[] = [];
     for (const productPhoto of productPhotos) {
       preparedProductPhotos.push(this.prepareProductPhoto(productPhoto));

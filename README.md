@@ -1,6 +1,6 @@
 # E-Commerce Platform - NestJS API
 
-REST API for the E-commerce Platform project.
+REST API for the [E-commerce Platform project](https://github.com/michalmarchewczyk/ecommerce-platform)
 
 [![GitHub](https://img.shields.io/github/license/michalmarchewczyk/ecommerce-platform-nestjs-api)](LICENSE)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/michalmarchewczyk/ecommerce-platform-nestjs-api/main.yml?label=CI)](https://github.com/michalmarchewczyk/ecommerce-platform-nestjs-api/actions/workflows/main.yml)

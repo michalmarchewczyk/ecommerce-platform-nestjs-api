@@ -212,6 +212,7 @@ describe('ProductRatingPhotosController (e2e)', () => {
             mimeType: 'image/jpeg',
             path: expect.any(String),
             thumbnailPath: expect.any(String),
+            placeholderBase64: expect.any(String),
           },
         ],
       });
@@ -220,6 +221,7 @@ describe('ProductRatingPhotosController (e2e)', () => {
         mimeType: 'image/jpeg',
         path: expect.any(String),
         thumbnailPath: expect.any(String),
+        placeholderBase64: expect.any(String),
       });
     });
 

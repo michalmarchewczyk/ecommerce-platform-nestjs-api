@@ -32,6 +32,7 @@ describe('ProductPhotosController', () => {
               mimeType: v.mimetype,
             })),
             createPhotoThumbnail: jest.fn((v: string) => v + '-thumbnail'),
+            createPhotoPlaceholder: jest.fn(() => 'placeholder'),
           },
         },
       ],
@@ -62,6 +63,7 @@ describe('ProductPhotosController', () => {
           path: fileMetadata.path,
           mimeType: 'image/jpeg',
           thumbnailPath: fileMetadata.path + '-thumbnail',
+          placeholderBase64: 'placeholder',
         },
       ]);
     });

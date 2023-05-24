@@ -54,4 +54,11 @@ export class LocalFilesService {
       .toFile(outputPath);
     return outputPath;
   }
+
+  async createPhotoPlaceholder(path: string): Promise<string> {
+    const res = await sharp(path)
+      .resize(12, 12, { fit: 'contain', background: '#ffffff' })
+      .toBuffer();
+    return `data:image/png;base64,${res.toString('base64')}`;
+  }
 }

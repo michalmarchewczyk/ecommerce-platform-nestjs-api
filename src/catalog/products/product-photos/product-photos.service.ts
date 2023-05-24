@@ -52,6 +52,8 @@ export class ProductPhotosService {
     photo.thumbnailPath = await this.localFilesService.createPhotoThumbnail(
       photo.path,
     );
+    photo.placeholderBase64 =
+      await this.localFilesService.createPhotoPlaceholder(photo.path);
     product.photos.push(photo);
     await this.productsRepository.save(product);
     if (product.photosOrder) {
@@ -80,6 +82,8 @@ export class ProductPhotosService {
     photo.thumbnailPath = await this.localFilesService.createPhotoThumbnail(
       file.path,
     );
+    photo.placeholderBase64 =
+      await this.localFilesService.createPhotoPlaceholder(file.path);
     product.photos.push(photo);
     await this.productsRepository.save(product);
     if (product.photosOrder) {

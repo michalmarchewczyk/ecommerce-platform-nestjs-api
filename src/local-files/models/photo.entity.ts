@@ -12,4 +12,7 @@ export abstract class Photo {
 
   @Column()
   thumbnailPath: string;
+
+  @Column({ nullable: true })
+  placeholderBase64: string;
 }

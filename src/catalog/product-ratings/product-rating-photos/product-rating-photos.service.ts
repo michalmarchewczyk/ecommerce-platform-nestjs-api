@@ -69,6 +69,8 @@ export class ProductRatingPhotosService {
     photo.thumbnailPath = await this.localFilesService.createPhotoThumbnail(
       file.path,
     );
+    photo.placeholderBase64 =
+      await this.localFilesService.createPhotoPlaceholder(file.path);
     productRating.photos.push(photo);
     return this.productRatingsRepository.save(productRating);
   }

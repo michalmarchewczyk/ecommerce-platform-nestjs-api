@@ -73,6 +73,7 @@ describe('ProductPhotosController (e2e)', () => {
             mimeType: 'image/jpeg',
             path: expect.any(String),
             thumbnailPath: expect.any(String),
+            placeholderBase64: expect.any(String),
           },
         ],
       });
@@ -81,6 +82,7 @@ describe('ProductPhotosController (e2e)', () => {
         mimeType: 'image/jpeg',
         path: expect.any(String),
         thumbnailPath: expect.any(String),
+        placeholderBase64: expect.any(String),
       });
     });
 
@@ -116,6 +118,7 @@ describe('ProductPhotosController (e2e)', () => {
             mimeType: 'image/png',
             path: expect.any(String),
             thumbnailPath: expect.any(String),
+            placeholderBase64: expect.any(String),
           },
         ],
       });
@@ -124,6 +127,7 @@ describe('ProductPhotosController (e2e)', () => {
         mimeType: 'image/png',
         path: expect.any(String),
         thumbnailPath: expect.any(String),
+        placeholderBase64: expect.any(String),
       });
     });
 

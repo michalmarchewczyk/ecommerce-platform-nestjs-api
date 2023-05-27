@@ -29,6 +29,7 @@ export class Order {
 
   @ManyToOne(() => User, {
     nullable: true,
+    onDelete: 'SET NULL',
   })
   user?: User;
 

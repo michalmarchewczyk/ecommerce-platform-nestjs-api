@@ -18,7 +18,11 @@ export class Cart {
   @UpdateDateColumn()
   updated: Date;
 
-  @OneToOne(() => User, { nullable: true, orphanedRowAction: 'delete' })
+  @OneToOne(() => User, {
+    nullable: true,
+    orphanedRowAction: 'delete',
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   user?: User;
 

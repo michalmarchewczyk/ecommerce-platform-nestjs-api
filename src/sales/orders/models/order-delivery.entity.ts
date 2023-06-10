@@ -21,7 +21,7 @@ export class OrderDelivery {
 
   @ManyToOne(() => DeliveryMethod, {
     eager: true,
-    onDelete: 'RESTRICT',
+    onDelete: 'SET NULL',
     orphanedRowAction: 'nullify',
   })
   method: DeliveryMethod;

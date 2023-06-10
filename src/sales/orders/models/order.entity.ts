@@ -48,7 +48,7 @@ export class Order {
   @OneToOne(() => OrderDelivery, (delivery) => delivery.order, {
     cascade: true,
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
+    onDelete: 'RESTRICT',
     nullable: false,
   })
   @JoinColumn()
@@ -57,7 +57,7 @@ export class Order {
   @OneToOne(() => OrderPayment, (payment) => payment.order, {
     cascade: true,
     onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
+    onDelete: 'RESTRICT',
     nullable: false,
   })
   @JoinColumn()

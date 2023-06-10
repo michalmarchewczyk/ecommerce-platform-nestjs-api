@@ -21,7 +21,7 @@ export class OrderPayment {
 
   @ManyToOne(() => PaymentMethod, {
     eager: true,
-    onDelete: 'RESTRICT',
+    onDelete: 'SET NULL',
     orphanedRowAction: 'nullify',
   })
   method: PaymentMethod;

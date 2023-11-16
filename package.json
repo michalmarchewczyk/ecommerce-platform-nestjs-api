@@ -46,7 +46,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.8.0",
-    "sharp": "^0.31.3",
+    "sharp": "^0.32.6",
     "tar": "^6.1.13",
     "typeorm": "^0.3.15",
     "validator": "^13.7.0"
